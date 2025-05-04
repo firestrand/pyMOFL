@@ -15,7 +15,7 @@ class OptimizationFunction(ABC):
         _bounds (np.ndarray): A 2D array of shape (dimension, 2) representing [lower, upper] bounds.
     """
     
-    def __init__(self, dimension: int, bounds: np.ndarray = None):
+    def __init__(self, dimension: int, bias: float = 0.0, bounds: np.ndarray = None):
         """
         Initialize the optimization function with the given dimension and bounds.
         
@@ -25,6 +25,7 @@ class OptimizationFunction(ABC):
                                            Defaults to [-100, 100] for each dimension if not provided.
         """
         self.dimension = dimension
+        self.bias = bias
         if bounds is None:
             # Set default bounds to [-100, 100] for each dimension
             self._bounds = np.array([[-100, 100]] * dimension)
@@ -42,6 +43,51 @@ class OptimizationFunction(ABC):
             np.ndarray: A 2D array of shape (dimension, 2) with lower and upper bounds.
         """
         return self._bounds
+    
+    def _validate_input(self, x: np.ndarray) -> np.ndarray:
+        """
+        Validate and preprocess the input for evaluation.
+        
+        Args:
+            x (np.ndarray): A point in the search space.
+            
+        Returns:
+            np.ndarray: The validated and preprocessed input.
+            
+        Raises:
+            ValueError: If the input dimension does not match the function's dimension.
+        """
+        # Ensure x is a numpy array
+        x = np.array(x)
+        
+        # Check if the input has the correct dimension
+        if x.size != self.dimension:
+            raise ValueError(f"Expected input dimension {self.dimension}, got {x.size}")
+        
+        # Apply ravel to ensure consistent shape
+        return x.ravel()
+    
+    def _validate_batch_input(self, X: np.ndarray) -> np.ndarray:
+        """
+        Validate and preprocess the batch input for evaluation.
+        
+        Args:
+            X (np.ndarray): A batch of points in the search space.
+            
+        Returns:
+            np.ndarray: The validated and preprocessed batch input.
+            
+        Raises:
+            ValueError: If the input dimension does not match the function's dimension.
+        """
+        # Ensure X is a numpy array
+        X = np.asarray(X)
+        
+        # Check if the input has the correct shape
+        if X.shape[1] != self.dimension:
+            raise ValueError(f"Expected input dimension {self.dimension}, got {X.shape[1]}")
+        
+        return X
     
     @abstractmethod
     def evaluate(self, x: np.ndarray) -> float:
@@ -66,6 +112,9 @@ class OptimizationFunction(ABC):
         Returns:
             np.ndarray: A 1D array containing the function values for each point in `X`.
         """
+        # Validate the batch input
+        X = self._validate_batch_input(X)
+        
         # This default implementation uses a list comprehension.
         # Derived classes can override this method for better performance if needed.
         return np.array([self.evaluate(x) for x in X])

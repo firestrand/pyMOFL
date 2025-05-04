@@ -66,12 +66,8 @@ class RotatedFunction(OptimizationFunction):
         Returns:
             float: The function value at point x.
         """
-        # Ensure x is a numpy array
-        x = np.asarray(x)
-        
-        # Check if the input has the correct dimension
-        if x.shape[0] != self.dimension:
-            raise ValueError(f"Expected input dimension {self.dimension}, got {x.shape[0]}")
+        # Validate and preprocess the input
+        x = self._validate_input(x)
         
         # Apply the rotation transformation and evaluate the base function
         rotated_x = self.rotation_matrix.dot(x)
@@ -87,12 +83,8 @@ class RotatedFunction(OptimizationFunction):
         Returns:
             np.ndarray: The function values for each point.
         """
-        # Ensure X is a numpy array
-        X = np.asarray(X)
-        
-        # Check if the input has the correct shape
-        if X.shape[1] != self.dimension:
-            raise ValueError(f"Expected input dimension {self.dimension}, got {X.shape[1]}")
+        # Validate the batch input
+        X = self._validate_batch_input(X)
         
         # Apply the rotation transformation and evaluate the base function
         rotated_X = np.dot(X, self.rotation_matrix.T)

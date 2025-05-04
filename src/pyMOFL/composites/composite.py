@@ -52,7 +52,7 @@ class CompositeFunction(OptimizationFunction):
         if bounds is None:
             bounds = components[0].bounds
         
-        super().__init__(dimension, bounds)
+        super().__init__(dimension, 0.0, bounds)
         
         # Store the components and parameters
         self.components = components
@@ -74,12 +74,8 @@ class CompositeFunction(OptimizationFunction):
         Returns:
             float: The function value at point x.
         """
-        # Ensure x is a numpy array
-        x = np.asarray(x)
-        
-        # Check if the input has the correct dimension
-        if x.shape[0] != self.dimension:
-            raise ValueError(f"Expected input dimension {self.dimension}, got {x.shape[0]}")
+        # Validate and preprocess the input
+        x = self._validate_input(x)
         
         # Evaluate each component and compute the weights
         weights = np.zeros(len(self.components))
@@ -109,30 +105,4 @@ class CompositeFunction(OptimizationFunction):
             weights[np.argmin(self.biases)] = 1.0
         
         # Compute the weighted sum
-        return float(np.dot(weights, values))
-    
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
-        """
-        Evaluate the composite function on a batch of points.
-        
-        Args:
-            X (np.ndarray): A batch of points in the search space.
-            
-        Returns:
-            np.ndarray: The function values for each point.
-        """
-        # Ensure X is a numpy array
-        X = np.asarray(X)
-        
-        # Check if the input has the correct shape
-        if X.shape[1] != self.dimension:
-            raise ValueError(f"Expected input dimension {self.dimension}, got {X.shape[1]}")
-        
-        # Initialize the result array
-        result = np.zeros(X.shape[0])
-        
-        # Evaluate each point
-        for i in range(X.shape[0]):
-            result[i] = self.evaluate(X[i])
-        
-        return result 
+        return float(np.dot(weights, values)) 

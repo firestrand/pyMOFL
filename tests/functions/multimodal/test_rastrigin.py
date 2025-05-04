@@ -1,5 +1,5 @@
 """
-Tests for multimodal benchmark functions.
+Tests for the Rastrigin function.
 """
 
 import pytest

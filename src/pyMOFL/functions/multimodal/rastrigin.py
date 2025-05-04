@@ -3,6 +3,13 @@ Rastrigin function implementation.
 
 The Rastrigin function is a non-convex multimodal benchmark function with many local minima.
 It is often used to test the ability of optimization algorithms to escape local optima.
+
+References:
+    .. [1] Rastrigin, L.A. (1974). "Systems of extremal control". Mir, Moscow.
+    .. [2] Adorio, E.P., & Diliman, U.P. (2005). MVF - "Multivariate Test Functions Library in C for 
+           Unconstrained Global Optimization", 2005.
+    .. [3] Mühlenbein, H., Schomisch, D., & Born, J. (1991). "The parallel genetic algorithm as function 
+           optimizer". Parallel Computing, 17(6-7), 619-632.
 """
 
 import numpy as np
@@ -18,9 +25,14 @@ class RastriginFunction(OptimizationFunction):
     Attributes:
         dimension (int): The dimensionality of the function.
         bounds (np.ndarray): Default bounds are [-5.12, 5.12] for each dimension.
+        
+    References:
+        .. [1] Rastrigin, L.A. (1974). "Systems of extremal control". Mir, Moscow.
+        .. [2] Mühlenbein, H., Schomisch, D., & Born, J. (1991). "The parallel genetic algorithm as function 
+               optimizer". Parallel Computing, 17(6-7), 619-632.
     """
     
-    def __init__(self, dimension: int, bounds: np.ndarray = None):
+    def __init__(self, dimension: int, bias: float = 0.0, bounds: np.ndarray = None):
         """
         Initialize the Rastrigin function.
         
@@ -33,7 +45,7 @@ class RastriginFunction(OptimizationFunction):
         if bounds is None:
             bounds = np.array([[-5.12, 5.12]] * dimension)
         
-        super().__init__(dimension, bounds)
+        super().__init__(dimension, bias, bounds)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -45,15 +57,11 @@ class RastriginFunction(OptimizationFunction):
         Returns:
             float: The function value at point x.
         """
-        # Ensure x is a numpy array
-        x = np.asarray(x)
+        # Validate and preprocess the input
+        x = self._validate_input(x)
         
-        # Check if the input has the correct dimension
-        if x.shape[0] != self.dimension:
-            raise ValueError(f"Expected input dimension {self.dimension}, got {x.shape[0]}")
-        
-        # Compute the function value using vectorized operations
-        return float(10 * self.dimension + np.sum(x**2 - 10 * np.cos(2 * np.pi * x)))
+        # Compute the function value using the optimized formula
+        return float(np.sum(x**2 - 10 * np.cos(2 * np.pi * x) + 10) + self.bias)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -65,12 +73,9 @@ class RastriginFunction(OptimizationFunction):
         Returns:
             np.ndarray: The function values for each point.
         """
-        # Ensure X is a numpy array
-        X = np.asarray(X)
+        # Validate the batch input
+        X = self._validate_batch_input(X)
         
-        # Check if the input has the correct shape
-        if X.shape[1] != self.dimension:
-            raise ValueError(f"Expected input dimension {self.dimension}, got {X.shape[1]}")
-        
-        # Compute the function values using vectorized operations
-        return 10 * self.dimension + np.sum(X**2 - 10 * np.cos(2 * np.pi * X), axis=1) 
+        # Compute the function values using the optimized formula
+        # This is more efficient than calling evaluate for each point
+        return np.sum(X**2 - 10 * np.cos(2 * np.pi * X) + 10, axis=1) + self.bias
