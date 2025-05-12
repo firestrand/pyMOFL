@@ -42,15 +42,16 @@ class TripodFunction(OptimizationFunction):
                Technical report, Technical University of Gdańsk.
         .. [2] Clerc, M. (2012). "Standard PSO 2007/2011 Benchmark Documentation."
                Technical report, see also Zambrano-Bigiarini et al. (2013).
+               
+    Note:
+        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
     """
     
-    def __init__(self, bias: float = 0.0, bounds: np.ndarray = None):
+    def __init__(self, bounds: np.ndarray = None):
         """
         Initialize the Tripod function.
         
         Args:
-            bias (float, optional): A bias value added to the function value.
-                                    Defaults to 0.0.
             bounds (np.ndarray, optional): Bounds for each dimension.
                                           Defaults to [-100, 100] for each dimension.
         """
@@ -61,7 +62,7 @@ class TripodFunction(OptimizationFunction):
         if bounds is None:
             bounds = np.array([[-100, 100]] * dimension)
         
-        super().__init__(dimension, bias, bounds)
+        super().__init__(dimension, bounds)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -84,7 +85,7 @@ class TripodFunction(OptimizationFunction):
         term2 = np.abs(x[0] + 50 * p[1] * (1 - 2 * p[0]))
         term3 = np.abs(x[1] + 50 * (1 - 2 * p[1]))
         
-        return float(term1 + term2 + term3 + self.bias)
+        return float(term1 + term2 + term3)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -107,4 +108,23 @@ class TripodFunction(OptimizationFunction):
         term2 = np.abs(X[:, 0] + 50 * p[:, 1] * (1 - 2 * p[:, 0]))
         term3 = np.abs(X[:, 1] + 50 * (1 - 2 * p[:, 1]))
         
-        return term1 + term2 + term3 + self.bias 
+        return term1 + term2 + term3
+    
+    @staticmethod
+    def get_global_minimum(dimension: int = 2) -> tuple:
+        """
+        Get the global minimum of the function.
+        
+        Args:
+            dimension (int, optional): The dimension of the function. 
+                                      Defaults to 2, as Tripod is always 2D.
+            
+        Returns:
+            tuple: A tuple containing the global minimum point and the function value at that point.
+        """
+        if dimension != 2:
+            raise ValueError("Tripod function is only defined for 2 dimensions")
+            
+        global_min_point = np.array([0.0, -50.0])
+        global_min_value = 0.0
+        return global_min_point, global_min_value 

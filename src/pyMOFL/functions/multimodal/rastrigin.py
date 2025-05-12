@@ -30,9 +30,12 @@ class RastriginFunction(OptimizationFunction):
         .. [1] Rastrigin, L.A. (1974). "Systems of extremal control". Mir, Moscow.
         .. [2] Mühlenbein, H., Schomisch, D., & Born, J. (1991). "The parallel genetic algorithm as function 
                optimizer". Parallel Computing, 17(6-7), 619-632.
+               
+    Note:
+        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
     """
     
-    def __init__(self, dimension: int, bias: float = 0.0, bounds: np.ndarray = None):
+    def __init__(self, dimension: int, bounds: np.ndarray = None):
         """
         Initialize the Rastrigin function.
         
@@ -45,7 +48,7 @@ class RastriginFunction(OptimizationFunction):
         if bounds is None:
             bounds = np.array([[-5.12, 5.12]] * dimension)
         
-        super().__init__(dimension, bias, bounds)
+        super().__init__(dimension, bounds)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -61,7 +64,7 @@ class RastriginFunction(OptimizationFunction):
         x = self._validate_input(x)
         
         # Compute the function value using the optimized formula
-        return float(np.sum(x**2 - 10 * np.cos(2 * np.pi * x) + 10) + self.bias)
+        return float(np.sum(x**2 - 10 * np.cos(2 * np.pi * x) + 10))
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -78,4 +81,19 @@ class RastriginFunction(OptimizationFunction):
         
         # Compute the function values using the optimized formula
         # This is more efficient than calling evaluate for each point
-        return np.sum(X**2 - 10 * np.cos(2 * np.pi * X) + 10, axis=1) + self.bias
+        return np.sum(X**2 - 10 * np.cos(2 * np.pi * X) + 10, axis=1)
+    
+    @staticmethod
+    def get_global_minimum(dimension: int) -> tuple:
+        """
+        Get the global minimum of the function.
+        
+        Args:
+            dimension (int): The dimension of the function.
+            
+        Returns:
+            tuple: A tuple containing the global minimum point and the function value at that point.
+        """
+        global_min_point = np.zeros(dimension)
+        global_min_value = 0.0
+        return global_min_point, global_min_value

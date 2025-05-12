@@ -51,6 +51,9 @@ class LennardJonesFunction(OptimizationFunction):
                Basin-Hopping and the Lowest Energy Structures of Lennard-Jones
                Clusters Containing up to 110 Atoms." *J. Phys. Chem. A*, 101,
                5111-5116.
+    
+    Note:
+        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
     """
     
     # Reference minimum energies for different atom counts from SPSO 2011
@@ -76,14 +79,12 @@ class LennardJonesFunction(OptimizationFunction):
         15: -52.32
     }
     
-    def __init__(self, n_atoms: int = 6, bias: float = 0.0, bounds: np.ndarray = None):
+    def __init__(self, n_atoms: int = 6, bounds: np.ndarray = None):
         """
         Initialize the Lennard-Jones cluster function.
         
         Args:
             n_atoms (int, optional): Number of atoms in the cluster. Defaults to 6.
-            bias (float, optional): A bias value added to the energy value.
-                                   Defaults to 0.0.
             bounds (np.ndarray, optional): Bounds for each coordinate.
                                           Defaults to [-2, 2] for each coordinate.
         """
@@ -94,7 +95,7 @@ class LennardJonesFunction(OptimizationFunction):
         if bounds is None:
             bounds = np.array([[-2, 2]] * dimension)
         
-        super().__init__(dimension, bias, bounds)
+        super().__init__(dimension, bounds)
         
         self.n_atoms = n_atoms
         self.global_minimum = self.LJ_GLOBAL_MINIMA.get(n_atoms, None)
@@ -136,7 +137,7 @@ class LennardJonesFunction(OptimizationFunction):
                     # 4 * [(1/r)^12 - (1/r)^6]
                     energy += 4.0 * (inv_dist12 - inv_dist6)
         
-        return float(energy + self.bias)
+        return float(energy)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """

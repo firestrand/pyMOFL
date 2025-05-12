@@ -53,15 +53,16 @@ class NetworkFunction(OptimizationFunction):
     References:
         .. [1] Clerc, M. (2012). "Standard Particle Swarm Optimisation 2007/2011 - 
                Benchmark Suite and Descriptions". Technical Note, 21 pp.
+    
+    Note:
+        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
     """
     
-    def __init__(self, bias: float = 0.0, bounds: np.ndarray = None):
+    def __init__(self, bounds: np.ndarray = None):
         """
         Initialize the Network function.
         
         Args:
-            bias (float, optional): A bias value added to the function value.
-                                    Defaults to 0.0.
             bounds (np.ndarray, optional): Bounds for each dimension.
                                           If None, default bounds are used.
         """
@@ -83,7 +84,7 @@ class NetworkFunction(OptimizationFunction):
             # Combine bounds
             bounds = np.vstack((binary_bounds, continuous_bounds))
         
-        super().__init__(dimension, bias, bounds)
+        super().__init__(dimension, bounds)
         
         # Fixed BTS positions (from original implementation)
         self.bts_positions = np.array([
@@ -163,7 +164,7 @@ class NetworkFunction(OptimizationFunction):
                 # Add the distance to the objective value
                 f += np.sqrt(dx*dx + dy*dy)
         
-        return float(f + self.bias)
+        return float(f)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """

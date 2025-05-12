@@ -10,12 +10,15 @@ class OptimizationFunction(ABC):
     - Expose a `bounds` property representing the lower and upper limits for each dimension.
     - Optionally, implement or override `evaluate_batch(X)` for vectorized evaluations.
     
+    For function transformations like shifting, rotation, or adding bias, use the decorator 
+    classes provided in the `decorators` module rather than modifying the base functions.
+    
     Attributes:
         dimension (int): The dimensionality of the input space.
         _bounds (np.ndarray): A 2D array of shape (dimension, 2) representing [lower, upper] bounds.
     """
     
-    def __init__(self, dimension: int, bias: float = 0.0, bounds: np.ndarray = None):
+    def __init__(self, dimension: int, bounds: np.ndarray = None):
         """
         Initialize the optimization function with the given dimension and bounds.
         
@@ -23,9 +26,11 @@ class OptimizationFunction(ABC):
             dimension (int): The number of dimensions for the input.
             bounds (np.ndarray, optional): A 2D numpy array of shape (dimension, 2) for the bounds.
                                            Defaults to [-100, 100] for each dimension if not provided.
+        
+        Note:
+            To add a bias to the function, use the BiasedFunction decorator from the decorators module.
         """
         self.dimension = dimension
-        self.bias = bias
         if bounds is None:
             # Set default bounds to [-100, 100] for each dimension
             self._bounds = np.array([[-100, 100]] * dimension)

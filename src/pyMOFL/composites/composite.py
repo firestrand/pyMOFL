@@ -52,7 +52,7 @@ class CompositeFunction(OptimizationFunction):
         if bounds is None:
             bounds = components[0].bounds
         
-        super().__init__(dimension, 0.0, bounds)
+        super().__init__(dimension, bounds)
         
         # Store the components and parameters
         self.components = components

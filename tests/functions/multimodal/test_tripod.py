@@ -5,6 +5,7 @@ Tests for the Tripod function.
 import pytest
 import numpy as np
 from pyMOFL.functions.multimodal import TripodFunction
+from pyMOFL.decorators import BiasedFunction
 
 
 class TestTripodFunction:
@@ -25,59 +26,63 @@ class TestTripodFunction:
         assert func.bounds.shape == (2, 2)
         assert np.array_equal(func.bounds, custom_bounds)
     
-    def test_evaluate_global_minimum(self):
-        """Test the evaluate method at global minimum."""
+    def test_global_minimum(self):
+        """Test the function at its global minimum."""
         func = TripodFunction()
         
-        # Test at global minimum (0, -50)
-        np.testing.assert_allclose(func.evaluate(np.array([0, -50])), 0, atol=1e-10)
+        # Get global minimum
+        min_point, min_value = TripodFunction.get_global_minimum()
+        
+        # Verify global minimum point and value
+        np.testing.assert_allclose(min_point, np.array([0, -50]))
+        assert min_value == 0.0
+        
+        # Test evaluation at global minimum
+        np.testing.assert_allclose(func.evaluate(min_point), min_value, atol=1e-10)
+        
+        # Test with bias
+        bias_value = 10.0
+        biased_func = BiasedFunction(func, bias=bias_value)
+        np.testing.assert_allclose(biased_func.evaluate(min_point), min_value + bias_value, atol=1e-10)
     
-    def test_evaluate_quadrants(self):
-        """Test the function value in different quadrants of the plane."""
+    def test_function_values(self):
+        """Test function values at specific points in different quadrants."""
         func = TripodFunction()
         
-        # Quadrant I: x1 >= 0, x2 >= 0
-        # p(x1) = 1, p(x2) = 1
-        x = np.array([5, 10])
-        # term1 = 1 * (1 + 1) = 2
-        # term2 = |5 + 50 * 1 * (1 - 2 * 1)| = |5 - 50| = 45
-        # term3 = |10 + 50 * (1 - 2 * 1)| = |10 - 50| = 40
-        expected = 2 + 45 + 40
-        np.testing.assert_allclose(func.evaluate(x), expected)
+        # Test points and expected values
+        test_cases = [
+            # Global minimum
+            (np.array([0, -50]), 0.0),
+            
+            # Quadrant I: x1 >= 0, x2 >= 0
+            (np.array([5, 10]), 87.0),
+            
+            # Quadrant II: x1 < 0, x2 >= 0
+            (np.array([-5, 10]), 86.0),
+            
+            # Quadrant III: x1 < 0, x2 < 0
+            (np.array([-5, -10]), 45.0),
+            
+            # Quadrant IV: x1 >= 0, x2 < 0
+            (np.array([5, -10]), 45.0)
+        ]
         
-        # Quadrant II: x1 < 0, x2 >= 0
-        # p(x1) = 0, p(x2) = 1
-        x = np.array([-5, 10])
-        # term1 = 1 * (1 + 0) = 1
-        # term2 = |-5 + 50 * 1 * (1 - 2 * 0)| = |-5 + 50| = 45
-        # term3 = |10 + 50 * (1 - 2 * 1)| = |10 - 50| = 40
-        expected = 1 + 45 + 40
-        np.testing.assert_allclose(func.evaluate(x), expected)
+        # Test each point
+        for point, expected in test_cases:
+            np.testing.assert_allclose(func.evaluate(point), expected, atol=1e-14)
         
-        # Quadrant III: x1 < 0, x2 < 0
-        # p(x1) = 0, p(x2) = 0
-        x = np.array([-5, -10])
-        # term1 = 0 * (1 + 0) = 0
-        # term2 = |-5 + 50 * 0 * (1 - 2 * 0)| = |-5| = 5
-        # term3 = |-10 + 50 * (1 - 2 * 0)| = |-10 + 50| = 40
-        expected = 0 + 5 + 40
-        np.testing.assert_allclose(func.evaluate(x), expected)
-        
-        # Quadrant IV: x1 >= 0, x2 < 0
-        # p(x1) = 1, p(x2) = 0
-        x = np.array([5, -10])
-        # term1 = 0 * (1 + 1) = 0
-        # term2 = |5 + 50 * 0 * (1 - 2 * 1)| = |5| = 5
-        # term3 = |-10 + 50 * (1 - 2 * 0)| = |-10 + 50| = 40
-        expected = 0 + 5 + 40
-        np.testing.assert_allclose(func.evaluate(x), expected)
+        # Test with bias decorator
+        bias_value = 15.0
+        biased_func = BiasedFunction(func, bias=bias_value)
+        for point, expected in test_cases:
+            np.testing.assert_allclose(biased_func.evaluate(point), expected + bias_value, atol=1e-14)
     
     def test_evaluate_batch(self):
         """Test the evaluate_batch method."""
         func = TripodFunction()
         
-        # Test with batch of vectors
-        X = np.array([
+        # Create a batch of test points from different quadrants
+        points = np.array([
             [0, -50],  # global minimum
             [5, 10],   # quadrant I
             [-5, 10],  # quadrant II
@@ -85,15 +90,23 @@ class TestTripodFunction:
             [5, -10]   # quadrant IV
         ])
         
+        # Get expected values by individual evaluation
         expected = np.array([
-            0,
-            2 + 45 + 40,  # quadrant I
-            1 + 45 + 40,  # quadrant II
-            0 + 5 + 40,   # quadrant III
-            0 + 5 + 40    # quadrant IV
+            func.evaluate(points[0]),
+            func.evaluate(points[1]),
+            func.evaluate(points[2]),
+            func.evaluate(points[3]),
+            func.evaluate(points[4])
         ])
         
-        np.testing.assert_allclose(func.evaluate_batch(X), expected)
+        # Test batch evaluation
+        np.testing.assert_allclose(func.evaluate_batch(points), expected)
+        
+        # Test with bias decorator
+        bias_value = 7.5
+        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_results = biased_func.evaluate_batch(points)
+        np.testing.assert_allclose(biased_results, expected + bias_value)
     
     def test_dimension_validation(self):
         """Test that input dimension is validated correctly."""
@@ -105,6 +118,10 @@ class TestTripodFunction:
         
         with pytest.raises(ValueError):
             func.evaluate_batch(np.array([[1, 2, 3], [4, 5, 6]]))
+            
+        # Test global_minimum with wrong dimension
+        with pytest.raises(ValueError):
+            TripodFunction.get_global_minimum(dimension=3)
     
     def test_non_negativity(self):
         """Test that function values are non-negative for points in the domain."""
@@ -118,17 +135,25 @@ class TestTripodFunction:
         values = func.evaluate_batch(points)
         
         # Check that all values are non-negative
-        assert (values >= 0).all()
+        assert np.all(values >= 0)
+    
+    def test_bounds_respect(self):
+        """Test that bounds are properly respected."""
+        # Create function with specific bounds
+        bounds = np.array([[-50, 50], [-50, 50]])
+        func = TripodFunction(bounds=bounds)
         
-    def test_with_bias(self):
-        """Test function with a bias value."""
-        bias = 10.0
-        func = TripodFunction(bias=bias)
+        # Points at the bounds
+        edge_points = [
+            np.array([-50, 0]),
+            np.array([50, 0]),
+            np.array([0, -50]),
+            np.array([0, 50])
+        ]
         
-        # Test at global minimum
-        np.testing.assert_allclose(func.evaluate(np.array([0, -50])), bias, atol=1e-10)
-        
-        # Test at another point
-        x = np.array([5, 10])
-        expected = 2 + 45 + 40 + bias
-        np.testing.assert_allclose(func.evaluate(x), expected) 
+        # All points should be valid and evaluate without error
+        for point in edge_points:
+            # This should execute without error
+            value = func.evaluate(point)
+            assert isinstance(value, (int, float))
+            assert value >= 0 

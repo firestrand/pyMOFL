@@ -5,6 +5,7 @@ Tests for the Rosenbrock function.
 import pytest
 import numpy as np
 from pyMOFL.functions.unimodal import RosenbrockFunction
+from pyMOFL.decorators import BiasedFunction
 
 
 class TestRosenbrockFunction:
@@ -25,30 +26,102 @@ class TestRosenbrockFunction:
         assert func.bounds.shape == (2, 2)
         assert np.array_equal(func.bounds, custom_bounds)
     
-    def test_evaluate(self):
-        """Test the evaluate method."""
+    def test_global_minimum(self):
+        """Test the function at its global minimum."""
+        for dim in [2, 3, 5]:
+            # Get the global minimum
+            min_point, min_value = RosenbrockFunction.get_global_minimum(dim)
+            
+            # Create function
+            func = RosenbrockFunction(dimension=dim)
+            
+            # Verify global minimum point and value
+            np.testing.assert_allclose(min_point, np.ones(dim))
+            assert min_value == 0.0
+            
+            # Test at global minimum
+            np.testing.assert_allclose(func.evaluate(min_point), min_value)
+            
+            # Test with bias
+            bias_value = 10.0
+            biased_func = BiasedFunction(func, bias=bias_value)
+            np.testing.assert_allclose(biased_func.evaluate(min_point), min_value + bias_value)
+    
+    def test_function_values(self):
+        """Test function values at specific points."""
         func = RosenbrockFunction(dimension=2)
         
-        # Test at global minimum
-        assert func.evaluate(np.array([1, 1])) == 0
+        # Test points and expected values
+        test_cases = [
+            # Global minimum
+            (np.array([1, 1]), 0.0),
+            
+            # Origin point
+            (np.array([0, 0]), 1.0),
+            
+            # Arbitrary point
+            (np.array([2, 3]), 101.0)
+        ]
         
-        # Test at origin
-        # f(0,0) = (0-1)^2 + 100*(0-0^2)^2 = 1
-        assert func.evaluate(np.array([0, 0])) == 1
+        # Test each point
+        for point, expected in test_cases:
+            np.testing.assert_allclose(func.evaluate(point), expected)
         
-        # Test with arbitrary vector
-        # f(2,3) = (2-1)^2 + 100*(3-2^2)^2 = 1 + 100*1 = 101
-        x = np.array([2, 3])
-        assert func.evaluate(x) == 101
+        # Test with bias decorator
+        bias_value = 50.0
+        biased_func = BiasedFunction(func, bias=bias_value)
+        for point, expected in test_cases:
+            np.testing.assert_allclose(biased_func.evaluate(point), expected + bias_value)
+    
+    def test_higher_dimensions(self):
+        """Test the function in higher dimensions."""
+        func = RosenbrockFunction(dimension=3)
+        
+        # Test points and expected values
+        test_cases = [
+            # Global minimum
+            (np.array([1, 1, 1]), 0.0),
+            
+            # Arbitrary point
+            (np.array([2, 2, 2]), 802.0)
+        ]
+        
+        # Test each point
+        for point, expected in test_cases:
+            np.testing.assert_allclose(func.evaluate(point), expected)
+        
+        # Test with bias decorator
+        bias_value = 30.0
+        biased_func = BiasedFunction(func, bias=bias_value)
+        for point, expected in test_cases:
+            np.testing.assert_allclose(biased_func.evaluate(point), expected + bias_value)
     
     def test_evaluate_batch(self):
-        """Test the evaluate_batch method."""
+        """Test the batch evaluation method."""
         func = RosenbrockFunction(dimension=2)
         
-        # Test with batch of vectors
-        X = np.array([[1, 1], [0, 0], [2, 3]])
-        expected = np.array([0, 1, 101])
-        np.testing.assert_allclose(func.evaluate_batch(X), expected)
+        # Create a batch of test points
+        points = np.array([
+            [1, 1],  # global minimum
+            [0, 0],  # origin
+            [2, 3]   # arbitrary point
+        ])
+        
+        # Get expected values by individual evaluation
+        expected = np.array([
+            func.evaluate(points[0]),
+            func.evaluate(points[1]),
+            func.evaluate(points[2])
+        ])
+        
+        # Test batch evaluation
+        np.testing.assert_allclose(func.evaluate_batch(points), expected)
+        
+        # Test with bias decorator
+        bias_value = 25.0
+        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_results = biased_func.evaluate_batch(points)
+        np.testing.assert_allclose(biased_results, expected + bias_value)
     
     def test_dimension_validation(self):
         """Test that input dimension is validated correctly."""
@@ -61,16 +134,23 @@ class TestRosenbrockFunction:
         with pytest.raises(ValueError):
             func.evaluate_batch(np.array([[1, 2, 3], [4, 5, 6]]))
     
-    def test_higher_dimensions(self):
-        """Test the function in higher dimensions."""
-        func = RosenbrockFunction(dimension=3)
+    def test_bounds_respect(self):
+        """Test that bounds are properly respected."""
+        # Create function with specific bounds
+        bounds = np.array([[-10, 10], [-10, 10]])
+        func = RosenbrockFunction(dimension=2, bounds=bounds)
         
-        # Test at global minimum
-        assert func.evaluate(np.array([1, 1, 1])) == 0
+        # Points at the bounds
+        edge_points = [
+            np.array([-10, 0]),
+            np.array([10, 0]),
+            np.array([0, -10]),
+            np.array([0, 10])
+        ]
         
-        # Test with arbitrary vector
-        # For 3D: f(x,y,z) = 100*(y-x^2)^2 + (x-1)^2 + 100*(z-y^2)^2 + (y-1)^2
-        # f(2,2,2) = 100*(2-4)^2 + (2-1)^2 + 100*(2-4)^2 + (2-1)^2
-        #          = 100*4 + 1 + 100*4 + 1 = 802
-        x = np.array([2, 2, 2])
-        assert func.evaluate(x) == 802 
+        # All points should be valid and evaluate without error
+        for point in edge_points:
+            # This should execute without error
+            value = func.evaluate(point)
+            assert isinstance(value, (int, float))
+            assert value >= 0 

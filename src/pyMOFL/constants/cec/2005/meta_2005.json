@@ -1,0 +1,321 @@
+{
+  "year": 2005,
+  "functions": {
+    "f01": {
+      "name": "Shifted Sphere Function",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f01/shift_D50.txt"
+      }
+    },
+    "f02": {
+      "name": "Shifted Schwefel's Problem 1.2",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f02/shift_D50.txt"
+      }
+    },
+    "f03": {
+      "name": "Shifted Rotated High Conditioned Elliptic Function",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f03/shift_D50.txt",
+        "rot": "f03/rot_D2.txt"
+      }
+    },
+    "f04": {
+      "name": "Shifted Schwefel's Problem 1.2 with Noise in Fitness",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f04/shift_D50.txt"
+      }
+    },
+    "f05": {
+      "name": "Schwefel's Problem 2.6 with Global Optimum on Bounds",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f05/shift_D50.txt"
+      }
+    },
+    "f06": {
+      "name": "Shifted Rosenbrock's Function",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f06/shift_D50.txt"
+      }
+    },
+    "f07": {
+      "name": "Shifted Rotated Griewank's Function",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f07/shift_D50.txt",
+        "rot": "f07/rot_D2.txt"
+      }
+    },
+    "f08": {
+      "name": "Shifted Rotated Ackley's Function with Global Optimum on Bounds",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f08/shift_D50.txt",
+        "rot": "f08/rot_D2.txt"
+      }
+    },
+    "f09": {
+      "name": "Shifted Rastrigin's Function",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f09/shift_D50.txt"
+      }
+    },
+    "f10": {
+      "name": "Shifted Rotated Rastrigin's Function",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f10/shift_D50.txt",
+        "rot": "f10/rot_D2.txt"
+      }
+    },
+    "f11": {
+      "name": "Shifted Rotated Weierstrass Function",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f11/shift_D50.txt",
+        "rot": "f11/rot_D2.txt"
+      }
+    },
+    "f12": {
+      "name": "Schwefel's Problem 2.13",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "bias": "f12/bias_D50.txt"
+      }
+    },
+    "f13": {
+      "name": "Shifted Expanded Griewank's plus Rosenbrock's Function (F8F2)",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f13/shift_D50.txt"
+      }
+    },
+    "f14": {
+      "name": "Shifted Rotated Expanded Schaffer's F6 Function",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f14/shift_D50.txt",
+        "rot": "f14/rot_D2.txt"
+      }
+    },
+    "f15": {
+      "name": "Hybrid Composition Function 1",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f15/shift_D50.txt"
+      }
+    },
+    "f16": {
+      "name": "Rotated Hybrid Composition Function 1",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f16/shift_D50.txt",
+        "rot": "f16/rot_D2.txt"
+      }
+    },
+    "f17": {
+      "name": "Rotated Hybrid Composition Function 1 with Noise in Fitness",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f17/shift_D50.txt",
+        "rot": "f17/rot_D2.txt"
+      }
+    },
+    "f18": {
+      "name": "Rotated Hybrid Composition Function 2",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f18/shift_D50.txt",
+        "rot": "f18/rot_D2.txt"
+      }
+    },
+    "f19": {
+      "name": "Rotated Hybrid Composition Function 2 with a Narrow Basin for the Global Optimum",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f19/shift_D50.txt",
+        "rot": "f19/rot_D2.txt"
+      }
+    },
+    "f20": {
+      "name": "Rotated Hybrid Composition Function 2 with the Global Optimum on the Bounds",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f20/shift_D50.txt",
+        "rot": "f20/rot_D2.txt"
+      }
+    },
+    "f21": {
+      "name": "Rotated Hybrid Composition Function 3",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f21/shift_D50.txt",
+        "rot": "f21/rot_D2.txt"
+      }
+    },
+    "f22": {
+      "name": "Rotated Hybrid Composition Function 3 with High Condition Number Matrix",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f22/shift_D50.txt",
+        "rot": "f22/rot_sub_D2.txt"
+      }
+    },
+    "f23": {
+      "name": "Non-Continuous Rotated Hybrid Composition Function 3",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f23/shift_D50.txt",
+        "rot": "f23/rot_D2.txt"
+      }
+    },
+    "f24": {
+      "name": "Rotated Hybrid Composition Function 4",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f24/shift_D50.txt",
+        "rot": "f24/rot_D2.txt"
+      }
+    },
+    "f25": {
+      "name": "Rotated Hybrid Composition Function 4 without Bounds",
+      "dimensions": [
+        2,
+        10,
+        30,
+        50
+      ],
+      "files": {
+        "shift": "f25/shift_D50.txt",
+        "rot": "f25/rot_D2.txt"
+      }
+    }
+  }
+}

@@ -32,9 +32,12 @@ class SphereFunction(OptimizationFunction):
         .. [2] Jamil, M., & Yang, X.S. (2013). "A literature survey of benchmark functions for global 
                optimization problems". International Journal of Mathematical Modelling and Numerical 
                Optimisation, 4(2), 150-194.
+               
+    Note:
+        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
     """
     
-    def __init__(self, dimension: int, bias: float = 0.0, bounds: np.ndarray = None):
+    def __init__(self, dimension: int, bounds: np.ndarray = None):
         """
         Initialize the Sphere function.
         
@@ -43,7 +46,7 @@ class SphereFunction(OptimizationFunction):
             bounds (np.ndarray, optional): Bounds for each dimension. 
                                           Defaults to [-100, 100] for each dimension.
         """
-        super().__init__(dimension, bias, bounds)
+        super().__init__(dimension, bounds)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -59,7 +62,7 @@ class SphereFunction(OptimizationFunction):
         x = self._validate_input(x)
         
         # Compute the function value using vectorized operations
-        return float(np.sum(x**2) + self.bias)
+        return float(np.sum(x**2))
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -76,4 +79,19 @@ class SphereFunction(OptimizationFunction):
         
         # Compute the function values using vectorized operations
         # This is more efficient than calling evaluate for each point
-        return np.sum(X**2, axis=1) + self.bias
+        return np.sum(X**2, axis=1)
+    
+    @staticmethod
+    def get_global_minimum(dimension: int) -> tuple:
+        """
+        Get the global minimum of the function.
+        
+        Args:
+            dimension (int): The dimension of the function.
+            
+        Returns:
+            tuple: A tuple containing the global minimum point and the function value at that point.
+        """
+        global_min_point = np.zeros(dimension)
+        global_min_value = 0.0
+        return global_min_point, global_min_value

@@ -174,3 +174,4 @@ cython_debug/
 .pypirc
 # JetBrains IDE
 .idea
+.DS_Store

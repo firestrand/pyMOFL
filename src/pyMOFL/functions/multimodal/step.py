@@ -18,14 +18,14 @@ from ...base import OptimizationFunction
 
 class StepFunction(OptimizationFunction):
     """
-    Biased Step function (De Jong's Step function with bias).
+    Step function (De Jong's Step function).
     
     Mathematical definition:
-    f(x) = sum_{i=1}^{10} [step(x_i)]^2 + bias
+    f(x) = sum_{i=1}^{10} [step(x_i)]^2
     
     where step(x_i) = floor(x_i + 0.5)
     
-    Global minimum: f = bias at any point with all coordinates in the interval [-0.5, 0.5)
+    Global minimum: f = 0 at any point with all coordinates in the interval [-0.5, 0.5)
     
     Attributes:
         dimension (int): Always 10 for the Step function.
@@ -42,15 +42,17 @@ class StepFunction(OptimizationFunction):
                Genetic Adaptive Systems." PhD thesis, University of Michigan.
         .. [2] Clerc, M. (2012). "Standard Particle Swarm Optimisation 2007/2011 –
                Benchmark Suite and Descriptions", Technical Note.
+    
+    Note:
+        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
+        The standard SPSO benchmark uses a bias of 30.0.
     """
     
-    def __init__(self, bias: float = 30.0, bounds: np.ndarray = None):
+    def __init__(self, bounds: np.ndarray = None):
         """
         Initialize the Step function.
         
         Args:
-            bias (float, optional): A bias value added to the function value.
-                                    Defaults to 30.0 as per SPSO specification.
             bounds (np.ndarray, optional): Bounds for each dimension.
                                           Defaults to [-100, 100] for each dimension.
         """
@@ -61,7 +63,7 @@ class StepFunction(OptimizationFunction):
         if bounds is None:
             bounds = np.array([[-100, 100]] * dimension)
         
-        super().__init__(dimension, bias, bounds)
+        super().__init__(dimension, bounds)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -80,7 +82,7 @@ class StepFunction(OptimizationFunction):
         stepped = np.floor(x + 0.5)
         
         # Square and sum
-        result = np.sum(stepped ** 2) + self.bias
+        result = np.sum(stepped ** 2)
         
         return float(result)
     
@@ -101,6 +103,6 @@ class StepFunction(OptimizationFunction):
         stepped = np.floor(X + 0.5)
         
         # Square and sum along each row
-        result = np.sum(stepped ** 2, axis=1) + self.bias
+        result = np.sum(stepped ** 2, axis=1)
         
         return result 

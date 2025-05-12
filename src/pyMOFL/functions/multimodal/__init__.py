@@ -1,20 +1,35 @@
 """
-Multimodal benchmark functions for optimization.
+Multimodal functions module.
 
-These functions have multiple local optima and are typically used to test
-the ability of optimization algorithms to escape local optima.
+This module contains implementations of multimodal optimization functions,
+i.e., functions with multiple local minima.
 """
 
 from .rastrigin import RastriginFunction
-from .tripod import TripodFunction
 from .step import StepFunction
+from .tripod import TripodFunction
 from .lennard_jones import LennardJonesFunction
+from .gear_train import GearTrainFunction
+from .perm import PermFunction
+from .griewank import GriewankFunction
+from .ackley import AckleyFunction
+from .weierstrass import WeierstrassFunction
+from .schwefel_2_13 import SchwefelFunction213
+from .scaffer_f6 import SchafferF6Function, ScafferF6Function
 
 __all__ = [
     "RastriginFunction",
-    "TripodFunction",
     "StepFunction",
-    "LennardJonesFunction"
+    "TripodFunction",
+    "LennardJonesFunction",
+    "GearTrainFunction",
+    "PermFunction",
+    "GriewankFunction",
+    "AckleyFunction",
+    "WeierstrassFunction",
+    "SchwefelFunction213",
+    "SchafferF6Function",
+    "ScafferF6Function"
 ]
 
 
