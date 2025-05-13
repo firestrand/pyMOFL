@@ -175,3 +175,7 @@ cython_debug/
 # JetBrains IDE
 .idea
 .DS_Store
+
+# Ignore LLM utility files
+utility_scripts/
+TODO.md
