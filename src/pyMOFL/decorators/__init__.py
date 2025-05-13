@@ -9,5 +9,6 @@ from .shifted import ShiftedFunction
 from .rotated import RotatedFunction
 from .biased import BiasedFunction
 from .noise import NoiseDecorator
+from .scaled import ScaledFunction
 
  

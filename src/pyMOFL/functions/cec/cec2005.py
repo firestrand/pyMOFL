@@ -32,6 +32,7 @@ from typing import Union, Dict, List, Tuple, Optional, Any
 from ..unimodal.schwefel import SchwefelFunction12
 from ..unimodal.sphere import SphereFunction
 from ..unimodal.elliptic import EllipticFunction
+from ..unimodal.rosenbrock import RosenbrockFunction
 
 # Import decorators
 from ...decorators.shifted import ShiftedFunction
@@ -1011,6 +1012,9 @@ class F06(CEC2005Function):
     f(x) = sum(100(z_i^2 - z_{i+1})^2 + (z_i - 1)^2) + bias
     where z = x - o + 1
     
+    For Rosenbrock function, the standard optimum is at [1,1,...,1], 
+    but in CEC2005 it is shifted to be at the specific shift vector.
+    
     Global optimum: f(o) = bias = 390
     
     Attributes:
@@ -1018,6 +1022,7 @@ class F06(CEC2005Function):
         bounds (np.ndarray): Bounds for each dimension, default is [-100, 100].
         shift_vector (np.ndarray): The shift vector o.
         bias (float): The bias value (390.0).
+        base_func (OptimizationFunction): The composed function using decorators.
     """
     
     def __init__(self, dimension: int, bounds: np.ndarray = None, data_dir: str = None):
@@ -1043,42 +1048,25 @@ class F06(CEC2005Function):
             "is_separable": False
         })
         
-        # Set bias value
-        self.bias = 390.0
-    
-    def _transform_input(self, x: np.ndarray) -> np.ndarray:
-        """
-        Apply transformations to input.
+        # Set bias value from the CEC_2005_BIAS mapping constant
+        self.bias = CEC_2005_BIAS[6]
         
-        For Rosenbrock, the transformation is z = x - o + 1
+        # Create base function using decorators according to CEC 2005 specifications
+        # 1. Create base Rosenbrock function
+        from ..unimodal import RosenbrockFunction
+        func = RosenbrockFunction(dimension, bounds)
         
-        Args:
-            x (np.ndarray): Input vector.
-            
-        Returns:
-            np.ndarray: Transformed vector.
-        """
-        # For Rosenbrock, we shift by o and then add 1
-        z = x - self.shift_vector + 1.0
+        # 2. First apply a shift of -1 to all dimensions 
+        # This handles the fact that Rosenbrock's natural optimum is at [1,1,...,1]
+        # and we need to move it to [0,0,...,0] before applying the CEC shift
+        ones_vector = np.ones(dimension)
+        centered_func = ShiftedFunction(func, -ones_vector)
         
-        return z
-    
-    def _transform_batch(self, X: np.ndarray) -> np.ndarray:
-        """
-        Apply transformations to a batch of inputs.
+        # 3. Then apply the actual CEC shift to move the optimum to the required position
+        shifted_func = ShiftedFunction(centered_func, self.shift_vector)
         
-        For Rosenbrock, the transformation is z = x - o + 1
-        
-        Args:
-            X (np.ndarray): Batch of input vectors, shape (N, dimension).
-            
-        Returns:
-            np.ndarray: Batch of transformed vectors.
-        """
-        # For Rosenbrock, we shift by o and then add 1
-        Z = X - self.shift_vector + 1.0
-        
-        return Z
+        # 4. Apply bias transformation
+        self.base_func = BiasedFunction(shifted_func, self.bias)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -1091,13 +1079,9 @@ class F06(CEC2005Function):
             float: Function value at x.
         """
         x = self._validate_input(x)
-        z = self._transform_input(x)
         
-        result = 0.0
-        for i in range(self.dimension - 1):
-            result += 100.0 * (z[i]**2 - z[i+1])**2 + (z[i] - 1.0)**2
-        
-        return float(result) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate(x)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -1110,16 +1094,9 @@ class F06(CEC2005Function):
             np.ndarray: Function values at each point, shape (N,).
         """
         X = self._validate_batch_input(X)
-        Z = self._transform_batch(X)
         
-        # Vectorized implementation
-        result = np.zeros(Z.shape[0])
-        
-        for i in range(self.dimension - 1):
-            # 100 * (z_i^2 - z_{i+1})^2 + (z_i - 1)^2
-            result += 100.0 * (Z[:, i]**2 - Z[:, i+1])**2 + (Z[:, i] - 1.0)**2
-        
-        return result + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F07: Shifted Rotated Griewank's Function without Bounds
