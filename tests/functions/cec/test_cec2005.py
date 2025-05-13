@@ -24,8 +24,8 @@ class TestCEC2005Functions:
         
         # Function-specific tolerances
         # Add more if needed for specific functions
-        "f07": {"rtol": 1e-4, "atol": 1e-6},  # Griewank function can be numerically sensitive
-        "f25": {"rtol": 1e-3, "atol": 1e-5},  # Rotated hybrid composition functions may need higher tolerance
+        "f07": {"rtol": 1e-4, "atol": 1e-6},   # Griewank function can be numerically sensitive
+        "f25": {"rtol": 1e-3, "atol": 1e-5},   # Rotated hybrid composition functions may need higher tolerance
     }
     
     # Define dimensionalities to test
@@ -40,6 +40,7 @@ class TestCEC2005Functions:
         # First, find the data directory
         import os
         from src.pyMOFL.functions.cec.cec2005 import CEC2005Function
+        import json
         
         # Create a dummy function to get the data directory
         try:
@@ -55,7 +56,12 @@ class TestCEC2005Functions:
             if manifest_exists:
                 with open(manifest_path, 'r') as f:
                     manifest = json.load(f)
-                available_functions = [int(k[1:]) for k in manifest.keys() if k.startswith('f')]
+                
+                # Extract available functions based on manifest structure
+                if "functions" in manifest:
+                    available_functions = [int(k[1:]) for k in manifest["functions"].keys() if k.startswith('f')]
+                else:
+                    available_functions = [int(k[1:]) for k in manifest.keys() if k.startswith('f')]
             
             return {
                 "data_dir_exists": os.path.exists(data_dir),
@@ -94,8 +100,8 @@ class TestCEC2005Functions:
                 
                 # Check properties
                 assert hasattr(func, "bias")
-                assert hasattr(func, "shift")
-                assert hasattr(func, "rotation")
+                assert hasattr(func, "shift_vector")
+                assert hasattr(func, "rotation_matrix")
                 
             except NotImplementedError:
                 pytest.skip(f"Function F{func_num:02d} is not yet implemented for dimension {dim}")
@@ -172,20 +178,22 @@ class TestCEC2005Functions:
             print(f"Metadata: {meta}")
             
             # Validate function against test data
-            results = validate_function(func, validation_data["test_cases"], rtol=rtol, atol=atol)
+            results = validate_function(func, validation_data, rtol=rtol, atol=atol)
             print_validation_summary(results)
             
-            # Assert that at least a reasonable percentage of test cases pass
-            min_pass_rate = 0.7  # At least 70% should pass
-            pass_count = sum(1 for r in results if r["passed"])
-            total_count = len(results)
+            # Assert that all tests pass, since we have very few test cases
+            # and they've been carefully chosen to match the expected behavior
+            assert results["passed_tests"] > 0, f"No tests passed for F{func_num:02d}"
             
-            if total_count > 0:
-                pass_rate = pass_count / total_count
-                assert pass_rate >= min_pass_rate, (
-                    f"Function F{func_num:02d} validation failed for dimension {dim}. "
-                    f"Pass rate: {pass_rate:.2%}, expected at least {min_pass_rate:.2%}"
-                )
+            # Skip strict validation for functions with noise or randomness
+            if meta.get("has_noise", False):
+                print(f"Function F{func_num:02d} has noise/randomness - skipping strict validation")
+                return
+                
+            assert results["failed_tests"] == 0, (
+                f"Function F{func_num:02d} validation failed for dimension {dim}. "
+                f"{results['failed_tests']} out of {results['total_tests']} tests failed!"
+            )
             
         except NotImplementedError:
             pytest.skip(f"Function F{func_num:02d} is not yet implemented")

@@ -31,14 +31,16 @@ from typing import Union, Dict, List, Tuple, Optional, Any
 # Import base functions from unimodal module
 from ..unimodal.schwefel import SchwefelFunction12
 from ..unimodal.sphere import SphereFunction
+from ..unimodal.elliptic import EllipticFunction
 
 # Import decorators
 from ...decorators.shifted import ShiftedFunction
 from ...decorators.biased import BiasedFunction
+from ...decorators.noise import NoiseDecorator
+from ...decorators.rotated import RotatedFunction
 
 # Base imports
 from ...base import OptimizationFunction
-from ...decorators.rotated import RotatedFunction
 
 # Load global bias values for CEC 2005 functions
 # These are defined in the function specifications
@@ -182,20 +184,31 @@ class CEC2005Function(OptimizationFunction):
         
         # Get function information from manifest
         func_key = f"f{self.function_number:02d}"
-        if func_key not in manifest:
+        
+        # Check if function exists in the manifest
+        if "functions" not in manifest or func_key not in manifest["functions"]:
             raise ValueError(f"Function {func_key} not found in manifest")
         
-        func_info = manifest[func_key]
+        func_info = manifest["functions"][func_key]
         
         # Load shift vector - try to find the appropriate file
         # CEC files typically contain data for larger dimensions (e.g., D50)
         # and we take the first D values for our dimension
         shift_file = None
-        for max_dim in [50, 30, 10]:  # Try different dimension files, starting with largest
-            potential_file = os.path.join(self.data_dir, func_key, f"shift_D{max_dim}.txt")
+        
+        # First try to get the shift file path from the manifest
+        if "files" in func_info and "shift" in func_info["files"]:
+            potential_file = os.path.join(self.data_dir, func_info["files"]["shift"])
             if os.path.exists(potential_file):
                 shift_file = potential_file
-                break
+        
+        # If not found in manifest, try the standard naming convention
+        if shift_file is None:
+            for max_dim in [50, 30, 10]:  # Try different dimension files, starting with largest
+                potential_file = os.path.join(self.data_dir, func_key, f"shift_D{max_dim}.txt")
+                if os.path.exists(potential_file):
+                    shift_file = potential_file
+                    break
         
         if shift_file is None:
             raise FileNotFoundError(f"Shift vector file not found for function {func_key}")
@@ -214,11 +227,20 @@ class CEC2005Function(OptimizationFunction):
         # Load rotation matrix if needed - usually dimension specific
         if self.use_rotation:
             rot_file = None
-            for dim in [self.dimension, 50, 30, 10]:  # Try exact dimension first, then others
-                potential_file = os.path.join(self.data_dir, func_key, f"rot_D{dim}.txt")
+            
+            # First try to get the rotation file path from the manifest
+            if "files" in func_info and "rotation" in func_info["files"]:
+                potential_file = os.path.join(self.data_dir, func_info["files"]["rotation"])
                 if os.path.exists(potential_file):
                     rot_file = potential_file
-                    break
+            
+            # If not found in manifest, try the standard naming convention
+            if rot_file is None:
+                for dim in [self.dimension, 50, 30, 10]:  # Try exact dimension first, then others
+                    potential_file = os.path.join(self.data_dir, func_key, f"rot_D{dim}.txt")
+                    if os.path.exists(potential_file):
+                        rot_file = potential_file
+                        break
             
             if rot_file is None:
                 raise FileNotFoundError(f"Rotation matrix file not found for function {func_key}")
@@ -236,10 +258,14 @@ class CEC2005Function(OptimizationFunction):
             except Exception as e:
                 raise RuntimeError(f"Failed to load rotation matrix: {e}")
         
-        # Load function bias from manifest
+        # Load function bias from manifest or use the global bias map
         if "bias" in func_info:
             self.bias = func_info["bias"]
-            self.metadata["is_biased"] = self.bias != 0.0
+        else:
+            # Use the global bias map if available
+            self.bias = CEC_2005_BIAS.get(self.function_number, 0.0)
+            
+        self.metadata["is_biased"] = self.bias != 0.0
     
     @property
     def optimum_value(self) -> float:
@@ -324,7 +350,7 @@ class CEC2005Function(OptimizationFunction):
         raise NotImplementedError("This method should be implemented by derived classes")
     
     @property
-    def shift_vector(self) -> np.ndarray:
+    def shift(self) -> np.ndarray:
         """
         Get the shift vector.
         
@@ -334,7 +360,7 @@ class CEC2005Function(OptimizationFunction):
         return self.shift_vector
     
     @property
-    def rotation_matrix(self) -> np.ndarray:
+    def rotation(self) -> np.ndarray:
         """
         Get the rotation matrix.
         
@@ -541,7 +567,7 @@ class F03(CEC2005Function):
     F03: Shifted Rotated High Conditioned Elliptic Function from CEC 2005.
     
     f(x) = sum((10^6)^((i-1)/(D-1)) * z_i^2) + bias
-    where z = (x - o) * M, M is an orthogonal matrix
+    where z = M * ((x - o) / lambda), M is an orthogonal matrix
     
     Global optimum: f(o) = bias = -450
     
@@ -551,6 +577,8 @@ class F03(CEC2005Function):
         shift_vector (np.ndarray): The shift vector o.
         rotation_matrix (np.ndarray): The rotation matrix M.
         bias (float): The bias value (-450.0).
+        lambda_value (float): Scaling factor.
+        elliptic_coefficients (np.ndarray): Coefficients for the elliptic function.
     """
     
     def __init__(self, dimension: int, bounds: np.ndarray = None, data_dir: str = None):
@@ -577,15 +605,28 @@ class F03(CEC2005Function):
             "is_separable": False
         })
         
-        # Set bias value
-        self.bias = -450.0
+        # Set bias value from the CEC_2005_BIAS mapping constant
+        self.bias = CEC_2005_BIAS[3]
         
-        # Precompute coefficients for efficiency
-        self.coefficients = np.array([(10**6)**((i)/(self.dimension-1)) for i in range(self.dimension)])
+        # Lambda value (scaling factor) for F03
+        self.lambda_value = 1.0  # Default in CEC benchmarks
+        
+        # Precompute the coefficients for the elliptic function
+        # For dimension D, we have (10^6)^(i/(D-1)) for i=0,1,...,D-1
+        self.elliptic_coefficients = np.array([
+            (10**6)**(i/(dimension-1)) for i in range(dimension)
+        ])
     
     def evaluate(self, x: np.ndarray) -> float:
         """
         Evaluate the function at point x.
+        
+        Implements the exact transformation sequence from the original C code:
+        1) Shift: x = x - o
+        2) Scale: x = x / lambda
+        3) Rotate: x = M * x
+        4) Apply elliptic function: sum(coeffs * x^2)
+        5) Add bias
         
         Args:
             x (np.ndarray): Input vector of dimension D.
@@ -594,10 +635,23 @@ class F03(CEC2005Function):
             float: Function value at x.
         """
         x = self._validate_input(x)
-        z = self._transform_input(x)
         
-        # Use precomputed coefficients for efficiency
-        return float(np.sum(self.coefficients * z**2)) + self.bias
+        # 1. Shift the input: temp_x1 = x - o
+        temp_x1 = x - self.shift_vector
+        
+        # 2. Scale by lambda: temp_x2 = temp_x1 / lambda
+        temp_x2 = temp_x1 / self.lambda_value
+        
+        # 3. Apply rotation matrix: temp_x3 = M * temp_x2
+        # In CEC benchmarks, rotation is applied as M*x (not x*M)
+        temp_x3 = np.dot(self.rotation_matrix, temp_x2)
+        
+        # 4. Apply the elliptic function: sum(coeffs * x^2)
+        # This is the high conditioned elliptic function that gives F03 its name
+        elliptic_value = np.sum(self.elliptic_coefficients * (temp_x3**2))
+        
+        # 5. Add bias
+        return float(elliptic_value) + self.bias
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -610,9 +664,26 @@ class F03(CEC2005Function):
             np.ndarray: Function values at each point, shape (N,).
         """
         X = self._validate_batch_input(X)
-        Z = self._transform_batch(X)
         
-        return np.sum(self.coefficients * Z**2, axis=1) + self.bias
+        # Apply transformations for all points in the batch
+        results = np.zeros(X.shape[0])
+        
+        for i in range(X.shape[0]):
+            # Use the same transformation sequence as in evaluate()
+            # 1. Shift
+            temp_x1 = X[i] - self.shift_vector
+            
+            # 2. Scale by lambda
+            temp_x2 = temp_x1 / self.lambda_value
+            
+            # 3. Apply rotation matrix (M*x)
+            temp_x3 = np.dot(self.rotation_matrix, temp_x2)
+            
+            # 4. Apply elliptic function
+            results[i] = np.sum(self.elliptic_coefficients * (temp_x3**2))
+        
+        # 5. Add bias
+        return results + self.bias
 
 
 # Implementation of F04: Shifted Schwefel's Problem 1.2 with Noise in Fitness
@@ -630,6 +701,7 @@ class F04(CEC2005Function):
         bounds (np.ndarray): Bounds for each dimension, default is [-100, 100].
         shift_vector (np.ndarray): The shift vector o.
         bias (float): The bias value (-450.0).
+        base_func (OptimizationFunction): The composed function using decorators.
     """
     
     def __init__(self, dimension: int, bounds: np.ndarray = None, data_dir: str = None):
@@ -656,8 +728,22 @@ class F04(CEC2005Function):
             "has_noise": True
         })
         
-        # Set bias value
-        self.bias = -450.0
+        # Set bias value from the CEC_2005_BIAS mapping constant
+        self.bias = CEC_2005_BIAS[4]
+        
+        # Create base function using decorators according to CEC 2005 specifications
+        # 1. Create base Schwefel 1.2 function
+        func = SchwefelFunction12(dimension, bounds)
+        
+        # 2. Apply shift transformation using the loaded shift vector
+        shifted_func = ShiftedFunction(func, self.shift_vector)
+        
+        # 3. Apply noise transformation with level 0.4
+        # The CEC noise is defined as 1 + 0.4|N(0,1)| which matches the NoiseDecorator implementation
+        noisy_shifted_func = NoiseDecorator(shifted_func, noise_type='gaussian', noise_level=0.4)
+        
+        # 4. Apply bias transformation
+        self.base_func = BiasedFunction(noisy_shifted_func, self.bias)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -670,19 +756,9 @@ class F04(CEC2005Function):
             float: Function value at x.
         """
         x = self._validate_input(x)
-        z = self._transform_input(x)
         
-        result = 0.0
-        for i in range(self.dimension):
-            sum_i = 0.0
-            for j in range(i + 1):
-                sum_i += z[j]
-            result += sum_i ** 2
-        
-        # Add noise
-        noise = 1.0 + 0.4 * abs(np.random.normal())
-        
-        return float(result * noise) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate(x)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -695,30 +771,18 @@ class F04(CEC2005Function):
             np.ndarray: Function values at each point, shape (N,).
         """
         X = self._validate_batch_input(X)
-        Z = self._transform_batch(X)
         
-        # Vectorized implementation with noise
-        N = Z.shape[0]
-        result = np.zeros(N)
-        
-        for n in range(N):
-            for i in range(self.dimension):
-                sum_i = np.sum(Z[n, :i+1])
-                result[n] += sum_i ** 2
-            
-            # Add noise (independent for each point)
-            result[n] *= 1.0 + 0.4 * abs(np.random.normal())
-        
-        return result + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F05: Schwefel's Problem 2.6 with Global Optimum on Bounds
 class F05(CEC2005Function):
     """
-    F05: Schwefel's Problem 2.6 with Global Optimum on Bounds from CEC 2005.
+    F05: Schwefel's Problem 2.6 with Global Optimum on Bounds.
     
     f(x) = max(|A_i*x - B_i|) + bias
-    where B_i = A_i*o
+    where B_i = A_i*o, and o is the shifted global optimum.
     
     Global optimum: f(o) = bias = -310
     
@@ -726,8 +790,8 @@ class F05(CEC2005Function):
         dimension (int): The dimensionality of the function.
         bounds (np.ndarray): Bounds for each dimension, default is [-100, 100].
         shift_vector (np.ndarray): The shift vector o.
-        A_matrix (np.ndarray): A matrix of size D x D.
-        B_vector (np.ndarray): Vector of size D.
+        A_matrix (np.ndarray): A matrix of size dimension x dimension.
+        B_vector (np.ndarray): B vector of size dimension, calculated as B = A*o.
         bias (float): The bias value (-310.0).
     """
     
@@ -742,6 +806,7 @@ class F05(CEC2005Function):
             data_dir (str, optional): Directory containing the CEC 2005 data files.
                                      If None, uses the default directory in the package.
         """
+        # Initialize parent class
         super().__init__(dimension, 5, bounds, data_dir)
         
         # Define function-specific metadata
@@ -749,55 +814,147 @@ class F05(CEC2005Function):
             "name": "F05 - Schwefel's Problem 2.6 with Global Optimum on Bounds",
             "is_shifted": True,
             "is_biased": True,
-            "is_unimodal": True,
+            "is_unimodal": True, 
             "is_multimodal": False,
-            "is_separable": False,
-            "global_optimum_on_bounds": True
+            "is_separable": False
         })
         
-        # Set bias value
+        # Set bias value from Schwefel's problem (negative to make global minimum)
         self.bias = -310.0
         
-        # Additional initialization
-        self.A_matrix = None
-        self.B_vector = None
+        # Try to load data from f5_data_dump
+        import os
+        import numpy as np
+        from pathlib import Path
         
-        # Load function-specific parameters
-        self._initialize_AB()
+        # Determine the project root directory
+        project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
+        f5_dump_dir = os.path.join(project_root, "utility_scripts", "f5_data_dump")
+        
+        # Try to load shift vector from dump
+        shift_file = os.path.join(f5_dump_dir, f"shift_vector_D{dimension}.txt")
+        if os.path.exists(shift_file):
+            try:
+                # Load the shift vector directly
+                self.shift_vector = np.loadtxt(shift_file)
+                print(f"Loaded shift vector from f5_data_dump: {shift_file}")
+            except Exception as e:
+                print(f"Failed to load shift vector from f5_data_dump, using default. Error: {e}")
+        
+        # Adjust shift vector to bounds (needed regardless of source)
+        self._adjust_shift_vector_to_bounds()
+        
+        # Try to load A matrix from dump
+        a_file = os.path.join(f5_dump_dir, f"A_matrix_D{dimension}.txt")
+        if os.path.exists(a_file):
+            try:
+                # Load the A matrix directly
+                self.A_matrix = np.loadtxt(a_file)
+                print(f"Loaded A matrix from f5_data_dump: {a_file}")
+            except Exception as e:
+                print(f"Failed to load A matrix from f5_data_dump, using default. Error: {e}")
+                # Fall back to the standard loading method
+                self.A_matrix = self._load_A_matrix_fallback()
+        else:
+            # Fall back to the standard loading method
+            self.A_matrix = self._load_A_matrix_fallback()
+        
+        # Calculate B vector as B = A*o
+        self.B_vector = np.dot(self.A_matrix, self.shift_vector)
     
-    def _load_function_parameters(self):
-        """Load function parameters."""
-        super()._load_function_parameters()
+    def _adjust_shift_vector_to_bounds(self):
+        """
+        Adjust the shift vector to match the original implementation.
         
-        # Set some components of the shift vector to boundary values
-        # This moves the global optimum to the bounds
-        quarter_dim = self.dimension // 4
-        three_quarter_dim = (3 * self.dimension) // 4
-        
-        for i in range(quarter_dim):
+        Based on the CEC 2005 paper and original code:
+        - Quarter of the variables are set to the lower bound (-100)
+        - Quarter of the variables are set to the upper bound (100)
+        """
+        # First quarter set to lower bound (-100)
+        index = self.dimension // 4
+        if index < 1:  # Handle edge case for very small dimensions
+            index = 1
+        for i in range(index):
             self.shift_vector[i] = -100.0
-            
-        for i in range(three_quarter_dim, self.dimension):
+        
+        # Last quarter set to upper bound (100)
+        index = (3 * self.dimension) // 4 - 1
+        if index < 0:  # Handle edge case for very small dimensions
+            index = 0
+        for i in range(index, self.dimension):
             self.shift_vector[i] = 100.0
     
+    def _load_A_matrix_fallback(self):
+        """
+        Fallback method to load the A matrix if it cannot be loaded from f5_data_dump.
+        
+        This method tries to load the A matrix from:
+        1. The shift_D50.txt file (original implementation)
+        2. Generate a random matrix as fallback
+        
+        Returns:
+            np.ndarray: The A matrix of size dimension x dimension.
+        """
+        import os
+        import numpy as np
+        
+        # Try original implementation as fallback
+        potential_paths = [
+            os.path.join(self.data_dir, "f05", "shift_D50.txt"),  # Standard path in our repo
+            os.path.join(self.data_dir, "schwefel_206_data.txt")  # Original CEC path
+        ]
+        
+        shift_file = None
+        for path in potential_paths:
+            if os.path.exists(path):
+                shift_file = path
+                break
+        
+        if shift_file is None:
+            print(f"Warning: Could not find data file for F05, using random matrix instead.")
+            return self._generate_A_matrix()
+        
+        try:
+            # Read the file line by line, matching the original C implementation
+            with open(shift_file, 'r') as f:
+                lines = f.readlines()
+            
+            # First read the shift vectors (nfunc lines)
+            num_funcs = min(len(lines), 25)  # CEC 2005 has 25 functions max
+            
+            # Then read the A matrix (dimension lines after the shift vectors)
+            A_matrix = np.zeros((self.dimension, self.dimension))
+            for i in range(min(self.dimension, len(lines) - num_funcs)):
+                # Parse the line for the A matrix row
+                line = lines[num_funcs + i]
+                values = np.array([float(x) for x in line.strip().split()])
+                
+                # Fill the A matrix row
+                A_matrix[i, :min(self.dimension, len(values))] = values[:self.dimension]
+            
+            return A_matrix
+                
+        except Exception as e:
+            print(f"Warning: Could not load A matrix from file, using random matrix instead. Error: {e}")
+            return self._generate_A_matrix()
+    
     def _generate_A_matrix(self):
-        """Generate A matrix with random integer values and non-zero determinant."""
+        """
+        Generate A matrix with random integer values and non-zero determinant.
+        This is used as a fallback if the data file cannot be loaded.
+        """
         while True:
             A = np.random.randint(-100, 101, size=(self.dimension, self.dimension))
             if np.linalg.det(A) != 0:
                 return A
     
-    def _initialize_AB(self):
-        """Initialize A matrix and B vector."""
-        # Generate or load A matrix
-        self.A_matrix = self._generate_A_matrix()
-        
-        # Compute B vector using the relationship B_i = A_i * o
-        self.B_vector = np.dot(self.A_matrix, self.shift_vector)
-    
     def evaluate(self, x: np.ndarray) -> float:
         """
         Evaluate the function at point x.
+        
+        Direct implementation based on the original C code:
+        f(x) = max(|A_i*x - B_i|) + bias
+        where B_i = A_i*o
         
         Args:
             x (np.ndarray): Input vector of dimension D.
@@ -807,11 +964,17 @@ class F05(CEC2005Function):
         """
         x = self._validate_input(x)
         
-        # Compute A*x - B for each row of A
-        values = np.abs(np.dot(self.A_matrix, x) - self.B_vector)
+        # Calculate A*x
+        Ax = np.dot(self.A_matrix, x)
         
-        # Maximum absolute value
-        return float(np.max(values)) + self.bias
+        # Calculate |A*x - B| for each row
+        abs_diff = np.abs(Ax - self.B_vector)
+        
+        # Get maximum value as per original C code
+        max_diff = np.max(abs_diff)
+        
+        # Return max value + bias
+        return float(max_diff) + self.bias
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -824,14 +987,20 @@ class F05(CEC2005Function):
             np.ndarray: Function values at each point, shape (N,).
         """
         X = self._validate_batch_input(X)
+        results = np.zeros(X.shape[0])
         
-        # Compute max(|A*x - B|) for each point
-        result = np.zeros(X.shape[0])
         for i in range(X.shape[0]):
-            values = np.abs(np.dot(self.A_matrix, X[i]) - self.B_vector)
-            result[i] = np.max(values)
+            # Calculate A*x for each input point
+            Ax = np.dot(self.A_matrix, X[i])
+            
+            # Calculate |A*x - B| for each row
+            abs_diff = np.abs(Ax - self.B_vector)
+            
+            # Get maximum value
+            results[i] = np.max(abs_diff)
         
-        return result + self.bias
+        # Add bias to all results
+        return results + self.bias
 
 
 # Implementation of F06: Shifted Rosenbrock's Function
