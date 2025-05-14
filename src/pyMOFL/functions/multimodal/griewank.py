@@ -52,8 +52,9 @@ class GriewankFunction(OptimizationFunction):
         
         super().__init__(dimension, bounds)
         
-        # Pre-calculate square roots of indices (1-indexed) to avoid repeated computation
-        self._sqrt_indices = np.sqrt(np.arange(1, dimension + 1))
+        # Pre-calculate square roots of indices to avoid repeated computation
+        # In the original C implementation, it's sqrt(1.0+i) where i is 0-indexed
+        self._sqrt_indices = np.sqrt(np.arange(1, dimension + 1))  # sqrt(1), sqrt(2), ..., sqrt(dimension)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -72,7 +73,7 @@ class GriewankFunction(OptimizationFunction):
         sum_term = np.sum(x**2) / 4000.0
         
         # Calculate the product term
-        # Avoid division by zero by using 1-indexed indices
+        # Using sqrt(1+i) as in the original C implementation
         prod_term = np.prod(np.cos(x / self._sqrt_indices))
         
         # Combine terms
@@ -101,7 +102,7 @@ class GriewankFunction(OptimizationFunction):
             # Calculate the sum term
             sum_term = np.sum(x**2) / 4000.0
             
-            # Calculate the product term
+            # Calculate the product term using the same approach as evaluate()
             prod_term = np.prod(np.cos(x / self._sqrt_indices))
             
             # Combine terms

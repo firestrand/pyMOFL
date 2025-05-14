@@ -13,4 +13,4 @@ from .schwefel import (
     SchwefelProblem12Function,  # For backward compatibility
     SchwefelProblem26Function   # For backward compatibility
 )
-from .elliptic import EllipticFunction 
+from .elliptic import HighConditionedElliptic

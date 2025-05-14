@@ -191,13 +191,20 @@ class TestCEC2005Functions:
             results = validate_function(func, validation_data, rtol=rtol, atol=atol)
             print_validation_summary(results)
             
-            # Assert that all tests pass, since we have very few test cases
-            # and they've been carefully chosen to match the expected behavior
-            assert results["passed_tests"] > 0, f"No tests passed for F{func_num:02d}"
+            # If there are failed tests, raise an assertion error with detailed information
+            if results["failed_tests"] > 0:
+                failure_details = "\n".join(
+                    f"Input: {failure['input']}, Expected: {failure['expected']}, "
+                    f"Got: {failure['actual']}, Absolute error: {failure.get('absolute_error')}"
+                    for failure in results.get("failures", [])
+                )
+                pytest.fail(
+                    f"Function F{func_num:02d} validation failed for dimension {dim}. "
+                    f"{results['failed_tests']} out of {results['total_tests']} tests failed!\n"
+                    f"Details:\n{failure_details}"
+                )
             
             # List of functions with known large discrepancies between implementations
-            # These functions pass the global optimum test but show different behavior for other points
-            # Skip strict validation for these functions to avoid failing tests
             functions_with_discrepancies = [3, 7, 8, 10, 11, 15]
             
             # Skip strict validation for functions with noise, randomness, or known discrepancies

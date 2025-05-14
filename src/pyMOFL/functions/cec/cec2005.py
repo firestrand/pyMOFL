@@ -31,7 +31,7 @@ from typing import Union, Dict, List, Tuple, Optional, Any
 # Import base functions from unimodal module
 from ..unimodal.schwefel import SchwefelFunction12
 from ..unimodal.sphere import SphereFunction
-from ..unimodal.elliptic import EllipticFunction
+from ..unimodal.elliptic import HighConditionedElliptic
 from ..unimodal.rosenbrock import RosenbrockFunction
 
 # Import decorators
@@ -39,6 +39,7 @@ from ...decorators.shifted import ShiftedFunction
 from ...decorators.biased import BiasedFunction
 from ...decorators.noise import NoiseDecorator
 from ...decorators.rotated import RotatedFunction
+from ...decorators.shift_then_rotate import ShiftThenRotateFunction
 
 # Base imports
 from ...base import OptimizationFunction
@@ -252,7 +253,7 @@ class CEC2005Function(OptimizationFunction):
                 
                 # Get appropriate sized submatrix if needed
                 if full_rotation_matrix.shape[0] >= self.dimension and full_rotation_matrix.shape[1] >= self.dimension:
-                    self.rotation_matrix = full_rotation_matrix[:self.dimension, :self.dimension]
+                    self.rotation_matrix = full_rotation_matrix[:self.dimension, :self.dimension].T # Transpose to match CEC convention
                 else:
                     raise ValueError(f"Rotation matrix file contains {full_rotation_matrix.shape} matrix, "
                                     f"but ({self.dimension}, {self.dimension}) is needed")
@@ -568,7 +569,7 @@ class F03(CEC2005Function):
     F03: Shifted Rotated High Conditioned Elliptic Function from CEC 2005.
     
     f(x) = sum((10^6)^((i-1)/(D-1)) * z_i^2) + bias
-    where z = M * ((x - o) / lambda), M is an orthogonal matrix
+    where z = M * (x - o), M is an orthogonal matrix
     
     Global optimum: f(o) = bias = -450
     
@@ -578,8 +579,6 @@ class F03(CEC2005Function):
         shift_vector (np.ndarray): The shift vector o.
         rotation_matrix (np.ndarray): The rotation matrix M.
         bias (float): The bias value (-450.0).
-        lambda_value (float): Scaling factor.
-        elliptic_coefficients (np.ndarray): Coefficients for the elliptic function.
     """
     
     def __init__(self, dimension: int, bounds: np.ndarray = None, data_dir: str = None):
@@ -608,26 +607,20 @@ class F03(CEC2005Function):
         
         # Set bias value from the CEC_2005_BIAS mapping constant
         self.bias = CEC_2005_BIAS[3]
-        
-        # Lambda value (scaling factor) for F03
-        self.lambda_value = 1.0  # Default in CEC benchmarks
-        
-        # Precompute the coefficients for the elliptic function
-        # For dimension D, we have (10^6)^(i/(D-1)) for i=0,1,...,D-1
-        self.elliptic_coefficients = np.array([
-            (10**6)**(i/(dimension-1)) for i in range(dimension)
-        ])
+
+        # Start with the base EllipticFunction
+        func = HighConditionedElliptic(dimension)
+
+        # Apply combined shift-then-rotate transformation matching the CEC C code sequence
+        shifted_rotated_func = ShiftThenRotateFunction(func, self.shift_vector, self.rotation_matrix)
+
+        # Apply BiasedFunction decorator to add the bias
+        self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
+
     
     def evaluate(self, x: np.ndarray) -> float:
         """
         Evaluate the function at point x.
-        
-        Implements the exact transformation sequence from the original C code:
-        1) Shift: x = x - o
-        2) Scale: x = x / lambda
-        3) Rotate: x = M * x
-        4) Apply elliptic function: sum(coeffs * x^2)
-        5) Add bias
         
         Args:
             x (np.ndarray): Input vector of dimension D.
@@ -636,23 +629,9 @@ class F03(CEC2005Function):
             float: Function value at x.
         """
         x = self._validate_input(x)
-        
-        # 1. Shift the input: temp_x1 = x - o
-        temp_x1 = x - self.shift_vector
-        
-        # 2. Scale by lambda: temp_x2 = temp_x1 / lambda
-        temp_x2 = temp_x1 / self.lambda_value
-        
-        # 3. Apply rotation matrix: temp_x3 = M * temp_x2
-        # In CEC benchmarks, rotation is applied as M*x (not x*M)
-        temp_x3 = np.dot(self.rotation_matrix, temp_x2)
-        
-        # 4. Apply the elliptic function: sum(coeffs * x^2)
-        # This is the high conditioned elliptic function that gives F03 its name
-        elliptic_value = np.sum(self.elliptic_coefficients * (temp_x3**2))
-        
-        # 5. Add bias
-        return float(elliptic_value) + self.bias
+
+        # Use the composed function with decorators
+        return self.base_func.evaluate(x)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -665,26 +644,9 @@ class F03(CEC2005Function):
             np.ndarray: Function values at each point, shape (N,).
         """
         X = self._validate_batch_input(X)
-        
-        # Apply transformations for all points in the batch
-        results = np.zeros(X.shape[0])
-        
-        for i in range(X.shape[0]):
-            # Use the same transformation sequence as in evaluate()
-            # 1. Shift
-            temp_x1 = X[i] - self.shift_vector
-            
-            # 2. Scale by lambda
-            temp_x2 = temp_x1 / self.lambda_value
-            
-            # 3. Apply rotation matrix (M*x)
-            temp_x3 = np.dot(self.rotation_matrix, temp_x2)
-            
-            # 4. Apply elliptic function
-            results[i] = np.sum(self.elliptic_coefficients * (temp_x3**2))
-        
-        # 5. Add bias
-        return results + self.bias
+
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F04: Shifted Schwefel's Problem 1.2 with Noise in Fitness
@@ -821,7 +783,7 @@ class F05(CEC2005Function):
         })
         
         # Set bias value from Schwefel's problem (negative to make global minimum)
-        self.bias = -310.0
+        self.bias = CEC_2005_BIAS[5]
         
         # Try to load data from f5_data_dump
         import os
@@ -1104,8 +1066,8 @@ class F07(CEC2005Function):
     """
     F07: Shifted Rotated Griewank's Function without Bounds from CEC 2005.
     
-    f(x) = sum(z_i^2/4000) - prod(cos(z_i/sqrt(i))) + 1 + bias
-    where z = (x - o) * M, M is a rotation matrix
+    f(x) = sum(z_i^2/4000) - prod(cos(z_i/sqrt(i+1))) + 1 + bias
+    where z = M * (x - o), M is a rotation matrix
     
     Global optimum: f(o) = bias = -180
     
@@ -1131,70 +1093,63 @@ class F07(CEC2005Function):
             # Using much larger bounds as the function is unbounded in the original specification
             bounds = np.array([[-1000, 1000]] * dimension)
         
+        # Set use_rotation to true before calling parent constructor
         self.use_rotation = True
         super().__init__(dimension, function_number=7, bounds=bounds, data_dir=data_dir)
-        self.bias = -180.0
         
-        # Apply a condition number of 3 to the rotation matrix
-        # In the original paper, M = M' * (1 + 0.3 * |N(0,1)|)
-        self.rotation_matrix = self.rotation_matrix * (1 + 0.3 * abs(np.random.normal()))
+        # Define function-specific metadata
+        self.metadata.update({
+            "name": "F07 - Shifted Rotated Griewank's Function without Bounds",
+            "is_shifted": True,
+            "is_rotated": True,
+            "is_biased": True,
+            "is_unimodal": False,
+            "is_multimodal": True,
+            "is_separable": False
+        })
+        
+        # Set bias value from the CEC_2005_BIAS mapping constant
+        self.bias = CEC_2005_BIAS[7]
+
+        # Create GriewankCore function - this is the base implementation without shift/rotate/bias
+        from ..multimodal.griewank import GriewankFunction
+        func = GriewankFunction(dimension)
+
+        # Apply combined shift-then-rotate transformation matching the CEC C code sequence
+        shifted_rotated_func = ShiftThenRotateFunction(func, self.shift_vector, self.rotation_matrix)
+
+        # Apply BiasedFunction decorator to add the bias
+        self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
-        Evaluate the F07 function at point x.
+        Evaluate the function at point x.
         
         Args:
-            x (np.ndarray): A point in the search space.
+            x (np.ndarray): Input vector of dimension D.
             
         Returns:
-            float: The function value at point x.
+            float: Function value at x.
         """
-        # Validate and preprocess the input
         x = self._validate_input(x)
         
-        # Apply transformations (shift and rotation)
-        z = self._transform_input(x)
-        
-        # Compute sum term
-        sum_term = np.sum(z**2) / 4000.0
-        
-        # Compute product term
-        indices = np.arange(1, self.dimension + 1)
-        prod_term = np.prod(np.cos(z / np.sqrt(indices)))
-        
-        return float(sum_term - prod_term + 1.0) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate(x)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
-        Evaluate the F07 function on a batch of points.
+        Evaluate the function at multiple points.
         
         Args:
-            X (np.ndarray): A batch of points in the search space.
+            X (np.ndarray): Input matrix of shape (N, D).
             
         Returns:
-            np.ndarray: The function values for each point.
+            np.ndarray: Function values at each point, shape (N,).
         """
-        # Validate the batch input
         X = self._validate_batch_input(X)
         
-        # Apply transformations
-        Z = self._transform_batch(X)
-        
-        # Compute values for each point
-        result = np.zeros(X.shape[0])
-        for i in range(X.shape[0]):
-            z = Z[i]
-            
-            # Compute sum term
-            sum_term = np.sum(z**2) / 4000.0
-            
-            # Compute product term
-            indices = np.arange(1, self.dimension + 1)
-            prod_term = np.prod(np.cos(z / np.sqrt(indices)))
-            
-            result[i] = sum_term - prod_term + 1.0
-        
-        return result + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F08: Shifted Rotated Ackley's Function with Global Optimum on Bounds
@@ -1203,7 +1158,7 @@ class F08(CEC2005Function):
     F08: Shifted Rotated Ackley's Function with Global Optimum on Bounds from CEC 2005.
     
     f(x) = -20*exp(-0.2*sqrt(sum(z_i^2)/D)) - exp(sum(cos(2π*z_i))/D) + 20 + e + bias
-    where z = (x - o) * M, M is a rotation matrix
+    where z = M * (x - o), M is a rotation matrix
     
     Global optimum: f(o) = bias = -140
     
@@ -1231,69 +1186,67 @@ class F08(CEC2005Function):
         
         self.use_rotation = True
         super().__init__(dimension, function_number=8, bounds=bounds, data_dir=data_dir)
-        self.bias = -140.0
+        
+        # Set bias value from the CEC_2005_BIAS mapping constant
+        self.bias = CEC_2005_BIAS[8]
         
         # For F08, global optimum is partially on bounds
-        # Set odd indexed elements to the lower bound (-32)
+        # Set even indexed elements to the lower bound (-32)
         for i in range(0, self.dimension, 2):
             if i < self.dimension:
                 self.shift_vector[i] = -32
+        
+        # Define function-specific metadata
+        self.metadata.update({
+            "name": "F08 - Shifted Rotated Ackley's Function with Global Optimum on Bounds",
+            "is_shifted": True,
+            "is_rotated": True,
+            "is_biased": True,
+            "is_unimodal": False,
+            "is_multimodal": True,
+            "is_separable": False,
+            "global_optimum_on_bounds": True
+        })
+        
+        # Create AckleyFunction - this is the base implementation without shift/rotate/bias
+        from ..multimodal.ackley import AckleyFunction
+        func = AckleyFunction(dimension)
+
+        # Apply combined shift-then-rotate transformation matching the CEC C code sequence
+        shifted_rotated_func = ShiftThenRotateFunction(func, self.shift_vector, self.rotation_matrix)
+
+        # Apply BiasedFunction decorator to add the bias
+        self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
-        Evaluate the F08 function at point x.
+        Evaluate the function at point x.
         
         Args:
-            x (np.ndarray): A point in the search space.
+            x (np.ndarray): Input vector of dimension D.
             
         Returns:
-            float: The function value at point x.
+            float: Function value at x.
         """
-        # Validate and preprocess the input
         x = self._validate_input(x)
         
-        # Apply transformations (shift and rotation)
-        z = self._transform_input(x)
-        
-        # Compute function value
-        sum_sq = np.sum(z**2) / self.dimension
-        sum_cos = np.sum(np.cos(2 * np.pi * z)) / self.dimension
-        
-        term1 = -20.0 * np.exp(-0.2 * np.sqrt(sum_sq))
-        term2 = -np.exp(sum_cos)
-        
-        return float(term1 + term2 + 20.0 + np.e) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate(x)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
-        Evaluate the F08 function on a batch of points.
+        Evaluate the function at multiple points.
         
         Args:
-            X (np.ndarray): A batch of points in the search space.
+            X (np.ndarray): Input matrix of shape (N, D).
             
         Returns:
-            np.ndarray: The function values for each point.
+            np.ndarray: Function values at each point, shape (N,).
         """
-        # Validate the batch input
         X = self._validate_batch_input(X)
         
-        # Apply transformations
-        Z = self._transform_batch(X)
-        
-        # Compute function values
-        result = np.zeros(X.shape[0])
-        for i in range(X.shape[0]):
-            z = Z[i]
-            
-            sum_sq = np.sum(z**2) / self.dimension
-            sum_cos = np.sum(np.cos(2 * np.pi * z)) / self.dimension
-            
-            term1 = -20.0 * np.exp(-0.2 * np.sqrt(sum_sq))
-            term2 = -np.exp(sum_cos)
-            
-            result[i] = term1 + term2 + 20.0 + np.e
-        
-        return result + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F09: Shifted Rastrigin's Function
