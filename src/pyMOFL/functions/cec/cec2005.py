@@ -34,6 +34,7 @@ from ..unimodal.sphere import SphereFunction
 from ..unimodal.elliptic import HighConditionedElliptic
 from ..unimodal.rosenbrock import RosenbrockFunction
 
+from ..multimodal.ackley import AckleyFunction
 from ..multimodal.griewank import GriewankFunction
 
 # Import decorators
@@ -95,7 +96,7 @@ class CEC2005Function(OptimizationFunction):
         bias (float): The bias value (function value at global optimum).
     """
     
-    def __init__(self, dimension: int, function_number: int, bounds: np.ndarray = None, 
+    def __init__(self, dimension: int, function_number: int, bounds: np.ndarray = None,
                  data_dir: str = None, use_rotation: bool = False):
         """
         Initialize a CEC 2005 benchmark function.
@@ -1107,7 +1108,7 @@ class F07(CEC2005Function):
         if bounds is None:
             # Using much larger bounds as the function is unbounded in the original specification
             bounds = np.array([[-1000, 1000]] * dimension)
-        
+
         super().__init__(dimension, function_number=7, bounds=bounds, data_dir=data_dir, use_rotation=True)
         
         # Define function-specific metadata
@@ -1195,13 +1196,13 @@ class F08(CEC2005Function):
         # Ackley's function has different bounds: [-32, 32]
         if bounds is None:
             bounds = np.array([[-32, 32]] * dimension)
-        
-        self.use_rotation = True
-        super().__init__(dimension, function_number=8, bounds=bounds, data_dir=data_dir)
+
+        super().__init__(dimension, function_number=8, bounds=bounds, data_dir=data_dir, use_rotation=True)
         
         # Set bias value from the CEC_2005_BIAS mapping constant
         self.bias = CEC_2005_BIAS[8]
         
+        # This is copied from the CEC C code initialization of the shift vector
         # For F08, global optimum is partially on bounds
         # Set even indexed elements to the lower bound (-32)
         for i in range(0, self.dimension, 2):
@@ -1221,7 +1222,6 @@ class F08(CEC2005Function):
         })
         
         # Create AckleyFunction - this is the base implementation without shift/rotate/bias
-        from ..multimodal.ackley import AckleyFunction
         func = AckleyFunction(dimension)
 
         # Apply combined shift-then-rotate transformation matching the CEC C code sequence

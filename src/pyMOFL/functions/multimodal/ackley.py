@@ -62,6 +62,10 @@ class AckleyFunction(OptimizationFunction):
         self.a = a
         self.b = b
         self.c = c
+
+        # pre-compute constants
+        self._const = self.a + np.e
+        self._inv_d = 1.0 / dimension               # 1 / D
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -75,18 +79,14 @@ class AckleyFunction(OptimizationFunction):
         """
         # Validate and preprocess the input
         x = self._validate_input(x)
-        n = len(x)
-        
-        # First exponential term
-        sum_squares = np.sum(x**2)
-        term1 = -self.a * np.exp(-self.b * np.sqrt(sum_squares / n))
-        
-        # Second exponential term
-        sum_cos = np.sum(np.cos(self.c * x))
-        term2 = -np.exp(sum_cos / n)
-        
-        # Combine terms with constants
-        return float(term1 + term2 + self.a + np.e)
+
+        s1 = np.dot(x, x)                           # Σ x²
+        s2 = np.cos(self.c * x).sum()               # Σ cos(2πx)
+
+        term1 = -self.a * np.exp(-self.b * np.sqrt(s1 * self._inv_d))
+        term2 = -np.exp(s2 * self._inv_d)
+
+        return float(term1 + term2 + self._const)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -100,26 +100,16 @@ class AckleyFunction(OptimizationFunction):
         """
         # Validate the batch input
         X = self._validate_batch_input(X)
-        
-        n_points, n_dims = X.shape
-        results = np.zeros(n_points)
-        
-        # For each point in the batch
-        for p in range(n_points):
-            x = X[p]
-            
-            # First exponential term
-            sum_squares = np.sum(x**2)
-            term1 = -self.a * np.exp(-self.b * np.sqrt(sum_squares / n_dims))
-            
-            # Second exponential term
-            sum_cos = np.sum(np.cos(self.c * x))
-            term2 = -np.exp(sum_cos / n_dims)
-            
-            # Combine terms with constants
-            results[p] = term1 + term2 + self.a + np.e
-        
-        return results
+
+        # Σ x²  per row
+        s1 = np.einsum("ij,ij->i", X, X, optimize="greedy")  # faster than (X**2).sum(axis=1)
+        # Σ cos(2πx)  per row
+        s2 = np.cos(self.c * X, out=X).sum(axis=1)            # reuse X’s buffer → minor win
+
+        term1 = -self.a * np.exp(-self.b * np.sqrt(s1 * self._inv_d))
+        term2 = -np.exp(s2 * self._inv_d)
+
+        return term1 + term2 + self._const
     
     @staticmethod
     def get_global_minimum(dimension: int) -> tuple:
