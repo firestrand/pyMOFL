@@ -34,6 +34,8 @@ from ..unimodal.sphere import SphereFunction
 from ..unimodal.elliptic import HighConditionedElliptic
 from ..unimodal.rosenbrock import RosenbrockFunction
 
+from ..multimodal.griewank import GriewankFunction
+
 # Import decorators
 from ...decorators.shifted import ShiftedFunction
 from ...decorators.biased import BiasedFunction
@@ -230,22 +232,35 @@ class CEC2005Function(OptimizationFunction):
         if self.use_rotation:
             rot_file = None
             
-            # First try to get the rotation file path from the manifest
-            if "files" in func_info and "rotation" in func_info["files"]:
+            # First try to get the dimension-specific rotation file path from the manifest
+            dim_specific_key = f"rot{self.dimension}"
+            if "files" in func_info and dim_specific_key in func_info["files"]:
+                potential_file = os.path.join(self.data_dir, func_info["files"][dim_specific_key])
+                if os.path.exists(potential_file):
+                    rot_file = potential_file
+            
+            # Then try the generic "rotation" key if dimension-specific wasn't found
+            if rot_file is None and "files" in func_info and "rotation" in func_info["files"]:
                 potential_file = os.path.join(self.data_dir, func_info["files"]["rotation"])
                 if os.path.exists(potential_file):
                     rot_file = potential_file
             
             # If not found in manifest, try the standard naming convention
             if rot_file is None:
-                for dim in [self.dimension, 50, 30, 10]:  # Try exact dimension first, then others
-                    potential_file = os.path.join(self.data_dir, func_key, f"rot_D{dim}.txt")
-                    if os.path.exists(potential_file):
-                        rot_file = potential_file
-                        break
+                # First try exact dimension
+                potential_file = os.path.join(self.data_dir, func_key, f"rot_D{self.dimension}.txt")
+                if os.path.exists(potential_file):
+                    rot_file = potential_file
+                else:
+                    # Then try to find any rotation matrix, preferring larger dimensions
+                    for dim in [50, 30, 10, 2]:  # Try different dimensions, starting with largest
+                        potential_file = os.path.join(self.data_dir, func_key, f"rot_D{dim}.txt")
+                        if os.path.exists(potential_file):
+                            rot_file = potential_file
+                            break
             
             if rot_file is None:
-                raise FileNotFoundError(f"Rotation matrix file not found for function {func_key}")
+                raise FileNotFoundError(f"Rotation matrix file not found for function {func_key} dimension {self.dimension}")
             
             try:
                 # Load the full rotation matrix
@@ -1093,9 +1108,7 @@ class F07(CEC2005Function):
             # Using much larger bounds as the function is unbounded in the original specification
             bounds = np.array([[-1000, 1000]] * dimension)
         
-        # Set use_rotation to true before calling parent constructor
-        self.use_rotation = True
-        super().__init__(dimension, function_number=7, bounds=bounds, data_dir=data_dir)
+        super().__init__(dimension, function_number=7, bounds=bounds, data_dir=data_dir, use_rotation=True)
         
         # Define function-specific metadata
         self.metadata.update({
@@ -1112,7 +1125,6 @@ class F07(CEC2005Function):
         self.bias = CEC_2005_BIAS[7]
 
         # Create GriewankCore function - this is the base implementation without shift/rotate/bias
-        from ..multimodal.griewank import GriewankFunction
         func = GriewankFunction(dimension)
 
         # Apply combined shift-then-rotate transformation matching the CEC C code sequence

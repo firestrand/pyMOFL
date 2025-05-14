@@ -35,7 +35,10 @@
       ],
       "files": {
         "shift": "f03/shift_D50.txt",
-        "rot": "f03/rot_D2.txt"
+        "rot2": "f03/rot_D2.txt",
+        "rot10": "f03/rot_D10.txt",
+        "rot30": "f03/rot_D30.txt",
+        "rot50": "f03/rot_D50.txt"
       }
     },
     "f04": {
@@ -84,7 +87,10 @@
       ],
       "files": {
         "shift": "f07/shift_D50.txt",
-        "rot": "f07/rot_D2.txt"
+        "rot2": "f07/rot_D2.txt",
+        "rot10": "f07/rot_D10.txt",
+        "rot30": "f07/rot_D30.txt",
+        "rot50": "f07/rot_D50.txt"
       }
     },
     "f08": {
@@ -97,7 +103,10 @@
       ],
       "files": {
         "shift": "f08/shift_D50.txt",
-        "rot": "f08/rot_D2.txt"
+        "rot2": "f08/rot_D2.txt",
+        "rot10": "f08/rot_D10.txt",
+        "rot30": "f08/rot_D30.txt",
+        "rot50": "f08/rot_D50.txt"
       }
     },
     "f09": {
@@ -122,7 +131,10 @@
       ],
       "files": {
         "shift": "f10/shift_D50.txt",
-        "rot": "f10/rot_D2.txt"
+        "rot2": "f10/rot_D2.txt",
+        "rot10": "f10/rot_D10.txt",
+        "rot30": "f10/rot_D30.txt",
+        "rot50": "f10/rot_D50.txt"
       }
     },
     "f11": {
@@ -135,7 +147,10 @@
       ],
       "files": {
         "shift": "f11/shift_D50.txt",
-        "rot": "f11/rot_D2.txt"
+        "rot2": "f11/rot_D2.txt",
+        "rot10": "f11/rot_D10.txt",
+        "rot30": "f11/rot_D30.txt",
+        "rot50": "f11/rot_D50.txt"
       }
     },
     "f12": {
@@ -172,7 +187,10 @@
       ],
       "files": {
         "shift": "f14/shift_D50.txt",
-        "rot": "f14/rot_D2.txt"
+        "rot2": "f14/rot_D2.txt",
+        "rot10": "f14/rot_D10.txt",
+        "rot30": "f14/rot_D30.txt",
+        "rot50": "f14/rot_D50.txt"
       }
     },
     "f15": {
@@ -197,7 +215,10 @@
       ],
       "files": {
         "shift": "f16/shift_D50.txt",
-        "rot": "f16/rot_D2.txt"
+        "rot2": "f16/rot_D2.txt",
+        "rot10": "f16/rot_D10.txt",
+        "rot30": "f16/rot_D30.txt",
+        "rot50": "f16/rot_D50.txt"
       }
     },
     "f17": {
@@ -210,7 +231,10 @@
       ],
       "files": {
         "shift": "f17/shift_D50.txt",
-        "rot": "f17/rot_D2.txt"
+        "rot2": "f17/rot_D2.txt",
+        "rot10": "f17/rot_D10.txt",
+        "rot30": "f17/rot_D30.txt",
+        "rot50": "f17/rot_D50.txt"
       }
     },
     "f18": {
@@ -223,7 +247,10 @@
       ],
       "files": {
         "shift": "f18/shift_D50.txt",
-        "rot": "f18/rot_D2.txt"
+        "rot2": "f18/rot_D2.txt",
+        "rot10": "f18/rot_D10.txt",
+        "rot30": "f18/rot_D30.txt",
+        "rot50": "f18/rot_D50.txt"
       }
     },
     "f19": {
@@ -236,7 +263,10 @@
       ],
       "files": {
         "shift": "f19/shift_D50.txt",
-        "rot": "f19/rot_D2.txt"
+        "rot2": "f19/rot_D2.txt",
+        "rot10": "f19/rot_D10.txt",
+        "rot30": "f19/rot_D30.txt",
+        "rot50": "f19/rot_D50.txt"
       }
     },
     "f20": {
@@ -249,7 +279,10 @@
       ],
       "files": {
         "shift": "f20/shift_D50.txt",
-        "rot": "f20/rot_D2.txt"
+        "rot2": "f20/rot_D2.txt",
+        "rot10": "f20/rot_D10.txt",
+        "rot30": "f20/rot_D30.txt",
+        "rot50": "f20/rot_D50.txt"
       }
     },
     "f21": {
@@ -262,7 +295,10 @@
       ],
       "files": {
         "shift": "f21/shift_D50.txt",
-        "rot": "f21/rot_D2.txt"
+        "rot2": "f21/rot_D2.txt",
+        "rot10": "f21/rot_D10.txt",
+        "rot30": "f21/rot_D30.txt",
+        "rot50": "f21/rot_D50.txt"
       }
     },
     "f22": {
@@ -275,7 +311,10 @@
       ],
       "files": {
         "shift": "f22/shift_D50.txt",
-        "rot": "f22/rot_sub_D2.txt"
+        "rot2": "f22/rot_sub_D2.txt",
+        "rot10": "f22/rot_sub_D10.txt",
+        "rot30": "f22/rot_sub_D30.txt",
+        "rot50": "f22/rot_sub_D50.txt"
       }
     },
     "f23": {
@@ -288,7 +327,10 @@
       ],
       "files": {
         "shift": "f23/shift_D50.txt",
-        "rot": "f23/rot_D2.txt"
+        "rot2": "f23/rot_D2.txt",
+        "rot10": "f23/rot_D10.txt",
+        "rot30": "f23/rot_D30.txt",
+        "rot50": "f23/rot_D50.txt"
       }
     },
     "f24": {
@@ -301,7 +343,10 @@
       ],
       "files": {
         "shift": "f24/shift_D50.txt",
-        "rot": "f24/rot_D2.txt"
+        "rot2": "f24/rot_D2.txt",
+        "rot10": "f24/rot_D10.txt",
+        "rot30": "f24/rot_D30.txt",
+        "rot50": "f24/rot_D50.txt"
       }
     },
     "f25": {
@@ -314,7 +359,10 @@
       ],
       "files": {
         "shift": "f25/shift_D50.txt",
-        "rot": "f25/rot_D2.txt"
+        "rot2": "f25/rot_D2.txt",
+        "rot10": "f25/rot_D10.txt",
+        "rot30": "f25/rot_D30.txt",
+        "rot50": "f25/rot_D50.txt"
       }
     }
   }

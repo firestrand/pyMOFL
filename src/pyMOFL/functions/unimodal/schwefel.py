@@ -65,15 +65,9 @@ class SchwefelFunction12(OptimizationFunction):
         x = self._validate_input(x)
         
         # Compute the function value
-        n = len(x)
-        result = 0.0
-        for i in range(n):
-            # Calculate the sum of x from j=1 to i
-            sum_j = np.sum(x[:i+1])
-            result += sum_j**2
-        
-        return float(result)
-    
+        prefix = np.cumsum(x, dtype=np.float64)  # prefix[k] = Σ_{j≤k} x[j]
+        return float(np.dot(prefix, prefix))
+
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
         Evaluate the Schwefel's Problem 1.2 function on a batch of points.

@@ -53,9 +53,8 @@ class GriewankFunction(OptimizationFunction):
         super().__init__(dimension, bounds)
         
         # Pre-calculate square roots of indices to avoid repeated computation
-        # In the original C implementation, it's sqrt(1.0+i) where i is 0-indexed
-        self._sqrt_indices = np.sqrt(np.arange(1, dimension + 1))  # sqrt(1), sqrt(2), ..., sqrt(dimension)
-    
+        self._inv_sqrt = 1.0 / np.sqrt(np.arange(1, dimension + 1, dtype=np.float64))  # 1 / √(i+1)
+
     def evaluate(self, x: np.ndarray) -> float:
         """
         Evaluate the Griewank function at point x.
@@ -69,15 +68,11 @@ class GriewankFunction(OptimizationFunction):
         # Validate and preprocess the input
         x = self._validate_input(x)
         
-        # Calculate the sum term
-        sum_term = np.sum(x**2) / 4000.0
-        
-        # Calculate the product term
-        # Using sqrt(1+i) as in the original C implementation
-        prod_term = np.prod(np.cos(x / self._sqrt_indices))
-        
-        # Combine terms
-        return float(sum_term - prod_term + 1.0)
+        # dot is a tuned BLAS call, slightly faster than (x*x).sum()
+        s = np.dot(x, x)
+        # multiply once instead of divide every time: x * inv_sqrt
+        p = np.cos(x * self._inv_sqrt).prod()
+        return 1.0 + s * 0.00025 - p       # 1/4000 = 0.00025
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -106,7 +101,7 @@ class GriewankFunction(OptimizationFunction):
             prod_term = np.prod(np.cos(x / self._sqrt_indices))
             
             # Combine terms
-            results[p] = sum_term - prod_term + 1.0
+            results[p] = sum_term - float(prod_term) + 1.0
         
         return results
     
