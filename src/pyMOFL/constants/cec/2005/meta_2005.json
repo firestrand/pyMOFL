@@ -162,7 +162,9 @@
         50
       ],
       "files": {
-        "bias": "f12/bias_D50.txt"
+        "alpha": "f12/alpha_D50.txt",
+        "A": "f12/A_D50.txt",
+        "B": "f12/B_D50.txt"
       }
     },
     "f13": {

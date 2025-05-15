@@ -1367,9 +1367,8 @@ class F10(CEC2005Function):
         if bounds is None:
             bounds = np.array([[-5, 5]] * dimension)
         
-        self.use_rotation = True
-        super().__init__(dimension, function_number=10, bounds=bounds, data_dir=data_dir)
-        self.bias = -330.0
+        super().__init__(dimension, function_number=10, bounds=bounds, data_dir=data_dir, use_rotation=True)
+        self.bias = CEC_2005_BIAS[10]
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -1445,9 +1444,8 @@ class F11(CEC2005Function):
         if bounds is None:
             bounds = np.array([[-0.5, 0.5]] * dimension)
         
-        self.use_rotation = True
-        super().__init__(dimension, function_number=11, bounds=bounds, data_dir=data_dir)
-        self.bias = 90.0
+        super().__init__(dimension, function_number=11, bounds=bounds, data_dir=data_dir, use_rotation=True)
+        self.bias = CEC_2005_BIAS[11]
         
         # Set constants
         self.a = 0.5
@@ -1539,7 +1537,7 @@ class F12(CEC2005Function):
     Attributes:
         dimension (int): The dimensionality of the function.
         bounds (np.ndarray): Bounds for each dimension, default is [-π, π].
-        shift_vector (np.ndarray): The shift vector α (used as o).
+        alpha (np.ndarray): The α vector (used as shift vector in other functions).
         a (np.ndarray): Matrix a.
         b (np.ndarray): Matrix b.
         A (np.ndarray): Vector A.
@@ -1559,11 +1557,21 @@ class F12(CEC2005Function):
         if bounds is None:
             bounds = np.array([[-np.pi, np.pi]] * dimension)
         
-        self.use_rotation = False
         super().__init__(dimension, function_number=12, bounds=bounds, data_dir=data_dir)
-        self.bias = -460.0
+        self.bias = CEC_2005_BIAS[12]
+        
+        # Define function-specific metadata
+        self.metadata.update({
+            "name": "F12 - Schwefel's Problem 2.13",
+            "is_shifted": True,  # Uses alpha as shift vector
+            "is_biased": True,
+            "is_unimodal": False,
+            "is_multimodal": True,
+            "is_separable": False  # Not separable due to matrix operations
+        })
         
         # Initialize matrices and vectors
+        self.alpha = None
         self.a = None
         self.b = None
         self.A = None
@@ -1573,49 +1581,113 @@ class F12(CEC2005Function):
         """
         Load function-specific parameters.
         
-        This method extends the base class method to load the a and b matrices and α vector.
+        F12 doesn't use the standard shift/rotation pattern, so we override this method.
+        This method also loads and stores the specific file paths for alpha, A, and B matrices.
         """
-        super()._load_function_parameters()
+        # Load manifest file to get the base data directory
+        import os
+        import json
         
-        # In this case, the shift vector is actually the α vector
-        # So we'll just make sure it's loaded in the right range [-π, π]
-        if not hasattr(self, 'shift_vector') or self.shift_vector is None:
-            self.shift_vector = np.random.uniform(-np.pi, np.pi, self.dimension)
+        if not self.data_dir or not os.path.exists(self.data_dir):
+            raise FileNotFoundError(f"CEC2005 data directory not found: {self.data_dir}")
         
-        # Load a and b matrices or generate them if data files not available
-        if self.data_dir and os.path.exists(self.data_dir):
-            a_file = os.path.join(self.data_dir, f"f{self.function_number:02d}_a.dat")
-            b_file = os.path.join(self.data_dir, f"f{self.function_number:02d}_b.dat")
-            
-            if os.path.exists(a_file) and os.path.exists(b_file):
-                try:
-                    self.a = np.loadtxt(a_file)[:self.dimension, :self.dimension]
-                    self.b = np.loadtxt(b_file)[:self.dimension, :self.dimension]
-                except Exception as e:
-                    print(f"Error loading a and b matrices: {e}")
-                    self._generate_matrices()
-            else:
-                self._generate_matrices()
-        else:
-            self._generate_matrices()
-    
-    def _generate_matrices(self):
-        """Generate the a and b matrices with random integer values."""
-        self.a = np.random.randint(-100, 101, size=(self.dimension, self.dimension))
-        self.b = np.random.randint(-100, 101, size=(self.dimension, self.dimension))
+        # Load manifest file
+        manifest_path = os.path.join(self.data_dir, "meta_2005.json")
+        if not os.path.exists(manifest_path):
+            raise FileNotFoundError(f"CEC2005 manifest file not found: {manifest_path}")
+        
+        try:
+            with open(manifest_path, 'r') as f:
+                manifest = json.load(f)
+        except Exception as e:
+            raise RuntimeError(f"Failed to load CEC2005 manifest file: {e}")
+        
+        # Get function information from manifest
+        func_key = f"f{self.function_number:02d}"
+        
+        if "functions" not in manifest or func_key not in manifest["functions"]:
+            raise ValueError(f"Function {func_key} not found in manifest")
+        
+        func_info = manifest["functions"][func_key]
+        
+        # Load bias value from manifest or use the global bias map
+        self.bias = CEC_2005_BIAS.get(self.function_number, 0.0)
+        self.metadata["is_biased"] = self.bias != 0.0
+
+        # Store file paths for alpha, A, and B matrices
+        files_info = func_info.get("files", {})
+        if not all(k in files_info for k in ["alpha", "A", "B"]):
+            raise FileNotFoundError(
+                f"Missing alpha, A, or B file paths in manifest for {func_key}. "
+                f"Ensure 'alpha', 'A', and 'B' keys exist under 'files' for {func_key} in meta_2005.json."
+            )
+
+        self._alpha_vector_path = os.path.join(self.data_dir, files_info["alpha"])
+        self._a_matrix_path = os.path.join(self.data_dir, files_info["A"])
+        self._b_matrix_path = os.path.join(self.data_dir, files_info["B"])
+
+        # Ensure these files exist before proceeding to _initialize_matrices
+        for path, name in [
+            (self._alpha_vector_path, "Alpha vector"),
+            (self._a_matrix_path, "A matrix"),
+            (self._b_matrix_path, "B matrix"),
+        ]:
+            if not os.path.exists(path):
+                raise FileNotFoundError(f"{name} data file not found: {path}")
     
     def _initialize_matrices(self):
-        """Initialize the a and b matrices and compute A vector."""
-        if self.a is None or self.b is None:
-            self._generate_matrices()
+        """
+        Initialize the matrices for F12 from data files specified in the manifest.
         
-        # Compute A vector
+        This loads alpha vector, A matrix, and B matrix from their respective _D50.txt
+        files and slices them to the current function dimension.
+        """
+        import numpy as np
+        
+        dim = self.dimension
+        
+        try:
+            # Load full 50-dimensional data
+            # Assumes alpha_D50.txt loads as 1D array (50,)
+            # Assumes A_D50.txt and B_D50.txt load as 2D arrays (50,50)
+            alpha_full = np.loadtxt(self._alpha_vector_path)
+            a_full = np.loadtxt(self._a_matrix_path)
+            b_full = np.loadtxt(self._b_matrix_path)
+
+            # Basic validation of loaded shapes (assuming D50 files)
+            # More robust checks could compare against a known MAX_DIM if available
+            if alpha_full.ndim != 1 or alpha_full.shape[0] < dim:
+                raise ValueError(f"Loaded alpha data from {self._alpha_vector_path} has unexpected shape {alpha_full.shape} for dimension {dim}.")
+            if a_full.ndim != 2 or a_full.shape[0] < dim or a_full.shape[1] < dim:
+                raise ValueError(f"Loaded A matrix data from {self._a_matrix_path} has unexpected shape {a_full.shape} for dimension {dim}.")
+            if b_full.ndim != 2 or b_full.shape[0] < dim or b_full.shape[1] < dim:
+                raise ValueError(f"Loaded B matrix data from {self._b_matrix_path} has unexpected shape {b_full.shape} for dimension {dim}.")
+
+            # Slice to current dimension
+            self.alpha = alpha_full[:dim]
+            self.a = a_full[:dim, :dim]
+            self.b = b_full[:dim, :dim]
+            
+            # Use alpha as the shift vector (as per existing logic for F12)
+            self.shift_vector = self.alpha.copy()
+            
+            # Compute A vector (dependent on self.alpha, self.a, self.b)
+            self._compute_A_vector()
+            
+        except FileNotFoundError: # Should be caught by _load_function_parameters, but as safety
+            raise 
+        except Exception as e:
+            # Catch other potential errors during loadtxt or slicing
+            raise RuntimeError(f"Error processing F12 data files: {e}")
+    
+    def _compute_A_vector(self):
+        """Compute the A vector based on alpha, a, and b matrices."""
         self.A = np.zeros(self.dimension)
         for i in range(self.dimension):
             sum_val = 0.0
             for j in range(self.dimension):
-                sum_val += (self.a[i, j] * np.sin(self.shift_vector[j]) + 
-                           self.b[i, j] * np.cos(self.shift_vector[j]))
+                sum_val += (self.a[i, j] * np.sin(self.alpha[j]) + 
+                           self.b[i, j] * np.cos(self.alpha[j]))
             self.A[i] = sum_val
     
     def evaluate(self, x: np.ndarray) -> float:
