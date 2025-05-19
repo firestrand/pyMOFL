@@ -47,36 +47,6 @@ from ...decorators.shift_then_rotate import ShiftThenRotateFunction
 # Base imports
 from ...base import OptimizationFunction
 
-# Load global bias values for CEC 2005 functions
-# These are defined in the function specifications
-CEC_2005_BIAS = {
-    1: -450.0,   # F1: Shifted Sphere
-    2: -450.0,   # F2: Shifted Schwefel 1.2
-    3: -450.0,   # F3: Shifted Rotated High Conditioned Elliptic
-    4: -450.0,   # F4: Shifted Schwefel 1.2 with Noise
-    5: -310.0,   # F5: Schwefel 2.6 with Global Optimum on Bounds
-    6: 390.0,    # F6: Shifted Rosenbrock
-    7: -180.0,   # F7: Shifted Rotated Griewank without Bounds
-    8: -140.0,   # F8: Shifted Rotated Ackley with Global Optimum on Bounds
-    9: -330.0,   # F9: Shifted Rastrigin
-    10: -330.0,  # F10: Shifted Rotated Rastrigin
-    11: 90.0,    # F11: Shifted Rotated Weierstrass
-    12: -460.0,  # F12: Schwefel Problem 2.13
-    13: -130.0,  # F13: Shifted Expanded Griewank plus Rosenbrock
-    14: -300.0,  # F14: Shifted Rotated Expanded Scaffer F6
-    15: 120.0,   # F15: Hybrid Composition Function
-    16: 120.0,   # F16: Rotated Version of Hybrid Composition Function F15
-    17: 120.0,   # F17: F16 with Noise in Fitness
-    18: 10.0,    # F18: Rotated Hybrid Composition Function
-    19: 10.0,    # F19: Rotated Hybrid Composition Function with narrow basin for global optimum
-    20: 10.0,    # F20: Rotated Hybrid Composition Function with the global optimum on the bounds
-    21: 360.0,   # F21: Rotated Hybrid Composition Function
-    22: 360.0,   # F22: Rotated Hybrid Composition Function with high condition number matrix
-    23: 360.0,   # F23: Non-Continuous Rotated Hybrid Composition Function
-    24: 260.0,   # F24: Rotated Hybrid Composition Function
-    25: 260.0    # F25: Rotated Hybrid Composition Function without bounds
-}
-
 
 class CEC2005Function(OptimizationFunction):
     """
@@ -111,18 +81,20 @@ class CEC2005Function(OptimizationFunction):
             use_rotation (bool, optional): Whether to use rotation for this function.
                                           Default is False.
         """
-        # Set default bounds if not provided
-        if bounds is None:
-            # Most CEC 2005 functions use [-100, 100] bounds
-            bounds = np.array([[-100, 100]] * dimension)
-        
-        super().__init__(dimension, bounds)
-        
         self.function_number = function_number
-        self.bias = 0.0  # Most CEC 2005 functions have bias value = 0
+        self.bias = 0.0
         self.use_rotation = use_rotation
         
-        # Initialize metadata with default values
+        # Set default data directory if not provided
+        if data_dir is None:
+            # Use the package's constants directory
+            import os.path
+            package_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            self.data_dir = os.path.join(package_dir, 'constants', 'cec', '2005')
+        else:
+            self.data_dir = data_dir
+        
+        # Initialize metadata with default values (will be overridden by values from manifest)
         self.metadata = {
             "name": f"F{function_number:02d}",
             "is_shifted": False,
@@ -136,39 +108,52 @@ class CEC2005Function(OptimizationFunction):
             "global_optimum_on_bounds": False,
         }
         
-        # Set default data directory if not provided
-        if data_dir is None:
-            # Use the package's constants directory
-            import os.path
-            package_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            self.data_dir = os.path.join(package_dir, 'constants', 'cec', '2005')
-        else:
-            self.data_dir = data_dir
+        # Load function parameters from manifest
+        self._load_function_parameters()
+        
+        # Set bounds based on metadata or use provided bounds
+        if bounds is None:
+            default_bounds = self._get_default_bounds_from_metadata()
+            bounds = np.array([default_bounds] * dimension)
+        
+        # Initialize base class with dimension and bounds
+        super().__init__(dimension, bounds)
         
         # Initialize arrays
         self.shift_vector = np.zeros(dimension)
         self.rotation_matrix = np.eye(dimension)
         
-        # Load function parameters from data files
-        self._load_function_parameters()
+        # Load data files
+        self._load_data_files()
+    
+    def _get_default_bounds_from_metadata(self):
+        """
+        Get default bounds from metadata.
+        
+        Returns:
+            list: Default bounds [lower, upper] for this function.
+        """
+        func_key = f"f{self.function_number:02d}"
+        
+        try:
+            with open(os.path.join(self.data_dir, "meta_2005.json"), 'r') as f:
+                manifest = json.load(f)
+                
+            if "functions" in manifest and func_key in manifest["functions"]:
+                func_info = manifest["functions"][func_key]
+                if "default_bounds" in func_info:
+                    return func_info["default_bounds"]
+        except Exception as e:
+            print(f"Warning: Could not load default bounds from metadata: {e}")
+        
+        # Default fallback bounds
+        return [-100, 100]
     
     def _load_function_parameters(self):
         """
-        Load function-specific parameters.
+        Load function-specific parameters from manifest.
         
-        This method loads the shift vector and rotation matrix from data files
-        according to the standardized CEC constant naming convention.
-        
-        The method expects a meta_2005.json manifest file in the constants directory,
-        and will fail critically if it's missing.
-        
-        For CEC2005, the file structure follows the naming convention:
-        - shift_D{MAX_DIM}.txt: Contains shift vector values for up to MAX_DIM dimensions
-          (typically shift_D50.txt containing 50 values, from which we take the first D)
-        - rot_D{DIM}.txt: Contains rotation matrix for the specified dimension
-        
-        The shift and rotation files are located in function-specific subdirectories:
-        constants/cec/2005/f{FUNC_NUM:02d}/
+        This method loads metadata, bias, and other parameters from the meta_2005.json file.
         """
         import os
         import json
@@ -196,6 +181,42 @@ class CEC2005Function(OptimizationFunction):
         
         func_info = manifest["functions"][func_key]
         
+        # Load metadata from manifest
+        if "characteristics" in func_info:
+            self.metadata.update(func_info["characteristics"])
+        
+        # Update function name
+        if "name" in func_info:
+            self.metadata["name"] = func_info["name"]
+        
+        # Load bias value from manifest or use the global bias map
+        if "bias" in func_info:
+            self.bias = func_info["bias"]
+        self.metadata["is_biased"] = self.bias != 0.0
+    
+    def _load_data_files(self):
+        """
+        Load data files (shift vectors, rotation matrices) based on manifest info.
+        
+        This method is separate from _load_function_parameters to allow for a cleaner
+        separation of metadata loading and data file loading.
+        """
+        import os
+        import json
+        
+        # Load manifest file
+        manifest_path = os.path.join(self.data_dir, "meta_2005.json")
+        
+        try:
+            with open(manifest_path, 'r') as f:
+                manifest = json.load(f)
+        except Exception as e:
+            raise RuntimeError(f"Failed to load CEC2005 manifest file: {e}")
+        
+        # Get function information from manifest
+        func_key = f"f{self.function_number:02d}"
+        func_info = manifest["functions"][func_key]
+        
         # Load shift vector - try to find the appropriate file
         # CEC files typically contain data for larger dimensions (e.g., D50)
         # and we take the first D values for our dimension
@@ -215,19 +236,30 @@ class CEC2005Function(OptimizationFunction):
                     shift_file = potential_file
                     break
         
-        if shift_file is None:
+        if shift_file is None and self.metadata.get("is_shifted", False):
             raise FileNotFoundError(f"Shift vector file not found for function {func_key}")
         
-        try:
-            # Load the full shift vector and take only the first D values
-            full_shift_vector = np.loadtxt(shift_file)
-            if len(full_shift_vector) < self.dimension:
-                raise ValueError(f"Shift vector file contains {len(full_shift_vector)} values, "
-                                f"but {self.dimension} are needed")
-            
-            self.shift_vector = full_shift_vector[:self.dimension]
-        except Exception as e:
-            raise RuntimeError(f"Failed to load shift vector: {e}")
+        if shift_file:
+            try:
+                # Load the full shift vector and take only the first D values
+                full_shift_vector = np.loadtxt(shift_file)
+                if len(full_shift_vector) < self.dimension:
+                    # Instead of raising an error, replicate or pad the available values
+                    print(f"Warning: Shift vector file contains {len(full_shift_vector)} values, "
+                          f"but {self.dimension} are needed. Padding with zeros or replicating values.")
+                    
+                    # Use tile to repeat the vector until it's long enough
+                    if len(full_shift_vector) > 0:
+                        repetitions = int(np.ceil(self.dimension / len(full_shift_vector)))
+                        padded_vector = np.tile(full_shift_vector, repetitions)
+                        self.shift_vector = padded_vector[:self.dimension]
+                    else:
+                        # If the file is empty, use zeros
+                        self.shift_vector = np.zeros(self.dimension)
+                else:
+                    self.shift_vector = full_shift_vector[:self.dimension]
+            except Exception as e:
+                raise RuntimeError(f"Failed to load shift vector: {e}")
         
         # Load rotation matrix if needed - usually dimension specific
         if self.use_rotation:
@@ -260,31 +292,23 @@ class CEC2005Function(OptimizationFunction):
                             rot_file = potential_file
                             break
             
-            if rot_file is None:
+            if rot_file is None and self.metadata.get("is_rotated", False):
                 raise FileNotFoundError(f"Rotation matrix file not found for function {func_key} dimension {self.dimension}")
             
-            try:
-                # Load the full rotation matrix
-                full_rotation_matrix = np.loadtxt(rot_file)
-                
-                # Get appropriate sized submatrix if needed
-                if full_rotation_matrix.shape[0] >= self.dimension and full_rotation_matrix.shape[1] >= self.dimension:
-                    self.rotation_matrix = full_rotation_matrix[:self.dimension, :self.dimension].T # Transpose to match CEC convention
-                else:
-                    raise ValueError(f"Rotation matrix file contains {full_rotation_matrix.shape} matrix, "
-                                    f"but ({self.dimension}, {self.dimension}) is needed")
-            except Exception as e:
-                raise RuntimeError(f"Failed to load rotation matrix: {e}")
-        
-        # Load function bias from manifest or use the global bias map
-        if "bias" in func_info:
-            self.bias = func_info["bias"]
-        else:
-            # Use the global bias map if available
-            self.bias = CEC_2005_BIAS.get(self.function_number, 0.0)
-            
-        self.metadata["is_biased"] = self.bias != 0.0
-    
+            if rot_file:
+                try:
+                    # Load the full rotation matrix
+                    full_rotation_matrix = np.loadtxt(rot_file)
+                    
+                    # Get appropriate sized submatrix if needed
+                    if full_rotation_matrix.shape[0] >= self.dimension and full_rotation_matrix.shape[1] >= self.dimension:
+                        self.rotation_matrix = full_rotation_matrix[:self.dimension, :self.dimension].T # Transpose to match CEC convention
+                    else:
+                        raise ValueError(f"Rotation matrix file contains {full_rotation_matrix.shape} matrix, "
+                                        f"but ({self.dimension}, {self.dimension}) is needed")
+                except Exception as e:
+                    raise RuntimeError(f"Failed to load rotation matrix: {e}")
+
     @property
     def optimum_value(self) -> float:
         """
@@ -446,19 +470,6 @@ class F01(CEC2005Function):
         """
         super().__init__(dimension, 1, bounds, data_dir)
         
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F01 - Shifted Sphere Function",
-            "is_shifted": True,
-            "is_biased": True,
-            "is_unimodal": True,
-            "is_multimodal": False,
-            "is_separable": True
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[1]
-        
         # Create base function using decorators according to CEC 2005 specifications
         # 1. Create base Sphere function
         func = SphereFunction(dimension, bounds)
@@ -531,22 +542,9 @@ class F02(CEC2005Function):
         """
         super().__init__(dimension, 2, bounds, data_dir)
         
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F02 - Shifted Schwefel's Problem 1.2",
-            "is_shifted": True,
-            "is_biased": True,
-            "is_unimodal": True,
-            "is_multimodal": False,
-            "is_separable": False
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[2]
-        
         # Create base function using decorators according to CEC 2005 specifications
-        # 1. Create base Schwefel 1.2 function
-        func = SchwefelFunction12(dimension)
+        # 1. Create base Schwefel function
+        func = SchwefelFunction12(dimension, bounds)
         
         # 2. Apply shift transformation using the loaded shift vector
         shifted_func = ShiftedFunction(func, self.shift_vector)
@@ -615,20 +613,6 @@ class F03(CEC2005Function):
                                      If None, uses the default directory in the package.
         """
         super().__init__(dimension, 3, bounds, data_dir, use_rotation=True)
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F03 - Shifted Rotated High Conditioned Elliptic Function",
-            "is_shifted": True,
-            "is_rotated": True,
-            "is_biased": True,
-            "is_unimodal": True,
-            "is_multimodal": False,
-            "is_separable": False
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[3]
 
         # Start with the base EllipticFunction
         func = HighConditionedElliptic(dimension)
@@ -642,7 +626,6 @@ class F03(CEC2005Function):
 
         # Apply BiasedFunction decorator to add the bias
         self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
-
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -655,7 +638,7 @@ class F03(CEC2005Function):
             float: Function value at x.
         """
         x = self._validate_input(x)
-
+        
         # Use the composed function with decorators
         return self.base_func.evaluate(x)
     
@@ -670,7 +653,7 @@ class F03(CEC2005Function):
             np.ndarray: Function values at each point, shape (N,).
         """
         X = self._validate_batch_input(X)
-
+        
         # Use the composed function with decorators
         return self.base_func.evaluate_batch(X)
 
@@ -705,20 +688,6 @@ class F04(CEC2005Function):
                                      If None, uses the default directory in the package.
         """
         super().__init__(dimension, 4, bounds, data_dir)
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F04 - Shifted Schwefel's Problem 1.2 with Noise in Fitness",
-            "is_shifted": True,
-            "is_biased": True,
-            "is_unimodal": True,
-            "is_multimodal": False,
-            "is_separable": False,
-            "has_noise": True
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[4]
         
         # Create base function using decorators according to CEC 2005 specifications
         # 1. Create base Schwefel 1.2 function
@@ -797,19 +766,6 @@ class F05(CEC2005Function):
         """
         # Initialize parent class
         super().__init__(dimension, 5, bounds, data_dir)
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F05 - Schwefel's Problem 2.6 with Global Optimum on Bounds",
-            "is_shifted": True,
-            "is_biased": True,
-            "is_unimodal": True, 
-            "is_multimodal": False,
-            "is_separable": False
-        })
-        
-        # Set bias value from Schwefel's problem (negative to make global minimum)
-        self.bias = CEC_2005_BIAS[5]
         
         # Try to load data from f5_data_dump
         import os
@@ -1025,19 +981,7 @@ class F06(CEC2005Function):
                                      If None, uses the default directory in the package.
         """
         super().__init__(dimension, 6, bounds, data_dir)
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F06 - Shifted Rosenbrock's Function",
-            "is_shifted": True,
-            "is_biased": True,
-            "is_unimodal": False,  # Rosenbrock is actually multimodal for D > 3
-            "is_multimodal": True,
-            "is_separable": False
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[6]
+        self.metadata["name"] = "F06 - Shifted Rosenbrock's Function"
         
         # Create base function using decorators according to CEC 2005 specifications
         # 1. Create base Rosenbrock function
@@ -1120,34 +1064,14 @@ class F07(CEC2005Function):
             bounds = np.array([[-1000, 1000]] * dimension)
 
         super().__init__(dimension, function_number=7, bounds=bounds, data_dir=data_dir, use_rotation=True)
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F07 - Shifted Rotated Griewank's Function without Bounds",
-            "is_shifted": True,
-            "is_rotated": True,
-            "is_biased": True,
-            "is_unimodal": False,
-            "is_multimodal": True,
-            "is_separable": False
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[7]
-
-        # Create GriewankCore function - this is the base implementation without shift/rotate/bias
+        self.metadata["name"] = "F07 - Shifted Rotated Griewank's Function"
+        # Restore base_func construction
+        from ..multimodal.griewank import GriewankFunction
         func = GriewankFunction(dimension)
-
-        # Apply transformations using composition approach:
-        # 1. First apply rotation 
         rotated_func = RotatedFunction(func, self.rotation_matrix)
-        
-        # 2. Then apply shift (this produces the mathematically equivalent transformation to shift-then-rotate)
         shifted_rotated_func = ShiftedFunction(rotated_func, self.shift_vector)
-
-        # Apply BiasedFunction decorator to add the bias
         self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
-    
+
     def evaluate(self, x: np.ndarray) -> float:
         """
         Evaluate the function at point x.
@@ -1213,27 +1137,12 @@ class F08(CEC2005Function):
 
         super().__init__(dimension, function_number=8, bounds=bounds, data_dir=data_dir, use_rotation=True)
         
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[8]
-        
         # This is copied from the CEC C code initialization of the shift vector
         # For F08, global optimum is partially on bounds
         # Set even indexed elements to the lower bound (-32)
         for i in range(0, self.dimension, 2):
             if i < self.dimension:
                 self.shift_vector[i] = -32
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F08 - Shifted Rotated Ackley's Function with Global Optimum on Bounds",
-            "is_shifted": True,
-            "is_rotated": True,
-            "is_biased": True,
-            "is_unimodal": False,
-            "is_multimodal": True,
-            "is_separable": False,
-            "global_optimum_on_bounds": True
-        })
         
         # Create AckleyFunction - this is the base implementation without shift/rotate/bias
         func = AckleyFunction(dimension)
@@ -1311,19 +1220,6 @@ class F09(CEC2005Function):
             bounds = np.array([[-5, 5]] * dimension)
         
         super().__init__(dimension, function_number=9, bounds=bounds, data_dir=data_dir)
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F09 - Shifted Rastrigin\'s Function",
-            "is_shifted": True,
-            "is_biased": True,
-            "is_unimodal": False,
-            "is_multimodal": True,
-            "is_separable": True
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[9]
         
         # Create base function using decorators according to CEC 2005 specifications
         # 1. Create base Rastrigin function
@@ -1406,20 +1302,6 @@ class F10(CEC2005Function):
             bounds = np.array([[-5, 5]] * dimension)
         
         super().__init__(dimension, function_number=10, bounds=bounds, data_dir=data_dir, use_rotation=True)
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F10 - Shifted Rotated Rastrigin\'s Function",
-            "is_shifted": True,
-            "is_rotated": True,
-            "is_biased": True,
-            "is_unimodal": False,
-            "is_multimodal": True,
-            "is_separable": False
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[10]
         
         # Create base function using decorators according to CEC 2005 specifications
         # 1. Create base Rastrigin function
@@ -1505,20 +1387,6 @@ class F11(CEC2005Function):
             bounds = np.array([[-0.5, 0.5]] * dimension)
         
         super().__init__(dimension, function_number=11, bounds=bounds, data_dir=data_dir, use_rotation=True)
-        
-        # Define function-specific metadata
-        self.metadata.update({
-            "name": "F11 - Shifted Rotated Weierstrass Function",
-            "is_shifted": True,
-            "is_rotated": True,
-            "is_biased": True,
-            "is_unimodal": False,
-            "is_multimodal": True,
-            "is_separable": False
-        })
-        
-        # Set bias value from the CEC_2005_BIAS mapping constant
-        self.bias = CEC_2005_BIAS[11]
         
         # Create base function using decorators according to CEC 2005 specifications
         # 1. Create base Weierstrass function with appropriate parameters
@@ -1609,8 +1477,7 @@ class F12(CEC2005Function):
             bounds = np.array([[-np.pi, np.pi]] * dimension)
         
         super().__init__(dimension, function_number=12, bounds=bounds, data_dir=data_dir)
-        self.bias = CEC_2005_BIAS[12]
-        
+        # self.bias = 0.0  # Remove this line to use bias from metadata
         # Define function-specific metadata
         self.metadata.update({
             "name": "F12 - Schwefel's Problem 2.13",
@@ -1662,7 +1529,11 @@ class F12(CEC2005Function):
         func_info = manifest["functions"][func_key]
         
         # Load bias value from manifest or use the global bias map
-        self.bias = CEC_2005_BIAS.get(self.function_number, 0.0)
+        if "bias" in func_info:
+            self.bias = func_info["bias"]
+        else:
+            # Legacy fallback to the global bias mapping constant
+            self.bias = 0.0
         self.metadata["is_biased"] = self.bias != 0.0
 
         # Store file paths for alpha, A, and B matrices
@@ -1818,8 +1689,7 @@ class F13(CEC2005Function):
         
         self.use_rotation = False
         super().__init__(dimension, function_number=13, bounds=bounds, data_dir=data_dir)
-        self.bias = -130.0
-    
+
     def _transform_input(self, x: np.ndarray) -> np.ndarray:
         """
         DEPRECATED: Use decorators (ShiftedFunction, RotatedFunction, ShiftThenRotateFunction) instead.
@@ -1957,8 +1827,9 @@ class F14(CEC2005Function):
             data_dir (str, optional): Directory containing the CEC 2005 data files.
         """
         self.use_rotation = True
-        super().__init__(dimension, function_number=14, bounds=bounds, data_dir=data_dir)
-        self.bias = -300.0
+        super().__init__(dimension, function_number=14, bounds=bounds, data_dir=data_dir, use_rotation=True)
+        self.metadata["name"] = "F14 - Shifted Rotated Expanded Scaffer's F6 Function"
+        # Ensure rotation matrix is loaded and used if is_rotated is True (handled by base class)
     
     def _scaffer_f6(self, x: float, y: float) -> float:
         """
@@ -2067,19 +1938,6 @@ class F15(CEC2005Function):
         # Initialize parent class - note that we use the base class init
         # and handle some of the attributes (like shift_vector) differently
         super().__init__(dimension, function_number=15, bounds=bounds, data_dir=data_dir)
-        self.bias = 120.0
-        
-        # Update metadata for this function
-        self.metadata.update({
-            "name": "F15 - Hybrid Composition Function",
-            "is_shifted": True,
-            "is_rotated": False,
-            "is_biased": True,
-            "is_unimodal": False,
-            "is_multimodal": True,
-            "is_hybrid": True,
-            "is_separable": False
-        })
         
         # Number of basic functions
         self.n_func = 10
