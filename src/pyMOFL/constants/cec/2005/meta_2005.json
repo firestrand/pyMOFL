@@ -15,16 +15,13 @@
       },
       "bias": -450.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": true,
-        "is_multimodal": false,
-        "is_separable": true,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "unimodal",
+        "separability": "separable"
       },
-      "default_bounds": [-100.0, 100.0]
+      "default_bounds": [
+        -100.0,
+        100.0
+      ]
     },
     "f02": {
       "name": "Shifted Schwefel's Problem 1.2",
@@ -39,16 +36,13 @@
       },
       "bias": -450.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": true,
-        "is_multimodal": false,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "unimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-100.0, 100.0]
+      "default_bounds": [
+        -100.0,
+        100.0
+      ]
     },
     "f03": {
       "name": "Shifted Rotated High Conditioned Elliptic Function",
@@ -67,16 +61,13 @@
       },
       "bias": -450.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": true,
-        "is_multimodal": false,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "unimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-100.0, 100.0]
+      "default_bounds": [
+        -100.0,
+        100.0
+      ]
     },
     "f04": {
       "name": "Shifted Schwefel's Problem 1.2 with Noise in Fitness",
@@ -91,16 +82,14 @@
       },
       "bias": -450.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": true,
-        "is_multimodal": false,
-        "is_separable": false,
-        "has_noise": true,
-        "global_optimum_on_bounds": false
+        "modality": "unimodal",
+        "separability": "nonseparable",
+        "noise": true
       },
-      "default_bounds": [-100.0, 100.0]
+      "default_bounds": [
+        -100.0,
+        100.0
+      ]
     },
     "f05": {
       "name": "Schwefel's Problem 2.6 with Global Optimum on Bounds",
@@ -115,16 +104,14 @@
       },
       "bias": -310.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": true,
-        "is_multimodal": false,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": true
+        "modality": "unimodal",
+        "separability": "nonseparable",
+        "optimum_on_bounds": true
       },
-      "default_bounds": [-100.0, 100.0]
+      "default_bounds": [
+        -100.0,
+        100.0
+      ]
     },
     "f06": {
       "name": "Shifted Rosenbrock's Function",
@@ -139,16 +126,13 @@
       },
       "bias": 390.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-100.0, 100.0]
+      "default_bounds": [
+        -100.0,
+        100.0
+      ]
     },
     "f07": {
       "name": "Shifted Rotated Griewank's Function",
@@ -167,16 +151,13 @@
       },
       "bias": -180.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-1000.0, 1000.0]
+      "default_bounds": [
+        -1000.0,
+        1000.0
+      ]
     },
     "f08": {
       "name": "Shifted Rotated Ackley's Function with Global Optimum on Bounds",
@@ -195,16 +176,14 @@
       },
       "bias": -140.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": true
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "optimum_on_bounds": true
       },
-      "default_bounds": [-32.0, 32.0]
+      "default_bounds": [
+        -32.0,
+        32.0
+      ]
     },
     "f09": {
       "name": "Shifted Rastrigin's Function",
@@ -219,16 +198,13 @@
       },
       "bias": -330.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": true,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "separable"
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f10": {
       "name": "Shifted Rotated Rastrigin's Function",
@@ -247,16 +223,13 @@
       },
       "bias": -330.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f11": {
       "name": "Shifted Rotated Weierstrass Function",
@@ -275,16 +248,13 @@
       },
       "bias": 90.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-0.5, 0.5]
+      "default_bounds": [
+        -0.5,
+        0.5
+      ]
     },
     "f12": {
       "name": "Schwefel's Problem 2.13",
@@ -301,16 +271,13 @@
       },
       "bias": -460.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-3.14159265359, 3.14159265359]
+      "default_bounds": [
+        -3.14159265359,
+        3.14159265359
+      ]
     },
     "f13": {
       "name": "Shifted Expanded Griewank's plus Rosenbrock's Function (F8F2)",
@@ -325,16 +292,13 @@
       },
       "bias": -130.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f14": {
       "name": "Shifted Rotated Expanded Schaffer's F6 Function",
@@ -353,16 +317,13 @@
       },
       "bias": -300.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable"
       },
-      "default_bounds": [-100.0, 100.0]
+      "default_bounds": [
+        -100.0,
+        100.0
+      ]
     },
     "f15": {
       "name": "Hybrid Composition Function 1",
@@ -377,17 +338,14 @@
       },
       "bias": 120.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": false,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f16": {
       "name": "Rotated Hybrid Composition Function 1",
@@ -406,17 +364,14 @@
       },
       "bias": 120.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f17": {
       "name": "Rotated Hybrid Composition Function 1 with Noise in Fitness",
@@ -435,17 +390,15 @@
       },
       "bias": 120.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": true,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true,
+        "noise": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f18": {
       "name": "Rotated Hybrid Composition Function 2",
@@ -464,17 +417,14 @@
       },
       "bias": 10.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f19": {
       "name": "Rotated Hybrid Composition Function 2 with a Narrow Basin for the Global Optimum",
@@ -493,17 +443,14 @@
       },
       "bias": 10.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f20": {
       "name": "Rotated Hybrid Composition Function 2 with the Global Optimum on the Bounds",
@@ -522,17 +469,15 @@
       },
       "bias": 10.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": true
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true,
+        "optimum_on_bounds": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f21": {
       "name": "Rotated Hybrid Composition Function 3",
@@ -551,17 +496,14 @@
       },
       "bias": 360.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f22": {
       "name": "Rotated Hybrid Composition Function 3 with High Condition Number Matrix",
@@ -580,17 +522,14 @@
       },
       "bias": 360.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f23": {
       "name": "Non-Continuous Rotated Hybrid Composition Function 3",
@@ -609,17 +548,14 @@
       },
       "bias": 360.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f24": {
       "name": "Rotated Hybrid Composition Function 4",
@@ -638,17 +574,14 @@
       },
       "bias": 260.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     },
     "f25": {
       "name": "Rotated Hybrid Composition Function 4 without Bounds",
@@ -667,17 +600,14 @@
       },
       "bias": 260.0,
       "characteristics": {
-        "is_shifted": true,
-        "is_rotated": true,
-        "is_biased": true,
-        "is_unimodal": false,
-        "is_multimodal": true,
-        "is_hybrid": true,
-        "is_separable": false,
-        "has_noise": false,
-        "global_optimum_on_bounds": false
+        "modality": "multimodal",
+        "separability": "nonseparable",
+        "hybrid": true
       },
-      "default_bounds": [-5.0, 5.0]
+      "default_bounds": [
+        -5.0,
+        5.0
+      ]
     }
   }
 }

@@ -62,7 +62,12 @@ class CEC2005Function(OptimizationFunction):
         shift_vector (np.ndarray): The shift vector for the function.
         rotation_matrix (np.ndarray): The rotation matrix for the function (if applicable).
         data_dir (str): Directory containing the CEC 2005 data files.
-        metadata (dict): Dictionary containing metadata about the function.
+        metadata (dict): Dictionary containing metadata about the function, including:
+            - modality: "unimodal" or "multimodal"
+            - separability: "separable" or "nonseparable"
+            - hybrid: true if function is a hybrid composition (optional)
+            - noise: true if function includes noise (optional)
+            - optimum_on_bounds: true if global optimum is on bounds (optional)
         bias (float): The bias value (function value at global optimum).
     """
     
@@ -154,6 +159,8 @@ class CEC2005Function(OptimizationFunction):
         Load function-specific parameters from manifest.
         
         This method loads metadata, bias, and other parameters from the meta_2005.json file.
+        The metadata includes function characteristics such as modality, separability,
+        and optional flags for hybrid composition, noise, and optimum location.
         """
         import os
         import json
@@ -189,7 +196,7 @@ class CEC2005Function(OptimizationFunction):
         if "name" in func_info:
             self.metadata["name"] = func_info["name"]
         
-        # Load bias value from manifest or use the global bias map
+        # Load bias value from manifest
         if "bias" in func_info:
             self.bias = func_info["bias"]
         self.metadata["is_biased"] = self.bias != 0.0
