@@ -103,8 +103,9 @@ class AckleyFunction(OptimizationFunction):
 
         # Σ x²  per row
         s1 = np.einsum("ij,ij->i", X, X, optimize="greedy")  # faster than (X**2).sum(axis=1)
-        # Σ cos(2πx)  per row
-        s2 = np.cos(self.c * X, out=X).sum(axis=1)            # reuse X’s buffer → minor win
+        
+        # Σ cos(2πx)  per row - create a copy of X to avoid modifying the input
+        s2 = np.cos(self.c * X).sum(axis=1)  # don't reuse X's buffer to prevent side effects
 
         term1 = -self.a * np.exp(-self.b * np.sqrt(s1 * self._inv_d))
         term2 = -np.exp(s2 * self._inv_d)

@@ -41,29 +41,31 @@ class WeierstrassFunction(OptimizationFunction):
                Werth des letzteren einen bestimmten Differentialquotienten besitzen".
     """
     
-    def __init__(self, dimension: int, bias: float = 0.0, bounds: np.ndarray = None, 
-                 a: float = 0.5, b: float = 3.0, k_max: int = 20):
+    def __init__(self, dimension: int, bounds: np.ndarray = None, 
+                 a: float = 0.5, b: float = 3.0, k_max: int = 20, bias: float = 0.0):
         """
         Initialize the Weierstrass function.
         
         Args:
             dimension (int): The dimensionality of the function.
-            bias (float, optional): Bias term added to the function value. Defaults to 0.0.
             bounds (np.ndarray, optional): Bounds for each dimension. 
                                           Defaults to [-0.5, 0.5] for each dimension.
             a (float, optional): Base for the amplitude coefficient. Defaults to 0.5.
             b (float, optional): Base for the frequency coefficient. Defaults to 3.0.
             k_max (int, optional): Maximum value of k in the summation. Defaults to 20.
+            bias (float, optional): Bias term added to the function value. Defaults to 0.0.
         """
         # Set default bounds to [-0.5, 0.5] for each dimension
         if bounds is None:
             bounds = np.array([[-0.5, 0.5]] * dimension)
         
-        super().__init__(dimension, bias, bounds)
+        # Call the parent constructor with just dimension and bounds
+        super().__init__(dimension, bounds)
         
         self.a = a
         self.b = b
         self.k_max = k_max
+        self.bias = bias
         
         # Pre-calculate constants to avoid repeated computation
         self._a_powers = np.power(self.a, np.arange(self.k_max + 1))

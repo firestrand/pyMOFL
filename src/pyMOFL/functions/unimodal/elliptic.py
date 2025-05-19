@@ -31,6 +31,8 @@ class HighConditionedElliptic(OptimizationFunction):
         Problem dimensionality *D*.
     bounds : (D, 2) ndarray | None
         Search domain.  CEC uses ``[-100, 100]`` for every dim.
+    condition : float
+        Condition number (default: 10⁶). Higher values make the problem more difficult.
 
     Notes
     -----
@@ -40,13 +42,16 @@ class HighConditionedElliptic(OptimizationFunction):
     """
 
     # ---------- construction -------------------------------------------------
-    def __init__(self, dimension: int, bounds: np.ndarray = None):
+    def __init__(self, dimension: int, bounds: np.ndarray = None, condition: float = 1e6):
         super().__init__(dimension, bounds)
+        
+        # Store condition number
+        self.condition = condition
 
-        # Pre-compute the 10⁶^(i/(D-1)) weights once
+        # Pre-compute the condition^(i/(D-1)) weights once
         if dimension > 1:
             idx = np.arange(dimension, dtype=np.float64)
-            self._weights = 1e6 ** (idx / (dimension - 1))
+            self._weights = self.condition ** (idx / (dimension - 1))
         else:                       # D == 1 → condition number = 1
             self._weights = np.ones(1, dtype=np.float64)
 

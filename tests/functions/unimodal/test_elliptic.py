@@ -4,39 +4,39 @@ Tests for the Elliptic function.
 
 import pytest
 import numpy as np
-from pyMOFL.functions.unimodal import EllipticFunction
+from pyMOFL.functions.unimodal import HighConditionedElliptic
 from pyMOFL.decorators import BiasedFunction
 
 
-class TestEllipticFunction:
-    """Tests for the EllipticFunction."""
+class TestHighConditionedElliptic:
+    """Tests for the HighConditionedElliptic."""
     
     def test_initialization(self):
         """Test initialization with default and custom parameters."""
         # Default initialization
-        func = EllipticFunction(dimension=2)
+        func = HighConditionedElliptic(dimension=2)
         assert func.dimension == 2
         assert func.condition == 1e6
         assert func.bounds.shape == (2, 2)
         assert np.array_equal(func.bounds, np.array([[-100, 100], [-100, 100]]))
         
         # Custom dimension
-        func = EllipticFunction(dimension=5)
+        func = HighConditionedElliptic(dimension=5)
         assert func.dimension == 5
         assert func.bounds.shape == (5, 2)
         
         # Custom condition
-        func = EllipticFunction(dimension=3, condition=1e4)
+        func = HighConditionedElliptic(dimension=3, condition=1e4)
         assert func.condition == 1e4
         
         # Custom bounds
         custom_bounds = np.array([[-10, 10], [-20, 20], [-30, 30]])
-        func = EllipticFunction(dimension=3, bounds=custom_bounds)
+        func = HighConditionedElliptic(dimension=3, bounds=custom_bounds)
         assert np.array_equal(func.bounds, custom_bounds)
     
     def test_global_minimum(self):
         """Test the function at the global minimum."""
-        func = EllipticFunction(dimension=3)
+        func = HighConditionedElliptic(dimension=3)
         
         # The global minimum is at the origin (0, 0, 0)
         x_opt = np.zeros(3)
@@ -55,7 +55,7 @@ class TestEllipticFunction:
     
     def test_function_values(self):
         """Test function values at specific points."""
-        func = EllipticFunction(dimension=3)
+        func = HighConditionedElliptic(dimension=3)
         
         # Get actual values
         point1 = np.array([0.0, 0.0, 0.0])
@@ -91,7 +91,7 @@ class TestEllipticFunction:
     
     def test_evaluate_batch(self):
         """Test the evaluate_batch method."""
-        func = EllipticFunction(dimension=2)
+        func = HighConditionedElliptic(dimension=2)
         
         # Create batch of test points
         X = np.array([
@@ -110,7 +110,7 @@ class TestEllipticFunction:
     
     def test_dimension_validation(self):
         """Test that input dimension is validated correctly."""
-        func = EllipticFunction(dimension=2)
+        func = HighConditionedElliptic(dimension=2)
         
         # Test with incorrect dimension
         with pytest.raises(ValueError):
@@ -123,7 +123,7 @@ class TestEllipticFunction:
         """Test that bounds are respected in the evaluation."""
         # Create a function with bounds [-1, 1] for each dimension
         bounds = np.array([[-1, 1], [-1, 1]])
-        func = EllipticFunction(dimension=2, bounds=bounds)
+        func = HighConditionedElliptic(dimension=2, bounds=bounds)
         
         # Points outside bounds should be clamped for evaluation
         x_outside = np.array([10.0, -10.0])
@@ -152,8 +152,8 @@ class TestEllipticFunction:
         test_point = np.array([1.0, 1.0, 1.0])
         
         # Create functions with different condition numbers
-        func_small = EllipticFunction(dimension=dimension, condition=1e2)
-        func_large = EllipticFunction(dimension=dimension, condition=1e6)
+        func_small = HighConditionedElliptic(dimension=dimension, condition=1e2)
+        func_large = HighConditionedElliptic(dimension=dimension, condition=1e6)
         
         # Evaluate with both functions
         result_small = func_small.evaluate(test_point)
@@ -177,7 +177,7 @@ class TestEllipticFunction:
         # The elliptic function is not symmetric like some other functions
         # However, it should treat negative and positive values with
         # the same magnitude differently
-        func = EllipticFunction(dimension=2)
+        func = HighConditionedElliptic(dimension=2)
         
         # Test with positive and negative inputs of the same magnitude
         x_pos = np.array([1.0, 2.0])

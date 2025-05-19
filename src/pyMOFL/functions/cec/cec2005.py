@@ -310,9 +310,12 @@ class CEC2005Function(OptimizationFunction):
     
     def _transform_input(self, x: np.ndarray) -> np.ndarray:
         """
-        Apply transformations to input.
+        DEPRECATED: Use decorators (ShiftedFunction, RotatedFunction, ShiftThenRotateFunction) instead.
         
-        This method applies shift and rotation transformations to the input.
+        This method applies shift and rotation transformations to the input directly.
+        It is maintained for backward compatibility with older implementations.
+        
+        New implementations should use the decorator pattern for transformations.
         
         Args:
             x (np.ndarray): Input vector.
@@ -331,9 +334,12 @@ class CEC2005Function(OptimizationFunction):
     
     def _transform_batch(self, X: np.ndarray) -> np.ndarray:
         """
-        Apply transformations to a batch of inputs.
+        DEPRECATED: Use decorators (ShiftedFunction, RotatedFunction, ShiftThenRotateFunction) instead.
         
-        This method applies shift and rotation transformations to a batch of inputs.
+        This method applies shift and rotation transformations to a batch of inputs directly.
+        It is maintained for backward compatibility with older implementations.
+        
+        New implementations should use the decorator pattern for transformations.
         
         Args:
             X (np.ndarray): Batch of input vectors, shape (N, dimension).
@@ -627,8 +633,12 @@ class F03(CEC2005Function):
         # Start with the base EllipticFunction
         func = HighConditionedElliptic(dimension)
 
-        # Apply combined shift-then-rotate transformation matching the CEC C code sequence
-        shifted_rotated_func = ShiftThenRotateFunction(func, self.shift_vector, self.rotation_matrix)
+        # Apply transformations using composition approach:
+        # 1. First apply rotation 
+        rotated_func = RotatedFunction(func, self.rotation_matrix)
+        
+        # 2. Then apply shift (this produces the mathematically equivalent transformation to shift-then-rotate)
+        shifted_rotated_func = ShiftedFunction(rotated_func, self.shift_vector)
 
         # Apply BiasedFunction decorator to add the bias
         self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
@@ -1128,8 +1138,12 @@ class F07(CEC2005Function):
         # Create GriewankCore function - this is the base implementation without shift/rotate/bias
         func = GriewankFunction(dimension)
 
-        # Apply combined shift-then-rotate transformation matching the CEC C code sequence
-        shifted_rotated_func = ShiftThenRotateFunction(func, self.shift_vector, self.rotation_matrix)
+        # Apply transformations using composition approach:
+        # 1. First apply rotation 
+        rotated_func = RotatedFunction(func, self.rotation_matrix)
+        
+        # 2. Then apply shift (this produces the mathematically equivalent transformation to shift-then-rotate)
+        shifted_rotated_func = ShiftedFunction(rotated_func, self.shift_vector)
 
         # Apply BiasedFunction decorator to add the bias
         self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
@@ -1224,8 +1238,12 @@ class F08(CEC2005Function):
         # Create AckleyFunction - this is the base implementation without shift/rotate/bias
         func = AckleyFunction(dimension)
 
-        # Apply combined shift-then-rotate transformation matching the CEC C code sequence
-        shifted_rotated_func = ShiftThenRotateFunction(func, self.shift_vector, self.rotation_matrix)
+        # Apply transformations using composition approach:
+        # 1. First apply rotation 
+        rotated_func = RotatedFunction(func, self.rotation_matrix)
+        
+        # 2. Then apply shift (this produces the mathematically equivalent transformation to shift-then-rotate)
+        shifted_rotated_func = ShiftedFunction(rotated_func, self.shift_vector)
 
         # Apply BiasedFunction decorator to add the bias
         self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
@@ -1292,9 +1310,35 @@ class F09(CEC2005Function):
         if bounds is None:
             bounds = np.array([[-5, 5]] * dimension)
         
-        self.use_rotation = False
         super().__init__(dimension, function_number=9, bounds=bounds, data_dir=data_dir)
-        self.bias = -330.0
+        
+        # Define function-specific metadata
+        self.metadata.update({
+            "name": "F09 - Shifted Rastrigin\'s Function",
+            "is_shifted": True,
+            "is_biased": True,
+            "is_unimodal": False,
+            "is_multimodal": True,
+            "is_separable": True
+        })
+        
+        # Set bias value from the CEC_2005_BIAS mapping constant
+        self.bias = CEC_2005_BIAS[9]
+        
+        # Create base function using decorators according to CEC 2005 specifications
+        # 1. Create base Rastrigin function
+        from ..multimodal.rastrigin import RastriginFunction
+        func = RastriginFunction(dimension, bounds)
+        
+        # 2. Apply transformations using composition approach:
+        # First apply rotation 
+        rotated_func = RotatedFunction(func, self.rotation_matrix)
+        
+        # Then apply shift (this produces the mathematically equivalent transformation to shift-then-rotate)
+        shifted_rotated_func = ShiftedFunction(rotated_func, self.shift_vector)
+        
+        # 3. Apply bias transformation
+        self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -1309,11 +1353,8 @@ class F09(CEC2005Function):
         # Validate and preprocess the input
         x = self._validate_input(x)
         
-        # Apply shift transformation
-        z = self._transform_input(x)
-        
-        # Compute function value
-        return float(np.sum(z**2 - 10.0 * np.cos(2 * np.pi * z) + 10.0)) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate(x)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -1328,11 +1369,8 @@ class F09(CEC2005Function):
         # Validate the batch input
         X = self._validate_batch_input(X)
         
-        # Apply transformations
-        Z = self._transform_batch(X)
-        
-        # Compute function values using vectorized operations
-        return np.sum(Z**2 - 10.0 * np.cos(2 * np.pi * Z) + 10.0, axis=1) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F10: Shifted Rotated Rastrigin's Function
@@ -1368,7 +1406,35 @@ class F10(CEC2005Function):
             bounds = np.array([[-5, 5]] * dimension)
         
         super().__init__(dimension, function_number=10, bounds=bounds, data_dir=data_dir, use_rotation=True)
+        
+        # Define function-specific metadata
+        self.metadata.update({
+            "name": "F10 - Shifted Rotated Rastrigin\'s Function",
+            "is_shifted": True,
+            "is_rotated": True,
+            "is_biased": True,
+            "is_unimodal": False,
+            "is_multimodal": True,
+            "is_separable": False
+        })
+        
+        # Set bias value from the CEC_2005_BIAS mapping constant
         self.bias = CEC_2005_BIAS[10]
+        
+        # Create base function using decorators according to CEC 2005 specifications
+        # 1. Create base Rastrigin function
+        from ..multimodal.rastrigin import RastriginFunction
+        func = RastriginFunction(dimension, bounds)
+        
+        # 2. Apply transformations using composition approach:
+        # First apply rotation 
+        rotated_func = RotatedFunction(func, self.rotation_matrix)
+        
+        # Then apply shift (this produces the mathematically equivalent transformation to shift-then-rotate)
+        shifted_rotated_func = ShiftedFunction(rotated_func, self.shift_vector)
+        
+        # 3. Apply bias transformation
+        self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -1383,11 +1449,8 @@ class F10(CEC2005Function):
         # Validate and preprocess the input
         x = self._validate_input(x)
         
-        # Apply transformations (shift and rotation)
-        z = self._transform_input(x)
-        
-        # Compute function value
-        return float(np.sum(z**2 - 10.0 * np.cos(2 * np.pi * z) + 10.0)) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate(x)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -1402,11 +1465,8 @@ class F10(CEC2005Function):
         # Validate the batch input
         X = self._validate_batch_input(X)
         
-        # Apply transformations
-        Z = self._transform_batch(X)
-        
-        # Compute function values using vectorized operations
-        return np.sum(Z**2 - 10.0 * np.cos(2 * np.pi * Z) + 10.0, axis=1) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F11: Shifted Rotated Weierstrass Function
@@ -1445,17 +1505,41 @@ class F11(CEC2005Function):
             bounds = np.array([[-0.5, 0.5]] * dimension)
         
         super().__init__(dimension, function_number=11, bounds=bounds, data_dir=data_dir, use_rotation=True)
+        
+        # Define function-specific metadata
+        self.metadata.update({
+            "name": "F11 - Shifted Rotated Weierstrass Function",
+            "is_shifted": True,
+            "is_rotated": True,
+            "is_biased": True,
+            "is_unimodal": False,
+            "is_multimodal": True,
+            "is_separable": False
+        })
+        
+        # Set bias value from the CEC_2005_BIAS mapping constant
         self.bias = CEC_2005_BIAS[11]
         
-        # Set constants
-        self.a = 0.5
-        self.b = 3.0
-        self.k_max = 20
+        # Create base function using decorators according to CEC 2005 specifications
+        # 1. Create base Weierstrass function with appropriate parameters
+        from ..multimodal.weierstrass import WeierstrassFunction
+        func = WeierstrassFunction(
+            dimension,
+            bounds=bounds,
+            a=0.5,
+            b=3.0,
+            k_max=20
+        )
         
-        # Precompute powers and cosine terms for second sum
-        self.a_k = np.power(self.a, range(self.k_max + 1))
-        self.b_k = np.power(self.b, range(self.k_max + 1))
-        self.cos_term = np.sum(self.a_k * np.cos(2 * np.pi * self.b_k * 0.5))
+        # 2. Apply transformations using composition approach:
+        # First apply rotation 
+        rotated_func = RotatedFunction(func, self.rotation_matrix)
+        
+        # Then apply shift (this produces the mathematically equivalent transformation to shift-then-rotate)
+        shifted_rotated_func = ShiftedFunction(rotated_func, self.shift_vector)
+        
+        # 3. Apply bias transformation
+        self.base_func = BiasedFunction(shifted_rotated_func, self.bias)
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -1470,22 +1554,8 @@ class F11(CEC2005Function):
         # Validate and preprocess the input
         x = self._validate_input(x)
         
-        # Apply transformations (shift and rotation)
-        z = self._transform_input(x)
-        
-        # First sum (over dimensions)
-        sum_i = 0.0
-        for i in range(self.dimension):
-            # Second sum (over k)
-            sum_k = 0.0
-            for k in range(self.k_max + 1):
-                sum_k += self.a_k[k] * np.cos(2 * np.pi * self.b_k[k] * (z[i] + 0.5))
-            sum_i += sum_k
-        
-        # Subtract the constant term
-        result = sum_i - self.dimension * self.cos_term
-        
-        return float(result) + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate(x)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -1500,27 +1570,8 @@ class F11(CEC2005Function):
         # Validate the batch input
         X = self._validate_batch_input(X)
         
-        # Apply transformations
-        Z = self._transform_batch(X)
-        
-        # Compute function values
-        result = np.zeros(X.shape[0])
-        for i in range(X.shape[0]):
-            z = Z[i]
-            
-            # First sum (over dimensions)
-            sum_i = 0.0
-            for j in range(self.dimension):
-                # Second sum (over k)
-                sum_k = 0.0
-                for k in range(self.k_max + 1):
-                    sum_k += self.a_k[k] * np.cos(2 * np.pi * self.b_k[k] * (z[j] + 0.5))
-                sum_i += sum_k
-            
-            # Subtract the constant term
-            result[i] = sum_i - self.dimension * self.cos_term
-        
-        return result + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F12: Schwefel's Problem 2.13
@@ -1637,36 +1688,17 @@ class F12(CEC2005Function):
     
     def _initialize_matrices(self):
         """
-        Initialize the matrices for F12 from data files specified in the manifest.
+        Initialize the matrices for F12 from data files.
         
-        This loads alpha vector, A matrix, and B matrix from their respective _D50.txt
-        files and slices them to the current function dimension.
+        This loads alpha vector, A matrix, and B matrix and slices them to the current function dimension.
         """
-        import numpy as np
-        
-        dim = self.dimension
+        # Create data handler
+        from ...utils.cec_data import CECDataHandler
+        data_handler = CECDataHandler(self.data_dir, "2005")
         
         try:
-            # Load full 50-dimensional data
-            # Assumes alpha_D50.txt loads as 1D array (50,)
-            # Assumes A_D50.txt and B_D50.txt load as 2D arrays (50,50)
-            alpha_full = np.loadtxt(self._alpha_vector_path)
-            a_full = np.loadtxt(self._a_matrix_path)
-            b_full = np.loadtxt(self._b_matrix_path)
-
-            # Basic validation of loaded shapes (assuming D50 files)
-            # More robust checks could compare against a known MAX_DIM if available
-            if alpha_full.ndim != 1 or alpha_full.shape[0] < dim:
-                raise ValueError(f"Loaded alpha data from {self._alpha_vector_path} has unexpected shape {alpha_full.shape} for dimension {dim}.")
-            if a_full.ndim != 2 or a_full.shape[0] < dim or a_full.shape[1] < dim:
-                raise ValueError(f"Loaded A matrix data from {self._a_matrix_path} has unexpected shape {a_full.shape} for dimension {dim}.")
-            if b_full.ndim != 2 or b_full.shape[0] < dim or b_full.shape[1] < dim:
-                raise ValueError(f"Loaded B matrix data from {self._b_matrix_path} has unexpected shape {b_full.shape} for dimension {dim}.")
-
-            # Slice to current dimension
-            self.alpha = alpha_full[:dim]
-            self.a = a_full[:dim, :dim]
-            self.b = b_full[:dim, :dim]
+            # Load Schwefel 2.13 specific data files
+            self.a, self.b, self.alpha = data_handler.load_schwefel_213_data(self.dimension, func_number=12)
             
             # Use alpha as the shift vector (as per existing logic for F12)
             self.shift_vector = self.alpha.copy()
@@ -1674,12 +1706,12 @@ class F12(CEC2005Function):
             # Compute A vector (dependent on self.alpha, self.a, self.b)
             self._compute_A_vector()
             
-        except FileNotFoundError: # Should be caught by _load_function_parameters, but as safety
-            raise 
         except Exception as e:
-            # Catch other potential errors during loadtxt or slicing
-            raise RuntimeError(f"Error processing F12 data files: {e}")
-    
+            # Convert all possible exceptions to consistent error types
+            if isinstance(e, FileNotFoundError) or isinstance(e, ValueError):
+                raise
+            else:
+                raise RuntimeError(f"Error processing Schwefel 2.13 data files: {e}")
     def _compute_A_vector(self):
         """Compute the A vector based on alpha, a, and b matrices."""
         self.A = np.zeros(self.dimension)
@@ -1790,9 +1822,12 @@ class F13(CEC2005Function):
     
     def _transform_input(self, x: np.ndarray) -> np.ndarray:
         """
-        Apply transformations to input.
+        DEPRECATED: Use decorators (ShiftedFunction, RotatedFunction, ShiftThenRotateFunction) instead.
         
-        For this expanded function, we need to shift by o and add 1.
+        This method applies shift and rotation transformations to the input directly.
+        It is maintained for backward compatibility with older implementations.
+        
+        New implementations should use the decorator pattern for transformations.
         
         Args:
             x (np.ndarray): Input vector.
@@ -1805,15 +1840,18 @@ class F13(CEC2005Function):
     
     def _transform_batch(self, X: np.ndarray) -> np.ndarray:
         """
-        Apply transformations to a batch of inputs.
+        DEPRECATED: Use decorators (ShiftedFunction, RotatedFunction, ShiftThenRotateFunction) instead.
         
-        For this expanded function, we need to shift by o and add 1.
+        This method applies shift and rotation transformations to a batch of inputs directly.
+        It is maintained for backward compatibility with older implementations.
+        
+        New implementations should use the decorator pattern for transformations.
         
         Args:
-            X (np.ndarray): Batch of input vectors.
+            X (np.ndarray): Batch of input vectors, shape (N, dimension).
             
         Returns:
-            np.ndarray: Transformed batch of vectors.
+            np.ndarray: Batch of transformed vectors.
         """
         # Shift by o and add 1 (Z = X - o + 1)
         return X - self.shift_vector + 1
@@ -1884,26 +1922,8 @@ class F13(CEC2005Function):
         # Validate the batch input
         X = self._validate_batch_input(X)
         
-        # Apply transformations
-        Z = self._transform_batch(X)
-        
-        # Compute function values
-        result = np.zeros(X.shape[0])
-        for i in range(X.shape[0]):
-            z = Z[i]
-            
-            value = 0.0
-            for j in range(self.dimension - 1):
-                y = self._rosenbrock(z[j], z[j+1])
-                value += self._griewank(y)
-            
-            # Add the wrap-around term
-            y = self._rosenbrock(z[-1], z[0])
-            value += self._griewank(y)
-            
-            result[i] = value
-        
-        return result + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F14: Shifted Rotated Expanded Scaffer's F6 Function
@@ -1994,24 +2014,8 @@ class F14(CEC2005Function):
         # Validate the batch input
         X = self._validate_batch_input(X)
         
-        # Apply transformations
-        Z = self._transform_batch(X)
-        
-        # Compute function values
-        result = np.zeros(X.shape[0])
-        for i in range(X.shape[0]):
-            z = Z[i]
-            
-            value = 0.0
-            for j in range(self.dimension - 1):
-                value += self._scaffer_f6(z[j], z[j+1])
-            
-            # Add the wrap-around term
-            value += self._scaffer_f6(z[-1], z[0])
-            
-            result[i] = value
-        
-        return result + self.bias
+        # Use the composed function with decorators
+        return self.base_func.evaluate_batch(X)
 
 
 # Implementation of F15: Hybrid Composition Function
@@ -2064,6 +2068,18 @@ class F15(CEC2005Function):
         # and handle some of the attributes (like shift_vector) differently
         super().__init__(dimension, function_number=15, bounds=bounds, data_dir=data_dir)
         self.bias = 120.0
+        
+        # Update metadata for this function
+        self.metadata.update({
+            "name": "F15 - Hybrid Composition Function",
+            "is_shifted": True,
+            "is_rotated": False,
+            "is_biased": True,
+            "is_unimodal": False,
+            "is_multimodal": True,
+            "is_hybrid": True,
+            "is_separable": False
+        })
         
         # Number of basic functions
         self.n_func = 10

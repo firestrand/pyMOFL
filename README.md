@@ -170,6 +170,32 @@ Recommended ordering for most scenarios:
 2. Apply `RotatedFunction` next to rotate the landscape
 3. Apply `BiasedFunction` last to shift the function value
 
+## Decorator Composition and Transformation Order
+
+When composing decorators in Python, it's important to understand that transformations are applied in **reverse order** during evaluation:
+
+```python
+# When we write this:
+transformed = RotatedFunction(ShiftedFunction(base, shift), rotation)
+
+# The transformations actually apply in this order:
+# 1. Rotate first: z = R·x
+# 2. Shift second: z = z - s = R·x - s
+```
+
+This counterintuitive behavior is due to how function composition works. For CEC benchmark functions, the standard approach is to apply shift first, then rotation, which produces `R·(x-s)`. This can be achieved by applying decorators in the following order:
+
+```python
+# This produces the correct f(R·(x-s)) for CEC benchmarks:
+transformed = ShiftedFunction(RotatedFunction(base, rotation), shift)
+```
+
+Mathematically:
+- `ShiftedFunction(RotatedFunction(base))` computes `f(R·(x-s))`
+- `RotatedFunction(ShiftedFunction(base))` computes `f(R·x-s)`
+
+These expressions are not mathematically equivalent due to the non-commutativity of vector rotation and subtraction.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
