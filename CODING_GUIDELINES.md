@@ -186,4 +186,99 @@ shifted_func = ShiftedFunction(func, shift)
 
 # Combine transformations
 shifted_biased_func = BiasedFunction(ShiftedFunction(func, shift), bias=5.0)
-``` 
+```
+
+## Import and Packaging Conventions
+
+### 1. Use the **"src-layout"** for the package itself
+
+```
+yourproject/
+├── src/
+│   └── yourpkg/
+│       ├── __init__.py
+│       ├── core.py
+│       └── data/
+│           └── defaults.json
+├── tests/
+│   └── test_core.py
+└── pyproject.toml
+```
+
+* `src/` is **not** on `sys.path` by default, so nothing inside it is import-able until the project is *installed* (`pip install -e .`). This prevents the "it works on my machine" problem where you accidentally import from the working directory instead of the installed wheel. ([Python Packaging][1])
+
+### 2. Inside the package: **import by package name**, not by path
+
+```python
+# src/yourpkg/core.py
+from yourpkg.utils import helper      # absolute import (preferred)
+# or, within the same package,
+from .utils import helper             # explicit relative is also fine
+```
+
+Avoid `sys.path` hacks or references such as `import src.yourpkg…`—they couple the code to the project layout.
+
+### 3. Tests should import *the installed package*
+
+```bash
+# once per virtual-env
+pip install -e .
+```
+
+```python
+# tests/test_core.py
+import yourpkg
+from yourpkg.core import do_something
+```
+
+* **Do not** add `src/` to `PYTHONPATH` in CI; that hides packaging errors.
+* If you use **pytest**, keep its default "importlib" mode (pytest ≥ 7) or set `--import-mode=importlib` so tests see the same import resolution an end-user will. ([docs.pytest.org][2])
+
+### 4. Shipping constant files (JSON, CSV, etc.)
+
+1. **Package them**:
+
+   ```toml
+   # pyproject.toml (PEP 621 + setuptools)
+   [tool.setuptools.package-data]
+   "yourpkg.data" = ["*.json"]
+   ```
+
+2. **Load them with the std-lib** `importlib.resources` API (3.9+):
+
+   ```python
+   from importlib import resources
+   import json
+
+   def load_defaults() -> dict:
+       text = resources.files("yourpkg.data").joinpath("defaults.json").read_text()
+       return json.loads(text)
+   ```
+
+   *Works whether the package is on disk, in a wheel, or in a zipapp.* ([Python documentation][3])
+
+3. **Tests that need the same file** call the same helper:
+
+   ```python
+   def test_defaults_roundtrip():
+       cfg = yourpkg.load_defaults()
+       assert "threshold" in cfg
+   ```
+
+### 5. Test-only fixtures/data
+
+Put them under `tests/resources/…` and access with `pathlib.Path(__file__).parent / "resources" / "sample.json"`. Those files are not part of the installable package, so they stay out of your wheel.
+
+### 6. Quick checklist
+
+| Scope                      | Where to import from                      | How to reach data                             |
+| -------------------------- | ----------------------------------------- | --------------------------------------------- |
+| **Library code** (`src/…`) | `import yourpkg…` or `from .sub import …` | `importlib.resources`                         |
+| **Tests** (`tests/…`)      | *Same as users*: `import yourpkg…`        | Use library helper *or* `importlib.resources` |
+| **Test-only data**         | n/a                                       | `Path(__file__).parent / "resources"`         |
+
+Following this pattern keeps your runtime code, tests, and distributable artifacts aligned and eliminates path-related surprises.
+
+[1]: https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/?utm_source=chatgpt.com "src layout vs flat layout - Python Packaging User Guide"
+[2]: https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html?utm_source=chatgpt.com "Good Integration Practices - pytest documentation"
+[3]: https://docs.python.org/3/library/importlib.resources.html?utm_source=chatgpt.com "importlib.resources – Package resource reading, opening and ..." 
