@@ -11,7 +11,9 @@ from .bounds import Bounds
 class OptimizationFunction(ABC):
     """
     Abstract base class for optimization functions.
-    Handles bounds enforcement, quantization, and constraints.
+    Handles bounds enforcement, quantization, constraints, and input validation.
+
+    Subclasses should use _validate_input(x) and _validate_batch_input(X) to check input shape/type.
     """
     initialization_bounds: Bounds
     operational_bounds: Bounds | None
@@ -50,4 +52,24 @@ class OptimizationFunction(ABC):
         Returns the total constraint violation magnitude for x.
         Override in subclasses for custom constraints.
         """
-        return 0.0 
+        return 0.0
+
+    def _validate_input(self, x: NDArray[Any]) -> NDArray[Any]:
+        """
+        Validate that x is a 1D array of length self.dimension.
+        Raises ValueError if not.
+        """
+        x = np.asarray(x)
+        if x.shape != (self.dimension,):
+            raise ValueError(f"Input must be of shape ({self.dimension},), got {x.shape}")
+        return x
+
+    def _validate_batch_input(self, X: NDArray[Any]) -> NDArray[Any]:
+        """
+        Validate that X is a 2D array with shape (n, self.dimension).
+        Raises ValueError if not.
+        """
+        X = np.asarray(X)
+        if X.ndim != 2 or X.shape[1] != self.dimension:
+            raise ValueError(f"Each input must have dimension {self.dimension}, got {X.shape}")
+        return X 

@@ -7,7 +7,7 @@ multiple base functions with weighted sums.
 
 import numpy as np
 from typing import List, Optional
-from ..base import OptimizationFunction
+from pyMOFL.core.function import OptimizationFunction
 
 
 class CompositeFunction(OptimizationFunction):

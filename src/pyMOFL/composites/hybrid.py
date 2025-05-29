@@ -7,7 +7,7 @@ multiple base functions, where each function operates on a different subset of d
 
 import numpy as np
 from typing import List, Optional, Tuple
-from ..base import OptimizationFunction
+from pyMOFL.core.function import OptimizationFunction
 
 
 class HybridFunction(OptimizationFunction):
