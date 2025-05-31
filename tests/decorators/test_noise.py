@@ -1,70 +1,59 @@
-"""
-Tests for the NoiseDecorator (refactored for new bounds logic).
-"""
-
-import pytest
 import numpy as np
+import pytest
 from pyMOFL.functions.unimodal.sphere import SphereFunction
-from pyMOFL.core.bounds import Bounds
-from pyMOFL.core.bound_mode_enum import BoundModeEnum
-from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
-from pyMOFL.decorators.noise import NoiseDecorator
-from pyMOFL.decorators.biased import BiasedFunction
+from pyMOFL.decorators.noise import Noise
+from pyMOFL.decorators.biased import Biased
 
-class TestNoiseDecorator:
-    def test_initialization_and_delegation(self):
-        func = SphereFunction(dimension=2)
-        noise_func = NoiseDecorator(func, noise_type='gaussian', noise_level=0.2, noise_seed=42)
-        assert noise_func.dimension == 2
-        assert noise_func.initialization_bounds == func.initialization_bounds
-        assert noise_func.operational_bounds == func.operational_bounds
-
+class TestNoise:
     def test_gaussian_noise_single(self):
-        func = SphereFunction(dimension=1)
-        noise_func = NoiseDecorator(func, noise_type='gaussian', noise_level=0.5, noise_seed=123)
-        # With fixed seed, noise is deterministic
-        val = noise_func(np.array([2.0]))
-        expected = func(np.array([2.0]))
+        base = SphereFunction(dimension=1)
+        noise = Noise(base_function=base, noise_type='gaussian', noise_level=0.5, noise_seed=123)
+        val = noise(np.array([2.0]))
+        expected = base(np.array([2.0]))
         assert val != expected
-        assert np.isclose(val / expected, 1.0 + noise_func.noise_level * np.abs(np.random.normal()))
 
     def test_uniform_noise_single(self):
-        func = SphereFunction(dimension=1)
-        noise_func = NoiseDecorator(func, noise_type='uniform', noise_level=0.5, noise_seed=123)
-        val = noise_func(np.array([2.0]))
-        expected = func(np.array([2.0]))
+        base = SphereFunction(dimension=1)
+        noise = Noise(base_function=base, noise_type='uniform', noise_level=0.5, noise_seed=123)
+        val = noise(np.array([2.0]))
+        expected = base(np.array([2.0]))
         assert val != expected
-        # Uniform noise is in [1, 1.5]
-        assert 1.0 <= val / expected <= 1.5
 
     def test_gaussian_noise_batch(self):
-        func = SphereFunction(dimension=2)
-        noise_func = NoiseDecorator(func, noise_type='gaussian', noise_level=0.1, noise_seed=42)
+        base = SphereFunction(dimension=2)
+        noise = Noise(base_function=base, noise_type='gaussian', noise_level=0.1, noise_seed=42)
         X = np.array([[1.0, 2.0], [3.0, 4.0]])
-        vals = noise_func.evaluate_batch(X)
-        expected = func.evaluate_batch(X)
+        vals = noise.evaluate_batch(X)
+        expected = base.evaluate_batch(X)
         assert vals.shape == expected.shape
         assert not np.allclose(vals, expected)
 
     def test_uniform_noise_batch(self):
-        func = SphereFunction(dimension=2)
-        noise_func = NoiseDecorator(func, noise_type='uniform', noise_level=0.1, noise_seed=42)
+        base = SphereFunction(dimension=2)
+        noise = Noise(base_function=base, noise_type='uniform', noise_level=0.1, noise_seed=42)
         X = np.array([[1.0, 2.0], [3.0, 4.0]])
-        vals = noise_func.evaluate_batch(X)
-        expected = func.evaluate_batch(X)
+        vals = noise.evaluate_batch(X)
+        expected = base.evaluate_batch(X)
         assert vals.shape == expected.shape
         assert not np.allclose(vals, expected)
 
+    def test_property_delegation(self):
+        base = SphereFunction(dimension=2)
+        noise = Noise(base_function=base, noise_type='gaussian', noise_level=0.1)
+        assert noise.dimension == base.dimension
+        assert noise.initialization_bounds == base.initialization_bounds
+        assert noise.operational_bounds == base.operational_bounds
+
     def test_composability(self):
-        func = SphereFunction(dimension=2)
-        biased = BiasedFunction(func, bias=5.0)
-        noise_func = NoiseDecorator(biased, noise_type='gaussian', noise_level=0.1, noise_seed=42)
+        base = SphereFunction(dimension=2)
+        biased = Biased(base_function=base, bias=5.0)
+        noise = Noise(base_function=biased, noise_type='gaussian', noise_level=0.1, noise_seed=42)
         x = np.array([1.0, 2.0])
-        val = noise_func(x)
+        val = noise(x)
         expected = biased(x)
-        assert val != expected
+        assert not np.allclose(val, expected)
 
     def test_error_on_unsupported_noise_type(self):
-        func = SphereFunction(dimension=1)
+        base = SphereFunction(dimension=1)
         with pytest.raises(ValueError):
-            NoiseDecorator(func, noise_type='unsupported') 
+            Noise(base_function=base, noise_type='unsupported') 

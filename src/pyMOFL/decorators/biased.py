@@ -1,32 +1,31 @@
 """
-BiasedFunction decorator for adding a constant bias to an OptimizationFunction.
+Biased: Output-transforming decorator for adding a constant bias to an OptimizationFunction.
+
+Inherits from OutputTransformingFunction. Subclasses should only implement _apply and _apply_batch, never override evaluate or evaluate_batch.
+
+Usage:
+    # As a base function (rare, but possible)
+    f = Biased(dimension=1, bias=5.0)
+    value = f(x)  # always returns 5.0
+
+    # As a decorator
+    base = SphereFunction(...)
+    f = Biased(base_function=base, bias=5.0)
+    value = f(x)
 """
-from pyMOFL.core.function import OptimizationFunction
+from pyMOFL.core.composable_function import OutputTransformingFunction
+import numpy as np
 
-class BiasedFunction(OptimizationFunction):
-    """
-    Decorator that adds a constant bias to the output of an OptimizationFunction.
-    Does not modify or enforce bounds; delegates bounds to the wrapped function.
-    """
-    def __init__(self, base_func: OptimizationFunction, bias: float = 0.0):
-        self.base = base_func
-        self.dimension = base_func.dimension
+class Biased(OutputTransformingFunction):
+    def __init__(self, base_function=None, dimension=None, bias=0.0, initialization_bounds=None, operational_bounds=None):
         self.bias = bias
-        self.constraint_penalty = base_func.constraint_penalty
+        super().__init__(base_function=base_function, dimension=dimension, initialization_bounds=initialization_bounds, operational_bounds=operational_bounds)
 
-    def evaluate(self, x):
-        return self.base(x) + self.bias
+    def _apply(self, y):
+        y = np.asarray(y)
+        if y.shape == () or y.size == 1:
+            return float(y) + self.bias
+        return y + self.bias
 
-    def evaluate_batch(self, X):
-        return self.base.evaluate_batch(X) + self.bias
-
-    def violations(self, x):
-        return self.base.violations(x)
-
-    @property
-    def initialization_bounds(self):
-        return self.base.initialization_bounds
-
-    @property
-    def operational_bounds(self):
-        return self.base.operational_bounds 
+    def _apply_batch(self, Y):
+        return np.asarray(Y) + self.bias

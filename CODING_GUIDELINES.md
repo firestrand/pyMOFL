@@ -46,7 +46,9 @@ This document outlines the coding standards and best practices for contributors 
 
 ### Function Implementations
 
-- Validate inputs using base class methods (`_validate_input`, `_validate_batch_input`)
+- Validate inputs using base class methods (`_validate_input`, `_validate_batch_input`).
+  - All subclasses should use these methods for input validation in `evaluate` and `evaluate_batch`.
+  - These methods only check shape and type (they do not ravel or mutate input).
 - Use vectorized NumPy operations for performance
 - Include references to academic sources
 - Set appropriate default bounds for each function
@@ -56,13 +58,32 @@ This document outlines the coding standards and best practices for contributors 
 
 ### Decorators
 
-- Implement decorators as subclasses of `OptimizationFunction`
-- Maintain the dimension and bounds properties correctly
-- Use composition pattern: wrap base function and delegate evaluation
-- Each decorator should handle a single transformation concern:
-  - `ShiftedFunction`: Shifts the optimum position
-  - `RotatedFunction`: Rotates the function landscape
-  - `BiasedFunction`: Adds a constant to the function value
+- Implement decorators as subclasses of `InputTransformingFunction` or `OutputTransformingFunction` (both inherit from `ComposableFunction`).
+- **InputTransformingFunction**: Use for decorators that transform the input before calling the base function (e.g., `Shifted`, `Rotated`, `Scaled`).
+- **OutputTransformingFunction**: Use for decorators that transform the output of the base function (e.g., `Biased`, `Noise`, `MaxAbsolute`).
+- Do **not** override `evaluate` or `evaluate_batch` in decorator subclasses; only implement `_apply` and `_apply_batch`.
+- Maintain the dimension and bounds properties correctly (delegated to base function if present).
+- Use composition pattern: wrap base function and delegate evaluation.
+- Each decorator should handle a single transformation concern.
+
+#### Example Decorator Usage
+
+```python
+# Input-transforming decorator
+func = Shifted(base_function=SphereFunction(dimension=2), shift=np.ones(2))
+
+# Output-transforming decorator
+biased_func = Biased(base_function=func, bias=5.0)
+
+# Chaining
+composed = Biased(base_function=Shifted(base_function=SphereFunction(dimension=2), shift=np.ones(2)), bias=5.0)
+```
+
+#### Best Practices
+- Choose the correct base class for your decorator's transformation type.
+- Never override `evaluate` or `evaluate_batch` in subclasses of `InputTransformingFunction` or `OutputTransformingFunction`.
+- Only implement `_apply` and `_apply_batch`.
+- This pattern ensures DRY, KISS, and SOLID, and makes the codebase easy to extend and maintain.
 
 ### Function Transformations
 

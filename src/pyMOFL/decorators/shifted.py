@@ -1,55 +1,37 @@
 """
-Shifted function decorator implementation.
+Shifted: Input-transforming decorator for applying a shift transformation to an OptimizationFunction.
 
-This module provides a decorator that applies a shift transformation to a base optimization function.
+Inherits from InputTransformingFunction. Subclasses should only implement _apply and _apply_batch, never override evaluate or evaluate_batch.
+
+Usage:
+    # As a base function (rare, but possible)
+    f = Shifted(dimension=3, shift=np.array([1, 2, 3]))
+    value = f(x)
+
+    # As a decorator
+    base = SphereFunction(...)
+    f = Shifted(base_function=base, shift=np.array([1, 2, 3]))
+    value = f(x)
 """
 
 import numpy as np
-from pyMOFL.core.function import OptimizationFunction
+from pyMOFL.core.composable_function import InputTransformingFunction
 
-
-class ShiftedFunction(OptimizationFunction):
-    """
-    Decorator that applies a shift transformation to a base optimization function.
-    The shift transformation moves the optimum of the function to a new location.
-    Requires an explicit shift vector.
-    
-    Attributes:
-        base (OptimizationFunction): The base optimization function to be shifted.
-        shift (np.ndarray): The shift vector to be applied to the input.
-        dimension (int): The dimensionality of the function (inherited from the base function).
-    """
-    
-    def __init__(self, base_func: OptimizationFunction, shift: np.ndarray):
-        """
-        Initialize the shifted function decorator.
-        
-        Args:
-            base_func (OptimizationFunction): The base optimization function to be shifted.
-            shift (np.ndarray): The shift vector to be applied to the input.
-        """
+class Shifted(InputTransformingFunction):
+    def __init__(self, base_function=None, dimension=None, shift=None, initialization_bounds=None, operational_bounds=None):
         if shift is None:
-            raise ValueError("ShiftedFunction requires a shift vector. None was provided.")
-        self.base = base_func
-        self.dimension = base_func.dimension
+            raise ValueError("Shifted requires a shift vector. None was provided.")
         self.shift = np.asarray(shift)
-        if self.shift.shape[0] != self.dimension:
-            raise ValueError(f"Expected shift dimension {self.dimension}, got {self.shift.shape[0]}")
-        self.constraint_penalty = base_func.constraint_penalty
-    
-    def evaluate(self, x):
-        return self.base(x - self.shift)
-    
-    def evaluate_batch(self, X):
-        return self.base.evaluate_batch(X - self.shift)
-    
-    def violations(self, x):
-        return self.base.violations(x - self.shift)
-    
-    @property
-    def initialization_bounds(self):
-        return self.base.initialization_bounds
-    
-    @property
-    def operational_bounds(self):
-        return self.base.operational_bounds 
+        if base_function is not None:
+            dim = base_function.dimension
+        else:
+            dim = dimension
+        if self.shift.shape[0] != dim:
+            raise ValueError(f"Expected shift dimension {dim}, got {self.shift.shape[0]}")
+        super().__init__(base_function=base_function, dimension=dimension, initialization_bounds=initialization_bounds, operational_bounds=operational_bounds)
+
+    def _apply(self, x):
+        return x - self.shift
+
+    def _apply_batch(self, X):
+        return X - self.shift
