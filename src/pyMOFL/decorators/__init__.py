@@ -13,6 +13,7 @@ from .noise import Noise
 from .matrix_transform import MatrixTransform
 from .boundary_adjusted_shift import BoundaryAdjustedShift
 from .max_absolute import MaxAbsolute
+from .quantized import Quantized
 
 DECORATOR_REGISTRY = {
     "Shifted": Shifted,
@@ -22,6 +23,7 @@ DECORATOR_REGISTRY = {
     "Scaled": Scaled,
     "MatrixTransform": MatrixTransform,
     "BoundaryAdjustedShift": BoundaryAdjustedShift,
+    "Quantized": Quantized,
 }
 
 def register_decorator(name):
@@ -59,6 +61,7 @@ __all__ = [
     "MatrixTransform",
     "BoundaryAdjustedShift",
     "MaxAbsolute",
+    "Quantized",
     "DECORATOR_REGISTRY",
 ]
 

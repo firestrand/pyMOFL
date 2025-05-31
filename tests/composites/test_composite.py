@@ -6,8 +6,13 @@ import pytest
 import numpy as np
 from pyMOFL.functions.unimodal import SphereFunction
 from pyMOFL.functions.multimodal import RastriginFunction
-from pyMOFL.decorators import ShiftedFunction
+from pyMOFL.decorators import Shifted
 from pyMOFL.composites import CompositeFunction
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.decorators import Biased
+from pyMOFL.decorators import Quantized
 
 
 class TestCompositeFunction:
@@ -27,18 +32,35 @@ class TestCompositeFunction:
         composite = CompositeFunction(components, sigmas, lambdas, biases)
         
         assert composite.dimension == 2
-        assert np.array_equal(composite.bounds, sphere.bounds)
+        assert np.array_equal(composite.initialization_bounds.low, sphere.initialization_bounds.low)
+        assert np.array_equal(composite.operational_bounds.high, sphere.operational_bounds.high)
         assert len(composite.components) == 2
         assert np.array_equal(composite.sigmas, np.array([1.0, 2.0]))
         assert np.array_equal(composite.lambdas, np.array([1.0, 1.0]))
         assert np.array_equal(composite.biases, np.array([0.0, 100.0]))
         
         # Create a composite function with custom bounds
-        custom_bounds = np.array([[-10, 10], [-5, 5]])
-        composite = CompositeFunction(components, sigmas, lambdas, biases, bounds=custom_bounds)
+        custom_init_bounds = Bounds(
+            low=np.array([-10, -5]),
+            high=np.array([10, 5]),
+            mode=BoundModeEnum.INITIALIZATION,
+            qtype=QuantizationTypeEnum.CONTINUOUS
+        )
+        custom_oper_bounds = Bounds(
+            low=np.array([-10, -5]),
+            high=np.array([10, 5]),
+            mode=BoundModeEnum.OPERATIONAL,
+            qtype=QuantizationTypeEnum.CONTINUOUS
+        )
+        composite = CompositeFunction(
+            components, sigmas, lambdas, biases,
+            initialization_bounds=custom_init_bounds,
+            operational_bounds=custom_oper_bounds
+        )
         
         assert composite.dimension == 2
-        assert np.array_equal(composite.bounds, custom_bounds)
+        assert np.array_equal(composite.initialization_bounds.low, custom_init_bounds.low)
+        assert np.array_equal(composite.operational_bounds.high, custom_oper_bounds.high)
     
     def test_parameter_validation(self):
         """Test that parameters are validated correctly."""
@@ -113,7 +135,7 @@ class TestCompositeFunction:
         """Test the evaluate method with shifted components."""
         # Create component functions
         sphere = SphereFunction(dimension=2)
-        shifted_sphere = ShiftedFunction(sphere, np.array([1.0, 2.0]))
+        shifted_sphere = Shifted(base_function=sphere, shift=np.array([1.0, 2.0]))
         
         # Create a composite function with shifted components
         components = [sphere, shifted_sphere]
@@ -168,4 +190,20 @@ class TestCompositeFunction:
             composite.evaluate(np.array([1.0, 2.0, 3.0]))
         
         with pytest.raises(ValueError):
-            composite.evaluate_batch(np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])) 
+            composite.evaluate_batch(np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]))
+    
+    def test_decorator_compatibility(self):
+        """Test composite function with decorated (shifted, biased) components and quantized bounds."""
+        sphere = SphereFunction(dimension=2)
+        shifted = Shifted(base_function=sphere, shift=np.array([1.0, 1.0]))
+        biased = Biased(base_function=shifted, bias=5.0)
+        quantized = Quantized(base_function=biased, qtype=QuantizationTypeEnum.INTEGER)
+        components = [quantized]
+        sigmas = [1.0]
+        lambdas = [1.0]
+        biases = [0.0]
+        composite = CompositeFunction(components, sigmas, lambdas, biases)
+        # Should round input to integer, shift, then bias
+        x = np.array([2.7, 3.2])
+        # After quantization: [3, 3], shift: [2, 2], sphere: 8, bias: 13
+        assert np.isclose(composite.evaluate(x), 13.0) 

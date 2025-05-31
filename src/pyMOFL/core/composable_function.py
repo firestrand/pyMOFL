@@ -21,6 +21,9 @@ Properties like dimension, bounds, etc. are delegated to the base if present, or
 
 from .function import OptimizationFunction
 from typing import Optional
+import numpy as np
+from numpy.typing import NDArray
+from typing import Any
 
 class ComposableFunction(OptimizationFunction):
     """
@@ -73,7 +76,6 @@ class ComposableFunction(OptimizationFunction):
             return self.base_function.bounds
         # Legacy: return as (dim, 2) array if possible
         if self.operational_bounds is not None:
-            import numpy as np
             return np.stack([self.operational_bounds.low, self.operational_bounds.high], axis=1)
         return None
 
@@ -110,6 +112,20 @@ class ComposableFunction(OptimizationFunction):
             return self.base_function.violations(self._apply(x))
         return 0.0
 
+    def __call__(self, x: NDArray[Any]) -> float:
+        """
+        Evaluate the function at x, enforcing operational bounds and constraints.
+        Returns np.nan if constraints are violated.
+        Applies input transformation if this is an InputTransformingFunction.
+        """
+        # If this is an InputTransformingFunction, apply input transformation before enforcement
+        if isinstance(self, InputTransformingFunction):
+            x = self._apply(x)
+        x_proj = self._enforce(x)
+        if np.any(np.isnan(x_proj)):
+            return np.nan
+        return self.evaluate(x_proj)
+
 class InputTransformingFunction(ComposableFunction):
     """
     Abstract base for decorators that transform the input before calling the base function.
@@ -135,6 +151,17 @@ class InputTransformingFunction(ComposableFunction):
         else:
             X = self._validate_batch_input(X)
             return self._apply_batch(X)
+
+    def __call__(self, x: NDArray[Any]) -> float:
+        """
+        Evaluate the function at x, enforcing operational bounds and constraints.
+        Always applies input transformation (_apply) before enforcement and evaluation.
+        """
+        x = self._apply(x)
+        x_proj = self._enforce(x)
+        if np.any(np.isnan(x_proj)):
+            return np.nan
+        return self.evaluate(x_proj)
 
 class OutputTransformingFunction(ComposableFunction):
     """
