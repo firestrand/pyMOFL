@@ -13,7 +13,10 @@ References:
 """
 
 import numpy as np
-from ...base import OptimizationFunction
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.core.function import OptimizationFunction
 
 
 class SchwefelFunction213(OptimizationFunction):
@@ -28,44 +31,63 @@ class SchwefelFunction213(OptimizationFunction):
     
     Global minimum: f(alpha) = 0, where alpha is the predefined optimum point.
     
-    Attributes:
-        dimension (int): The dimensionality of the function.
-        bounds (np.ndarray): Default bounds are [-π, π] for each dimension.
-        a (np.ndarray): D×D coefficient matrix for sine terms.
-        b (np.ndarray): D×D coefficient matrix for cosine terms.
-        alpha (np.ndarray): Global optimum point.
-        A (np.ndarray): Precomputed A_i values.
-        
-    References:
-        .. [1] Suganthan, P. N., Hansen, N., Liang, J. J., Deb, K., Chen, Y. P., Auger, A., & Tiwari, S. (2005).
-               "Problem definitions and evaluation criteria for the CEC 2005 special session on real-parameter
-               optimization". Nanyang Technological University, Singapore, Tech. Rep.
-        .. [2] Schwefel, H.-P. (1981). "Numerical optimization of computer models".
-               John Wiley & Sons, Inc.
+    Parameters
+    ----------
+    dimension : int
+        The dimensionality of the function.
+    initialization_bounds : Bounds, optional
+        Bounds for initialization. If None, defaults to [-π, π]^d.
+    operational_bounds : Bounds, optional
+        Bounds for operation. If None, defaults to [-π, π]^d.
+    a : np.ndarray, optional
+        D×D coefficient matrix for sine terms. If None, random integers in [-100, 100] are used.
+    b : np.ndarray, optional
+        D×D coefficient matrix for cosine terms. If None, random integers in [-100, 100] are used.
+    alpha : np.ndarray, optional
+        Global optimum point. If None, random values in [-π, π] are used.
+    
+    References
+    ----------
+    .. [1] Suganthan, P. N., Hansen, N., Liang, J. J., Deb, K., Chen, Y. P., Auger, A., & Tiwari, S. (2005).
+           "Problem definitions and evaluation criteria for the CEC 2005 special session on real-parameter
+           optimization". Nanyang Technological University, Singapore, Tech. Rep.
+    .. [2] Schwefel, H.-P. (1981). "Numerical optimization of computer models".
+           John Wiley & Sons, Inc.
     """
     
-    def __init__(self, dimension: int, bias: float = 0.0, bounds: np.ndarray = None, 
+    def __init__(self, dimension: int,
+                 initialization_bounds: Bounds = None,
+                 operational_bounds: Bounds = None,
                  a: np.ndarray = None, b: np.ndarray = None, alpha: np.ndarray = None):
         """
         Initialize the Schwefel's Problem 2.13 function.
         
-        Args:
-            dimension (int): The dimensionality of the function.
-            bias (float, optional): Bias term added to the function value. Defaults to 0.0.
-            bounds (np.ndarray, optional): Bounds for each dimension. 
-                                          Defaults to [-π, π] for each dimension.
-            a (np.ndarray, optional): D×D coefficient matrix for sine terms.
-                                     If None, random integers in [-100, 100] are used.
-            b (np.ndarray, optional): D×D coefficient matrix for cosine terms.
-                                     If None, random integers in [-100, 100] are used.
-            alpha (np.ndarray, optional): Global optimum point.
-                                         If None, random values in [-π, π] are used.
+        Parameters
+        ----------
+        dimension : int
+            The dimensionality of the function.
+        initialization_bounds : Bounds, optional
+            Bounds for initialization. If None, defaults to [-π, π]^d.
+        operational_bounds : Bounds, optional
+            Bounds for operation. If None, defaults to [-π, π]^d.
+        a : np.ndarray, optional
+            D×D coefficient matrix for sine terms. If None, random integers in [-100, 100] are used.
+        b : np.ndarray, optional
+            D×D coefficient matrix for cosine terms. If None, random integers in [-100, 100] are used.
+        alpha : np.ndarray, optional
+            Global optimum point. If None, random values in [-π, π] are used.
         """
-        # Set default bounds to [-π, π] for each dimension
-        if bounds is None:
-            bounds = np.array([[-np.pi, np.pi]] * dimension)
-        
-        super().__init__(dimension, bias, bounds)
+        default_bounds = Bounds(
+            low=np.full(dimension, -np.pi),
+            high=np.full(dimension, np.pi),
+            mode=BoundModeEnum.OPERATIONAL,
+            qtype=QuantizationTypeEnum.CONTINUOUS
+        )
+        super().__init__(
+            dimension=dimension,
+            initialization_bounds=initialization_bounds or default_bounds,
+            operational_bounds=operational_bounds or default_bounds
+        )
         
         # Initialize coefficient matrices if not provided
         if a is None:
@@ -94,11 +116,14 @@ class SchwefelFunction213(OptimizationFunction):
         """
         Evaluate the Schwefel's Problem 2.13 function at point x.
         
-        Args:
-            x (np.ndarray): A point in the search space.
-            
-        Returns:
-            float: The function value at point x.
+        Parameters
+        ----------
+        x : np.ndarray
+            Input vector of shape (dimension,).
+        Returns
+        -------
+        float
+            The function value at x.
         """
         # Validate and preprocess the input
         x = self._validate_input(x)
@@ -113,17 +138,20 @@ class SchwefelFunction213(OptimizationFunction):
             # Add squared difference to result
             result += (self.A[i] - B_i)**2
         
-        return float(result + self.bias)
+        return float(result)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
         Evaluate the Schwefel's Problem 2.13 function on a batch of points.
         
-        Args:
-            X (np.ndarray): A batch of points in the search space.
-            
-        Returns:
-            np.ndarray: The function values for each point.
+        Parameters
+        ----------
+        X : np.ndarray
+            Input array of shape (n_points, dimension).
+        Returns
+        -------
+        np.ndarray
+            The function values for each point.
         """
         # Validate the batch input
         X = self._validate_batch_input(X)
@@ -147,16 +175,35 @@ class SchwefelFunction213(OptimizationFunction):
             
             results[p] = result
         
-        return results + self.bias
+        return results
     
-    def get_global_minimum(self) -> tuple:
+    @staticmethod
+    def get_global_minimum(dimension: int, a: np.ndarray, b: np.ndarray, alpha: np.ndarray) -> tuple:
         """
-        Get the global minimum of the function.
-        
-        Returns:
-            tuple: A tuple containing the global minimum point and the function value at that point.
+        Get the global minimum of the function for given parameters.
+
+        Parameters
+        ----------
+        dimension : int
+            The dimension of the function.
+        a : np.ndarray
+            D×D coefficient matrix for sine terms.
+        b : np.ndarray
+            D×D coefficient matrix for cosine terms.
+        alpha : np.ndarray
+            Global optimum point.
+
+        Returns
+        -------
+        tuple
+            (global_min_point, global_min_value)
+
+        Notes
+        -----
+        The global minimum is at alpha, with value 0.0 for the given a, b, alpha.
+        For reproducibility, the same a, b, alpha must be used as in the function instance.
         """
-        return self.alpha, self.bias
+        return alpha, 0.0
 
 
 # Alias for backward compatibility

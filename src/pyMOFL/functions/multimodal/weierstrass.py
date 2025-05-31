@@ -14,9 +14,14 @@ References:
 """
 
 import numpy as np
-from ...base import OptimizationFunction
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.core.function import OptimizationFunction
+from pyMOFL.base import register_function
 
 
+@register_function("Weierstrass")
 class WeierstrassFunction(OptimizationFunction):
     """
     Weierstrass function: 
@@ -26,9 +31,12 @@ class WeierstrassFunction(OptimizationFunction):
     
     Global minimum: f(0, 0, ..., 0) = 0
     
+    Input validation is handled by the base class (_validate_input, _validate_batch_input).
+    
     Attributes:
         dimension (int): The dimensionality of the function.
-        bounds (np.ndarray): Default bounds are [-0.5, 0.5] for each dimension.
+        initialization_bounds (Bounds): Bounds for initialization.
+        operational_bounds (Bounds): Bounds for operation.
         a (float): Base for the amplitude coefficient. Default is 0.5.
         b (float): Base for the frequency coefficient. Default is 3.0.
         k_max (int): Maximum value of k in the summation. Default is 20.
@@ -41,32 +49,37 @@ class WeierstrassFunction(OptimizationFunction):
                Werth des letzteren einen bestimmten Differentialquotienten besitzen".
     """
     
-    def __init__(self, dimension: int, bounds: np.ndarray = None, 
-                 a: float = 0.5, b: float = 3.0, k_max: int = 20, bias: float = 0.0):
+    def __init__(self, dimension: int,
+                 initialization_bounds: Bounds = None,
+                 operational_bounds: Bounds = None,
+                 a: float = 0.5, b: float = 3.0, k_max: int = 20):
         """
         Initialize the Weierstrass function.
         
         Args:
             dimension (int): The dimensionality of the function.
-            bounds (np.ndarray, optional): Bounds for each dimension. 
-                                          Defaults to [-0.5, 0.5] for each dimension.
+            initialization_bounds (Bounds, optional): Bounds for initialization. 
+                                                    Defaults to [-0.5, 0.5] for each dimension.
+            operational_bounds (Bounds, optional): Bounds for operation. 
+                                                  Defaults to [-0.5, 0.5] for each dimension.
             a (float, optional): Base for the amplitude coefficient. Defaults to 0.5.
             b (float, optional): Base for the frequency coefficient. Defaults to 3.0.
             k_max (int, optional): Maximum value of k in the summation. Defaults to 20.
-            bias (float, optional): Bias term added to the function value. Defaults to 0.0.
         """
-        # Set default bounds to [-0.5, 0.5] for each dimension
-        if bounds is None:
-            bounds = np.array([[-0.5, 0.5]] * dimension)
-        
-        # Call the parent constructor with just dimension and bounds
-        super().__init__(dimension, bounds)
-        
+        default_bounds = Bounds(
+            low=np.full(dimension, -0.5),
+            high=np.full(dimension, 0.5),
+            mode=BoundModeEnum.OPERATIONAL,
+            qtype=QuantizationTypeEnum.CONTINUOUS
+        )
+        super().__init__(
+            dimension=dimension,
+            initialization_bounds=initialization_bounds or default_bounds,
+            operational_bounds=operational_bounds or default_bounds
+        )
         self.a = a
         self.b = b
         self.k_max = k_max
-        self.bias = bias
-        
         # Pre-calculate constants to avoid repeated computation
         self._a_powers = np.power(self.a, np.arange(self.k_max + 1))
         self._b_powers = np.power(self.b, np.arange(self.k_max + 1))
@@ -82,20 +95,15 @@ class WeierstrassFunction(OptimizationFunction):
         Returns:
             float: The function value at point x.
         """
-        # Validate and preprocess the input
         x = self._validate_input(x)
-        
         result = 0.0
-        # For each dimension
         for i in range(self.dimension):
-            # Calculate the sum over k
             sum_k = 0.0
             for k in range(self.k_max + 1):
                 inner_term = 2 * np.pi * self._b_powers[k] * (x[i] + 0.5)
                 sum_k += self._a_powers[k] * np.cos(inner_term)
             result += sum_k
-        
-        return float(result - self._constant_term + self.bias)
+        return float(result - self._constant_term)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
@@ -107,29 +115,20 @@ class WeierstrassFunction(OptimizationFunction):
         Returns:
             np.ndarray: The function values for each point.
         """
-        # Validate the batch input
         X = self._validate_batch_input(X)
-        
         n_points, n_dims = X.shape
         results = np.zeros(n_points)
-        
-        # For each point in the batch
         for p in range(n_points):
             x = X[p]
             result = 0.0
-            
-            # For each dimension
             for i in range(n_dims):
-                # Calculate the sum over k
                 sum_k = 0.0
                 for k in range(self.k_max + 1):
                     inner_term = 2 * np.pi * self._b_powers[k] * (x[i] + 0.5)
                     sum_k += self._a_powers[k] * np.cos(inner_term)
                 result += sum_k
-            
             results[p] = result - self._constant_term
-        
-        return results + self.bias
+        return results
     
     @staticmethod
     def get_global_minimum(dimension: int) -> tuple:

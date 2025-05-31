@@ -4,8 +4,11 @@ Tests for the Network function.
 
 import pytest
 import numpy as np
-from pyMOFL.functions.hybrid import NetworkFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.functions.hybrid.network import NetworkFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 
 
 class TestNetworkFunction:
@@ -13,28 +16,38 @@ class TestNetworkFunction:
     
     def test_initialization(self):
         """Test initialization with default and custom bounds."""
-        # Test with default bounds
         func = NetworkFunction()
         assert func.dimension == 42  # 19*2 + 2*2 = 42
-        assert func.bounds.shape == (42, 2)
-        
-        # Check that binary and continuous bounds are set correctly
+        # Check binary and continuous bounds in initialization_bounds and operational_bounds
         binary_count = func.bts_count * func.bsc_count
-        
-        # Check binary bounds
-        for i in range(binary_count):
-            assert np.array_equal(func.bounds[i], np.array([0, 1]))
-        
-        # Check continuous bounds
-        for i in range(binary_count, func.dimension):
-            assert np.array_equal(func.bounds[i], np.array([0, 20]))
-        
+        cont_count = 2 * func.bsc_count
+        np.testing.assert_allclose(func.initialization_bounds.low[:binary_count], 0)
+        np.testing.assert_allclose(func.initialization_bounds.high[:binary_count], 1)
+        np.testing.assert_allclose(func.initialization_bounds.low[binary_count:], 0)
+        np.testing.assert_allclose(func.initialization_bounds.high[binary_count:], 20)
+        np.testing.assert_allclose(func.operational_bounds.low[:binary_count], 0)
+        np.testing.assert_allclose(func.operational_bounds.high[:binary_count], 1)
+        np.testing.assert_allclose(func.operational_bounds.low[binary_count:], 0)
+        np.testing.assert_allclose(func.operational_bounds.high[binary_count:], 20)
+
         # Test with custom bounds
-        custom_bounds = np.array([[0, 0.5]] * 42)
-        func = NetworkFunction(bounds=custom_bounds)
-        assert func.dimension == 42
-        assert func.bounds.shape == (42, 2)
-        assert np.array_equal(func.bounds, custom_bounds)
+        custom_init_bounds = Bounds(
+            low=np.zeros(42),
+            high=np.full(42, 0.5),
+            mode=BoundModeEnum.INITIALIZATION,
+            qtype=np.array([QuantizationTypeEnum.CONTINUOUS]*42)
+        )
+        custom_oper_bounds = Bounds(
+            low=np.zeros(42),
+            high=np.full(42, 0.5),
+            mode=BoundModeEnum.OPERATIONAL,
+            qtype=np.array([QuantizationTypeEnum.CONTINUOUS]*42)
+        )
+        func = NetworkFunction(initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, np.zeros(42))
+        np.testing.assert_allclose(func.initialization_bounds.high, np.full(42, 0.5))
+        np.testing.assert_allclose(func.operational_bounds.low, np.zeros(42))
+        np.testing.assert_allclose(func.operational_bounds.high, np.full(42, 0.5))
     
     def test_internal_properties(self):
         """Test that internal properties are set correctly."""
@@ -72,9 +85,9 @@ class TestNetworkFunction:
         
         result = func.evaluate(x)
         
-        # Test with BiasedFunction decorator
+        # Test with Biased decorator
         bias_value = 10.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_result = biased_func.evaluate(x)
         
         # Check that bias is correctly applied
@@ -173,9 +186,9 @@ class TestNetworkFunction:
         # Verify results match individual evaluations
         np.testing.assert_allclose(results, expected)
         
-        # Test with BiasedFunction decorator
+        # Test with Biased decorator
         bias_value = 5.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_results = biased_func.evaluate_batch(batch)
         
         # Check that bias is correctly applied to all results

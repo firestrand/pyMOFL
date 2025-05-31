@@ -19,6 +19,11 @@ class OptimizationFunction(ABC):
     operational_bounds: Bounds | None
     constraint_penalty: float = 1e8
 
+    def __init__(self, dimension: int, initialization_bounds: Bounds = None, operational_bounds: Bounds = None):
+        self.dimension = dimension
+        self.initialization_bounds = initialization_bounds
+        self.operational_bounds = operational_bounds
+
     def __call__(self, x: NDArray[Any]) -> float:
         """
         Evaluate the function at x, enforcing operational bounds and constraints.

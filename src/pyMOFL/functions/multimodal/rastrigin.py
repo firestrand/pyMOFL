@@ -13,9 +13,14 @@ References:
 """
 
 import numpy as np
-from ...base import OptimizationFunction
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.core.function import OptimizationFunction
+from pyMOFL.base import register_function
 
 
+@register_function("Rastrigin")
 class RastriginFunction(OptimizationFunction):
     """
     Rastrigin function: f(x) = 10*n + sum(x_i^2 - 10*cos(2*pi*x_i))
@@ -35,20 +40,30 @@ class RastriginFunction(OptimizationFunction):
         To add a bias to the function, use the BiasedFunction decorator from the decorators module.
     """
     
-    def __init__(self, dimension: int, bounds: np.ndarray = None):
+    def __init__(self, dimension: int,
+                 initialization_bounds: Bounds = None,
+                 operational_bounds: Bounds = None):
         """
         Initialize the Rastrigin function.
         
         Args:
             dimension (int): The dimensionality of the function.
-            bounds (np.ndarray, optional): Bounds for each dimension. 
-                                          Defaults to [-5.12, 5.12] for each dimension.
+            initialization_bounds (Bounds, optional): Bounds for initialization. 
+                                                    Defaults to [-5.12, 5.12] for each dimension.
+            operational_bounds (Bounds, optional): Bounds for operational use. 
+                                                  Defaults to [-5.12, 5.12] for each dimension.
         """
-        # Set default bounds to [-5.12, 5.12] for each dimension
-        if bounds is None:
-            bounds = np.array([[-5.12, 5.12]] * dimension)
-        
-        super().__init__(dimension, bounds)
+        default_bounds = Bounds(
+            low=np.full(dimension, -5.12),
+            high=np.full(dimension, 5.12),
+            mode=BoundModeEnum.OPERATIONAL,
+            qtype=QuantizationTypeEnum.CONTINUOUS
+        )
+        super().__init__(
+            dimension=dimension,
+            initialization_bounds=initialization_bounds or default_bounds,
+            operational_bounds=operational_bounds or default_bounds
+        )
     
     def evaluate(self, x: np.ndarray) -> float:
         """
@@ -60,10 +75,7 @@ class RastriginFunction(OptimizationFunction):
         Returns:
             float: The function value at point x.
         """
-        # Validate and preprocess the input
         x = self._validate_input(x)
-        
-        # Compute the function value using the optimized formula
         return float(np.sum(x**2 - 10 * np.cos(2 * np.pi * x) + 10))
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
@@ -76,11 +88,7 @@ class RastriginFunction(OptimizationFunction):
         Returns:
             np.ndarray: The function values for each point.
         """
-        # Validate the batch input
         X = self._validate_batch_input(X)
-        
-        # Compute the function values using the optimized formula
-        # This is more efficient than calling evaluate for each point
         return np.sum(X**2 - 10 * np.cos(2 * np.pi * X) + 10, axis=1)
     
     @staticmethod

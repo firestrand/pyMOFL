@@ -13,7 +13,10 @@ References:
 """
 
 import numpy as np
-from ...base import OptimizationFunction
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.core.function import OptimizationFunction
 
 
 class CompressionSpringFunction(OptimizationFunction):
@@ -42,50 +45,65 @@ class CompressionSpringFunction(OptimizationFunction):
     
     Global minimum: f ≈ 0.012665 kg at (d, D, N) ≈ (0.05150, 0.35166, 11)
     
-    Attributes:
-        dimension (int): Always 3 (d, D, N).
-        bounds (np.ndarray): Default bounds are [0.05, 2.00] for d, [0.25, 1.30] for D,
-                            and [2, 15] for N.
+    Parameters
+    ----------
+    initialization_bounds : Bounds, optional
+        Bounds for initialization. If None, defaults to [0.05, 2.00] for d, [0.25, 1.30] for D, [2, 15] for N.
+    operational_bounds : Bounds, optional
+        Bounds for operation. If None, defaults to [0.05, 2.00] for d, [0.25, 1.30] for D, [2, 15] for N.
     
-    Properties:
-        - Mixed-integer problem (continuous and integer variables)
-        - Highly constrained
-        - Narrow feasible ridge
-    
-    References:
-        .. [1] Deb, K. (2000). "An Efficient Constraint Handling Method for Genetic
-               Algorithms." *Computer Methods in Applied Mechanics and Engineering*,
-               186(2-4), 311-338.
-    
-    Note:
-        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
+    References
+    ----------
+    .. [1] Deb, K. (2000). "An Efficient Constraint Handling Method for Genetic
+           Algorithms." *Computer Methods in Applied Mechanics and Engineering*,
+           186(2-4), 311-338.
     """
     
-    def __init__(self, bounds: np.ndarray = None):
+    def __init__(
+        self,
+        initialization_bounds: Bounds = None,
+        operational_bounds: Bounds = None
+    ):
         """
         Initialize the Compression Spring function.
         
-        Args:
-            bounds (np.ndarray, optional): Bounds for each dimension.
-                                          Defaults to [[0.05, 2.00], [0.25, 1.30], [2, 15]].
+        Parameters
+        ----------
+        initialization_bounds : Bounds, optional
+            Bounds for initialization. If None, defaults to [0.05, 2.00] for d, [0.25, 1.30] for D, [2, 15] for N.
+        operational_bounds : Bounds, optional
+            Bounds for operation. If None, defaults to [0.05, 2.00] for d, [0.25, 1.30] for D, [2, 15] for N.
         """
-        # Compression spring is a 3D problem
         dimension = 3
-        
-        # Set default bounds based on the problem definition
-        if bounds is None:
-            bounds = np.array([
-                [0.05, 2.00],  # d: wire diameter (cm)
-                [0.25, 1.30],  # D: mean coil diameter (cm)
-                [2, 15]        # N: active coil count (integer)
-            ])
-        
-        super().__init__(dimension, bounds)
-        
-        # Penalty factor for constraint violations
+        # Per-variable quantization: d and D are continuous, N is integer
+        if initialization_bounds is None:
+            initialization_bounds = Bounds(
+                low=np.array([0.05, 0.25, 2]),
+                high=np.array([2.00, 1.30, 15]),
+                mode=BoundModeEnum.INITIALIZATION,
+                qtype=np.array([
+                    QuantizationTypeEnum.CONTINUOUS,
+                    QuantizationTypeEnum.CONTINUOUS,
+                    QuantizationTypeEnum.INTEGER
+                ])
+            )
+        if operational_bounds is None:
+            operational_bounds = Bounds(
+                low=np.array([0.05, 0.25, 2]),
+                high=np.array([2.00, 1.30, 15]),
+                mode=BoundModeEnum.OPERATIONAL,
+                qtype=np.array([
+                    QuantizationTypeEnum.CONTINUOUS,
+                    QuantizationTypeEnum.CONTINUOUS,
+                    QuantizationTypeEnum.INTEGER
+                ])
+            )
+        super().__init__(
+            dimension=dimension,
+            initialization_bounds=initialization_bounds,
+            operational_bounds=operational_bounds
+        )
         self._BIG = 1.0e5
-        
-        # Scaling factor to match published global minimum value
         self._scaling = 0.4234
     
     def evaluate(self, x: np.ndarray) -> float:
@@ -101,10 +119,10 @@ class CompressionSpringFunction(OptimizationFunction):
         # Validate and preprocess the input
         x = self._validate_input(x)
         
-        # Clip to bounds and round N to nearest integer
-        d = np.clip(x[0], 0.05, 2.00)  # wire diameter
-        D = np.clip(x[1], 0.25, 1.30)  # mean coil diameter
-        N = np.clip(np.rint(x[2]), 2, 15).astype(float)  # active coil count (integer)
+        # d, D, N (N is integer, d and D are continuous)
+        d = x[0]
+        D = x[1]
+        N = x[2]
         
         # Calculate weight with scaling factor to match expected global minimum
         weight = self._scaling * np.pi**2 * D * d**2 * (N + 2) * 0.25
@@ -139,10 +157,10 @@ class CompressionSpringFunction(OptimizationFunction):
         # Validate the batch input
         X = self._validate_batch_input(X)
         
-        # Clip to bounds and round N to nearest integer
-        d = np.clip(X[:, 0], 0.05, 2.00)  # wire diameter
-        D = np.clip(X[:, 1], 0.25, 1.30)  # mean coil diameter
-        N = np.clip(np.rint(X[:, 2]), 2, 15).astype(float)  # active coil count (integer)
+        # d, D, N (N is integer, d and D are continuous)
+        d = X[:, 0]
+        D = X[:, 1]
+        N = X[:, 2]
         
         # Calculate weight with scaling factor to match expected global minimum
         weight = self._scaling * np.pi**2 * D * d**2 * (N + 2) * 0.25

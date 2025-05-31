@@ -5,7 +5,9 @@ Tests for the Schaffer's F6 function implementation.
 import pytest
 import numpy as np
 from pyMOFL.functions.multimodal.scaffer_f6 import SchafferF6Function, ScafferF6Function
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
 
 
 class TestSchafferF6Function:
@@ -16,17 +18,27 @@ class TestSchafferF6Function:
         # Default initialization (2D)
         f = SchafferF6Function()
         assert f.dimension == 2
-        assert np.all(f.bounds == np.array([[-100, 100], [-100, 100]]))
+        np.testing.assert_allclose(f.initialization_bounds.low, [-100, -100])
+        np.testing.assert_allclose(f.initialization_bounds.high, [100, 100])
+        np.testing.assert_allclose(f.operational_bounds.low, [-100, -100])
+        np.testing.assert_allclose(f.operational_bounds.high, [100, 100])
         
-        # Custom dimension with warning
+        # Custom dimension
         f = SchafferF6Function(dimension=3)
         assert f.dimension == 3
-        assert np.all(f.bounds == np.array([[-100, 100], [-100, 100], [-100, 100]]))
+        np.testing.assert_allclose(f.initialization_bounds.low, [-100, -100, -100])
+        np.testing.assert_allclose(f.initialization_bounds.high, [100, 100, 100])
+        np.testing.assert_allclose(f.operational_bounds.low, [-100, -100, -100])
+        np.testing.assert_allclose(f.operational_bounds.high, [100, 100, 100])
         
         # Custom bounds
-        custom_bounds = np.array([[-50, 50], [-50, 50]])
-        f = SchafferF6Function(bounds=custom_bounds)
-        assert np.all(f.bounds == custom_bounds)
+        custom_init_bounds = Bounds(low=np.array([-50, -50]), high=np.array([50, 50]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-50, -50]), high=np.array([50, 50]), mode=BoundModeEnum.OPERATIONAL)
+        f = SchafferF6Function(initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(f.initialization_bounds.low, [-50, -50])
+        np.testing.assert_allclose(f.initialization_bounds.high, [50, 50])
+        np.testing.assert_allclose(f.operational_bounds.low, [-50, -50])
+        np.testing.assert_allclose(f.operational_bounds.high, [50, 50])
     
     def test_alias(self):
         """Test that the ScafferF6Function alias works."""
@@ -46,7 +58,7 @@ class TestSchafferF6Function:
         
         # Add bias using decorator and check
         bias = 5.0
-        f_biased = BiasedFunction(f, bias=bias)
+        f_biased = Biased(f, bias=bias)
         assert np.isclose(f_biased.evaluate(x_opt), bias)
     
     def test_evaluate(self):
@@ -65,7 +77,7 @@ class TestSchafferF6Function:
         
         # Test with bias using decorator
         bias = 3.0
-        f_biased = BiasedFunction(f, bias=bias)
+        f_biased = Biased(f, bias=bias)
         assert np.isclose(f_biased.evaluate(x), expected + bias)
     
     def test_evaluate_batch(self):
@@ -90,7 +102,7 @@ class TestSchafferF6Function:
         
         # Test with bias using decorator
         bias = 2.5
-        f_biased = BiasedFunction(f, bias=bias)
+        f_biased = Biased(f, bias=bias)
         biased_results = f_biased.evaluate_batch(X)
         assert np.allclose(biased_results, expected + bias)
     
@@ -141,5 +153,5 @@ class TestSchafferF6Function:
             
             # Check with bias using decorator
             bias_value = 7.5
-            biased_func = BiasedFunction(func, bias=bias_value)
+            biased_func = Biased(func, bias=bias_value)
             assert np.isclose(biased_func.evaluate(point), value + bias_value) 

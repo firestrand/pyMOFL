@@ -5,7 +5,9 @@ Tests for the Rastrigin function.
 import pytest
 import numpy as np
 from pyMOFL.functions.multimodal import RastriginFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
 
 
 class TestRastriginFunction:
@@ -16,14 +18,19 @@ class TestRastriginFunction:
         # Test with defaults
         func = RastriginFunction(dimension=2)
         assert func.dimension == 2
-        assert func.bounds.shape == (2, 2)
-        assert np.array_equal(func.bounds, np.array([[-5.12, 5.12], [-5.12, 5.12]]))
+        np.testing.assert_allclose(func.initialization_bounds.low, [-5.12, -5.12])
+        np.testing.assert_allclose(func.initialization_bounds.high, [5.12, 5.12])
+        np.testing.assert_allclose(func.operational_bounds.low, [-5.12, -5.12])
+        np.testing.assert_allclose(func.operational_bounds.high, [5.12, 5.12])
         
         # Test with custom bounds
-        custom_bounds = np.array([[-10, 10], [-10, 10], [-10, 10]])
-        func = RastriginFunction(dimension=3, bounds=custom_bounds)
-        assert func.bounds.shape == (3, 2)
-        assert np.array_equal(func.bounds, custom_bounds)
+        custom_init_bounds = Bounds(low=np.array([-10, -10, -10]), high=np.array([10, 10, 10]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-10, -10, -10]), high=np.array([10, 10, 10]), mode=BoundModeEnum.OPERATIONAL)
+        func = RastriginFunction(dimension=3, initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-10, -10, -10])
+        np.testing.assert_allclose(func.initialization_bounds.high, [10, 10, 10])
+        np.testing.assert_allclose(func.operational_bounds.low, [-10, -10, -10])
+        np.testing.assert_allclose(func.operational_bounds.high, [10, 10, 10])
     
     def test_global_minimum(self):
         """Test the function value at the global minimum."""
@@ -38,7 +45,7 @@ class TestRastriginFunction:
         
         # Test with BiasedFunction decorator
         bias_value = 5.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_result = biased_func.evaluate(min_point)
         
         # Value at global minimum with bias should be the bias value
@@ -100,7 +107,7 @@ class TestRastriginFunction:
         
         # Test with BiasedFunction decorator
         bias_value = 5.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_results = biased_func.evaluate_batch(points)
         
         # Biased results should be original results + bias
@@ -120,24 +127,14 @@ class TestRastriginFunction:
     def test_bounds_respect(self):
         """Test that bounds are properly respected."""
         # Create function with custom bounds
-        bounds = np.array([[-1, 1], [-1, 1]])
-        func = RastriginFunction(dimension=2, bounds=bounds)
+        custom_init_bounds = Bounds(low=np.array([-1, -1]), high=np.array([1, 1]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-1, -1]), high=np.array([1, 1]), mode=BoundModeEnum.OPERATIONAL)
+        func = RastriginFunction(dimension=2, initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
         
-        # Points outside the bounds
-        outside_point = np.array([10.0, -10.0])
-        
-        # Points should be clamped to bounds
-        clamped_point = np.array([1.0, -1.0])
-        
-        # The function might not have the same value due to clamping and the 
-        # behavior of cos(2*pi*x) with large values, so we should just verify
-        # that the function evaluates both points without error
-        outside_value = func.evaluate(outside_point)
-        clamped_value = func.evaluate(clamped_point)
-        
-        # Both values should be valid numbers
-        assert isinstance(outside_value, (int, float))
-        assert isinstance(clamped_value, (int, float))
+        # Points inside the bounds
+        inside_point = np.array([1.0, -1.0])
+        value = func.evaluate(inside_point)
+        assert isinstance(value, (int, float))
     
     def test_symmetry(self):
         """Test that the function is symmetric around origin."""

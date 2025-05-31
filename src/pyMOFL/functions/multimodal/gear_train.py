@@ -12,7 +12,10 @@ References:
 """
 
 import numpy as np
-from ...base import OptimizationFunction
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.core.function import OptimizationFunction
 
 
 class GearTrainFunction(OptimizationFunction):
@@ -31,103 +34,95 @@ class GearTrainFunction(OptimizationFunction):
     Global minimum: f = 1.643428e-6 at (z₁, z₂, z₃, z₄) = (16, 19, 43, 49)
     Note: Multiple symmetry-equivalent designs achieve the same error.
     
-    Attributes:
-        dimension (int): Always 4 (four gear tooth counts).
-        bounds (np.ndarray): Fixed bounds are [12, 60] for each dimension.
+    Parameters
+    ----------
+    initialization_bounds : Bounds, optional
+        Bounds for initialization. If None, defaults to [12, 60]^4.
+    operational_bounds : Bounds, optional
+        Bounds for operation. If None, defaults to [12, 60]^4.
     
-    Properties:
-        - Discrete variables (integers)
-        - Multimodal
-        - Plateau-like (many ties in function value)
-    
-    References:
-        .. [1] Sandgren, E. (1990). "Nonlinear Integer and Discrete Programming
-               in Mechanical Design Optimization." *Journal of Mechanical Design*,
-               112(2), 223-229.
-    
-    Note:
-        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
+    References
+    ----------
+    .. [1] Sandgren, E. (1990). "Nonlinear Integer and Discrete Programming
+           in Mechanical Design Optimization." *Journal of Mechanical Design*,
+           112(2), 223-229.
     """
     
-    # Constants
-    _LOW = 12    # Minimum number of teeth
-    _HIGH = 60   # Maximum number of teeth
-    _R_TARGET = 1.0 / 6.931  # Target gear ratio
-    
-    def __init__(self, bounds: np.ndarray = None):
-        """
-        Initialize the Gear Train function.
-        
-        Args:
-            bounds (np.ndarray, optional): Bounds for each dimension.
-                                          Defaults to [12, 60] for each dimension.
-        """
-        # Gear Train function is always 4D
+    _LOW = 12
+    _HIGH = 60
+    _R_TARGET = 1.0 / 6.931
+
+    def __init__(self,
+                 initialization_bounds: Bounds = None,
+                 operational_bounds: Bounds = None):
         dimension = 4
-        
-        # Set default bounds to [12, 60] for each dimension
-        if bounds is None:
-            bounds = np.array([[self._LOW, self._HIGH]] * dimension)
-        
-        super().__init__(dimension, bounds)
-    
-    def _clip_round(self, z: np.ndarray) -> np.ndarray:
-        """
-        Clamp values to [12, 60] and round to nearest integer.
-        
-        Args:
-            z (np.ndarray): Input array of gear tooth counts.
-            
-        Returns:
-            np.ndarray: Clipped and rounded integer values.
-        """
-        z = np.clip(z, self._LOW, self._HIGH)
-        return np.rint(z).astype(int)
+        default_init_bounds = Bounds(
+            low=np.full(dimension, self._LOW),
+            high=np.full(dimension, self._HIGH),
+            mode=BoundModeEnum.INITIALIZATION,
+            qtype=QuantizationTypeEnum.INTEGER
+        )
+        default_oper_bounds = Bounds(
+            low=np.full(dimension, self._LOW),
+            high=np.full(dimension, self._HIGH),
+            mode=BoundModeEnum.OPERATIONAL,
+            qtype=QuantizationTypeEnum.INTEGER
+        )
+        super().__init__(
+            dimension=dimension,
+            initialization_bounds=initialization_bounds or default_init_bounds,
+            operational_bounds=operational_bounds or default_oper_bounds
+        )
     
     def evaluate(self, x: np.ndarray) -> float:
         """
         Evaluate the Gear Train function at point x.
         
-        Args:
-            x (np.ndarray): A 4D point representing gear tooth counts.
-            
-        Returns:
-            float: The absolute deviation from the target ratio.
+        Parameters
+        ----------
+        x : np.ndarray
+            Input vector of shape (4,). Should be integer-valued.
+        Returns
+        -------
+        float
+            The absolute deviation from the target ratio.
         """
         # Validate and preprocess the input
         x = self._validate_input(x)
-        
-        # Convert to integers within bounds
-        z = self._clip_round(x)
-        
-        # Calculate gear ratio
-        ratio = (z[0] * z[1]) / (z[2] * z[3])
-        
-        # Calculate absolute deviation from target ratio
+        # Assume input is already integer and within bounds (enforced by decorator)
+        ratio = (x[0] * x[1]) / (x[2] * x[3])
         result = np.abs(ratio - self._R_TARGET)
-        
         return float(result)
     
     def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
         """
         Evaluate the Gear Train function for a batch of points.
         
-        Args:
-            X (np.ndarray): A batch of 4D points.
-            
-        Returns:
-            np.ndarray: The absolute deviation from the target ratio for each point.
+        Parameters
+        ----------
+        X : np.ndarray
+            Input array of shape (n_points, 4). Should be integer-valued.
+        Returns
+        -------
+        np.ndarray
+            The absolute deviation from the target ratio for each point.
         """
         # Validate the batch input
         X = self._validate_batch_input(X)
-        
-        # Convert to integers within bounds
-        z = self._clip_round(X)
-        
-        # Calculate gear ratio for each point
-        ratio = (z[:, 0] * z[:, 1]) / (z[:, 2] * z[:, 3])
-        
-        # Calculate absolute deviation from target ratio
+        ratio = (X[:, 0] * X[:, 1]) / (X[:, 2] * X[:, 3])
         result = np.abs(ratio - self._R_TARGET)
-        
-        return result 
+        return result
+
+    @staticmethod
+    def get_global_minimum() -> tuple:
+        """
+        Get the global minimum of the function.
+
+        Returns
+        -------
+        tuple
+            (global_min_point, global_min_value)
+        """
+        global_min_point = np.array([16, 19, 43, 49])
+        global_min_value = 1.643428e-6
+        return global_min_point, global_min_value 

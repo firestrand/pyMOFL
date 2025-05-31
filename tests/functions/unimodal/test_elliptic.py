@@ -5,7 +5,9 @@ Tests for the Elliptic function.
 import pytest
 import numpy as np
 from pyMOFL.functions.unimodal import HighConditionedElliptic
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
 
 
 class TestHighConditionedElliptic:
@@ -17,22 +19,31 @@ class TestHighConditionedElliptic:
         func = HighConditionedElliptic(dimension=2)
         assert func.dimension == 2
         assert func.condition == 1e6
-        assert func.bounds.shape == (2, 2)
-        assert np.array_equal(func.bounds, np.array([[-100, 100], [-100, 100]]))
+        np.testing.assert_allclose(func.initialization_bounds.low, [-100, -100])
+        np.testing.assert_allclose(func.initialization_bounds.high, [100, 100])
+        np.testing.assert_allclose(func.operational_bounds.low, [-100, -100])
+        np.testing.assert_allclose(func.operational_bounds.high, [100, 100])
         
         # Custom dimension
         func = HighConditionedElliptic(dimension=5)
         assert func.dimension == 5
-        assert func.bounds.shape == (5, 2)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-100]*5)
+        np.testing.assert_allclose(func.initialization_bounds.high, [100]*5)
+        np.testing.assert_allclose(func.operational_bounds.low, [-100]*5)
+        np.testing.assert_allclose(func.operational_bounds.high, [100]*5)
         
         # Custom condition
         func = HighConditionedElliptic(dimension=3, condition=1e4)
         assert func.condition == 1e4
         
         # Custom bounds
-        custom_bounds = np.array([[-10, 10], [-20, 20], [-30, 30]])
-        func = HighConditionedElliptic(dimension=3, bounds=custom_bounds)
-        assert np.array_equal(func.bounds, custom_bounds)
+        custom_init_bounds = Bounds(low=np.array([-10, -20, -30]), high=np.array([10, 20, 30]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-10, -20, -30]), high=np.array([10, 20, 30]), mode=BoundModeEnum.OPERATIONAL)
+        func = HighConditionedElliptic(dimension=3, initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-10, -20, -30])
+        np.testing.assert_allclose(func.initialization_bounds.high, [10, 20, 30])
+        np.testing.assert_allclose(func.operational_bounds.low, [-10, -20, -30])
+        np.testing.assert_allclose(func.operational_bounds.high, [10, 20, 30])
     
     def test_global_minimum(self):
         """Test the function at the global minimum."""
@@ -47,9 +58,8 @@ class TestHighConditionedElliptic:
         
         # Test with bias decorator
         bias_value = 10.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         f_biased = biased_func.evaluate(x_opt)
-        
         # Biased value should be bias_value
         assert np.isclose(f_biased, bias_value, atol=1e-10)
     
@@ -122,29 +132,17 @@ class TestHighConditionedElliptic:
     def test_bounds_respect(self):
         """Test that bounds are respected in the evaluation."""
         # Create a function with bounds [-1, 1] for each dimension
-        bounds = np.array([[-1, 1], [-1, 1]])
-        func = HighConditionedElliptic(dimension=2, bounds=bounds)
-        
-        # Points outside bounds should be clamped for evaluation
-        x_outside = np.array([10.0, -10.0])
-        x_clamped = np.array([1.0, -1.0])
-        
-        # For the Elliptic function, clamping will likely produce different values
-        # because the function value is proportional to the square of the input.
-        # Just verify that both points can be evaluated without errors.
-        outside_value = func.evaluate(x_outside)
-        clamped_value = func.evaluate(x_clamped)
-        
-        # Both values should be valid numbers
-        assert isinstance(outside_value, (int, float))
-        assert isinstance(clamped_value, (int, float))
-        
-        # Values should be non-negative
-        assert outside_value >= 0
-        assert clamped_value >= 0
-        
-        # Value of clamped_point should be approximately 1000001
-        assert 1000000 <= clamped_value <= 1000002
+        custom_init_bounds = Bounds(low=np.array([-1, -1]), high=np.array([1, 1]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-1, -1]), high=np.array([1, 1]), mode=BoundModeEnum.OPERATIONAL)
+        func = HighConditionedElliptic(dimension=2, initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        # Points at the bounds
+        x1 = np.array([-1.0, 1.0])
+        x2 = np.array([1.0, -1.0])
+        for x in [x1, x2]:
+            value = func.evaluate(x)
+            assert isinstance(value, (int, float))
+            assert value >= 0
+            assert 1000000 <= value <= 1000002
     
     def test_condition_effect(self):
         """Test the effect of different condition values."""

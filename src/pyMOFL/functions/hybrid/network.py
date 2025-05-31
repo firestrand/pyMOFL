@@ -16,7 +16,10 @@ References:
 """
 
 import numpy as np
-from ...base import OptimizationFunction
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.core.function import OptimizationFunction
 
 
 class NetworkFunction(OptimizationFunction):
@@ -41,50 +44,81 @@ class NetworkFunction(OptimizationFunction):
     
     Global minimum: Unknown (problem-dependent)
     
-    Attributes:
-        dimension (int): 42 (= 2*19 + 2*2) for the Network function.
-        bounds (np.ndarray): [0, 1] for binary variables, [0, 20] for continuous variables.
+    Parameters
+    ----------
+    initialization_bounds : Bounds, optional
+        Bounds for initialization. If None, defaults to [0,1] for binary variables and [0,20] for continuous variables.
+    operational_bounds : Bounds, optional
+        Bounds for operation. If None, defaults to [0,1] for binary variables and [0,20] for continuous variables.
     
-    Properties:
-        - Mixed-integer (binary and continuous variables)
-        - Constrained
-        - Real-world inspired
-    
-    References:
-        .. [1] Clerc, M. (2012). "Standard Particle Swarm Optimisation 2007/2011 - 
-               Benchmark Suite and Descriptions". Technical Note, 21 pp.
-    
-    Note:
-        To add a bias to the function, use the BiasedFunction decorator from the decorators module.
+    References
+    ----------
+    .. [1] Clerc, M. (2012). "Standard Particle Swarm Optimisation 2007/2011 - 
+           Benchmark Suite and Descriptions". Technical Note, 21 pp.
     """
     
-    def __init__(self, bounds: np.ndarray = None):
+    def __init__(
+        self,
+        initialization_bounds: Bounds = None,
+        operational_bounds: Bounds = None
+    ):
         """
         Initialize the Network function.
         
-        Args:
-            bounds (np.ndarray, optional): Bounds for each dimension.
-                                          If None, default bounds are used.
+        Parameters
+        ----------
+        initialization_bounds : Bounds, optional
+            Bounds for initialization. If None, defaults to [0,1] for binary variables and [0,20] for continuous variables.
+        operational_bounds : Bounds, optional
+            Bounds for operation. If None, defaults to [0,1] for binary variables and [0,20] for continuous variables.
         """
-        # Problem configuration
         self.bts_count = 19  # Number of Base Transceiver Stations
         self.bsc_count = 2   # Number of Base Station Controllers
-        
-        # Total dimension = bts_count * bsc_count (binary) + 2 * bsc_count (continuous)
         dimension = (self.bts_count * self.bsc_count) + (2 * self.bsc_count)
-        
-        # Set default bounds based on the problem definition
-        if bounds is None:
-            # First part: binary variables (connection matrix)
-            binary_bounds = np.array([[0, 1]] * (self.bts_count * self.bsc_count))
-            
-            # Second part: continuous variables (BSC positions)
-            continuous_bounds = np.array([[0, 20]] * (2 * self.bsc_count))
-            
-            # Combine bounds
-            bounds = np.vstack((binary_bounds, continuous_bounds))
-        
-        super().__init__(dimension, bounds)
+
+        # Default bounds for binary and continuous variables
+        binary_dim = self.bts_count * self.bsc_count
+        cont_dim = 2 * self.bsc_count
+        if initialization_bounds is None:
+            # First binary_dim variables are binary (0/1), quantized as INTEGER (binary is a special case)
+            init_low = np.concatenate([
+                np.zeros(binary_dim),
+                np.zeros(cont_dim)
+            ])
+            init_high = np.concatenate([
+                np.ones(binary_dim),
+                np.full(cont_dim, 20.0)
+            ])
+            initialization_bounds = Bounds(
+                low=init_low,
+                high=init_high,
+                mode=BoundModeEnum.INITIALIZATION,
+                qtype=np.array([
+                    [QuantizationTypeEnum.INTEGER]*binary_dim + [QuantizationTypeEnum.CONTINUOUS]*cont_dim
+                ]).flatten()
+            )
+        if operational_bounds is None:
+            oper_low = np.concatenate([
+                np.zeros(binary_dim),
+                np.zeros(cont_dim)
+            ])
+            oper_high = np.concatenate([
+                np.ones(binary_dim),
+                np.full(cont_dim, 20.0)
+            ])
+            operational_bounds = Bounds(
+                low=oper_low,
+                high=oper_high,
+                mode=BoundModeEnum.OPERATIONAL,
+                qtype=np.array([
+                    [QuantizationTypeEnum.INTEGER]*binary_dim + [QuantizationTypeEnum.CONTINUOUS]*cont_dim
+                ]).flatten()
+            )
+        super().__init__(
+            dimension=dimension,
+            initialization_bounds=initialization_bounds,
+            operational_bounds=operational_bounds
+        )
         
         # Fixed BTS positions (from original implementation)
         self.bts_positions = np.array([
@@ -116,13 +150,16 @@ class NetworkFunction(OptimizationFunction):
         """
         Evaluate the Network function at point x.
         
-        Args:
-            x (np.ndarray): A point in the search space.
-                           First self.bts_count * self.bsc_count elements are binary (connection matrix)
-                           Last 2 * self.bsc_count elements are continuous (BSC positions)
-            
-        Returns:
-            float: The function value at point x.
+        Parameters
+        ----------
+        x : np.ndarray
+            Input vector of shape (dimension,).
+            First self.bts_count * self.bsc_count elements are binary (connection matrix),
+            last 2 * self.bsc_count elements are continuous (BSC positions).
+        Returns
+        -------
+        float
+            The function value at x.
         """
         # Validate and preprocess the input
         x = self._validate_input(x)
@@ -170,11 +207,14 @@ class NetworkFunction(OptimizationFunction):
         """
         Evaluate the Network function on a batch of points.
         
-        Args:
-            X (np.ndarray): A batch of points in the search space.
-            
-        Returns:
-            np.ndarray: The function values for each point.
+        Parameters
+        ----------
+        X : np.ndarray
+            Input array of shape (n_points, dimension).
+        Returns
+        -------
+        np.ndarray
+            The function values for each point.
         """
         # Validate the batch input
         X = self._validate_batch_input(X)

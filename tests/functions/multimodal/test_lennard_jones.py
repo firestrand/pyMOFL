@@ -4,8 +4,10 @@ Tests for the Lennard-Jones cluster function.
 
 import pytest
 import numpy as np
-from pyMOFL.functions.multimodal import LennardJonesFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.functions.multimodal.lennard_jones import LennardJonesFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
 
 
 class TestLennardJonesFunction:
@@ -16,23 +18,31 @@ class TestLennardJonesFunction:
         # Test with defaults (6 atoms)
         func = LennardJonesFunction()
         assert func.dimension == 18
-        assert func.bounds.shape == (18, 2)
-        assert np.array_equal(func.bounds, np.array([[-2, 2]] * 18))
+        np.testing.assert_allclose(func.initialization_bounds.low, [-2]*18)
+        np.testing.assert_allclose(func.initialization_bounds.high, [2]*18)
+        np.testing.assert_allclose(func.operational_bounds.low, [-2]*18)
+        np.testing.assert_allclose(func.operational_bounds.high, [2]*18)
         assert func.n_atoms == 6
         assert func.global_minimum == -12.7121
         
         # Test with custom atom count
         func = LennardJonesFunction(n_atoms=4)
         assert func.dimension == 12
-        assert func.bounds.shape == (12, 2)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-2]*12)
+        np.testing.assert_allclose(func.initialization_bounds.high, [2]*12)
+        np.testing.assert_allclose(func.operational_bounds.low, [-2]*12)
+        np.testing.assert_allclose(func.operational_bounds.high, [2]*12)
         assert func.n_atoms == 4
         assert func.global_minimum == -6.0
         
         # Test with custom bounds
-        custom_bounds = np.array([[-1, 1]] * 18)
-        func = LennardJonesFunction(bounds=custom_bounds)
-        assert func.bounds.shape == (18, 2)
-        assert np.array_equal(func.bounds, custom_bounds)
+        custom_init_bounds = Bounds(low=np.array([-1]*18), high=np.array([1]*18), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-1]*18), high=np.array([1]*18), mode=BoundModeEnum.OPERATIONAL)
+        func = LennardJonesFunction(initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-1]*18)
+        np.testing.assert_allclose(func.initialization_bounds.high, [1]*18)
+        np.testing.assert_allclose(func.operational_bounds.low, [-1]*18)
+        np.testing.assert_allclose(func.operational_bounds.high, [1]*18)
     
     def test_evaluate_octahedral(self):
         """Test the energy of an octahedral configuration."""
@@ -58,7 +68,7 @@ class TestLennardJonesFunction:
         
         # Test with bias decorator
         bias_value = 10.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         energy_with_bias = biased_func.evaluate(coords)
         assert np.isclose(energy_with_bias, energy + bias_value, rtol=1e-4)
     
@@ -111,7 +121,7 @@ class TestLennardJonesFunction:
         
         # Test with bias decorator
         bias_value = 3.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_energies = biased_func.evaluate_batch(batch)
         np.testing.assert_allclose(biased_energies, energies + bias_value)
     

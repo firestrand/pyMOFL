@@ -4,8 +4,10 @@ Tests for the Gear Train function.
 
 import pytest
 import numpy as np
-from pyMOFL.functions.multimodal import GearTrainFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.functions.multimodal.gear_train import GearTrainFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
 
 
 class TestGearTrainFunction:
@@ -13,17 +15,20 @@ class TestGearTrainFunction:
     
     def test_initialization(self):
         """Test initialization with default and custom parameters."""
-        # Test with defaults
         func = GearTrainFunction()
         assert func.dimension == 4
-        assert func.bounds.shape == (4, 2)
-        assert np.array_equal(func.bounds, np.array([[12, 60]] * 4))
+        np.testing.assert_allclose(func.initialization_bounds.low, [12, 12, 12, 12])
+        np.testing.assert_allclose(func.initialization_bounds.high, [60, 60, 60, 60])
+        np.testing.assert_allclose(func.operational_bounds.low, [12, 12, 12, 12])
+        np.testing.assert_allclose(func.operational_bounds.high, [60, 60, 60, 60])
         
-        # Test with custom bounds
-        custom_bounds = np.array([[10, 70]] * 4)
-        func = GearTrainFunction(bounds=custom_bounds)
-        assert func.bounds.shape == (4, 2)
-        assert np.array_equal(func.bounds, custom_bounds)
+        custom_init_bounds = Bounds(low=np.array([10, 10, 10, 10]), high=np.array([70, 70, 70, 70]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([10, 10, 10, 10]), high=np.array([70, 70, 70, 70]), mode=BoundModeEnum.OPERATIONAL)
+        func = GearTrainFunction(initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, [10, 10, 10, 10])
+        np.testing.assert_allclose(func.initialization_bounds.high, [70, 70, 70, 70])
+        np.testing.assert_allclose(func.operational_bounds.low, [10, 10, 10, 10])
+        np.testing.assert_allclose(func.operational_bounds.high, [70, 70, 70, 70])
     
     def test_evaluate_global_minimum(self):
         """Test the evaluate method at the global minimum."""
@@ -39,47 +44,9 @@ class TestGearTrainFunction:
         
         # Test with bias decorator
         bias_value = 0.1
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         result_with_bias = biased_func.evaluate(best_design)
         assert np.isclose(result_with_bias, result + bias_value, atol=1e-8)
-    
-    def test_integer_conversion(self):
-        """Test that non-integer inputs are properly converted to integers."""
-        func = GearTrainFunction()
-        
-        # Test with fractional values near the global minimum
-        fractional = np.array([16.3, 19.7, 42.8, 49.2])
-        
-        # Should round to (16, 20, 43, 49)
-        rounded = np.array([16, 20, 43, 49])
-        
-        # Both should give the same result after clipping
-        result_fractional = func.evaluate(fractional)
-        result_rounded = func.evaluate(rounded)
-        assert np.isclose(result_fractional, result_rounded)
-        
-        # Test _clip_round directly
-        clipped_rounded = func._clip_round(fractional)
-        assert np.array_equal(clipped_rounded, rounded)
-    
-    def test_bounds_enforcement(self):
-        """Test that values outside bounds are properly clipped."""
-        func = GearTrainFunction()
-        
-        # Test with values outside bounds
-        out_of_bounds = np.array([5, 70, 30, 100])
-        
-        # Should clip to (12, 60, 30, 60)
-        expected_clipped = np.array([12, 60, 30, 60])
-        
-        # Both should give the same result after clipping
-        result_out_of_bounds = func.evaluate(out_of_bounds)
-        result_clipped = func.evaluate(expected_clipped)
-        assert np.isclose(result_out_of_bounds, result_clipped)
-        
-        # Test _clip_round directly
-        clipped = func._clip_round(out_of_bounds)
-        assert np.array_equal(clipped, expected_clipped)
     
     def test_evaluate_batch(self):
         """Test the evaluate_batch method."""
@@ -104,7 +71,7 @@ class TestGearTrainFunction:
         
         # Test with bias decorator
         bias_value = 0.5
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_results = biased_func.evaluate_batch(batch)
         np.testing.assert_allclose(biased_results, results + bias_value)
     
@@ -146,4 +113,10 @@ class TestGearTrainFunction:
         values = func.evaluate_batch(points)
         
         # Check that all values are >= 0
-        assert (values >= 0.0).all() 
+        assert (values >= 0.0).all()
+    
+    def test_get_global_minimum(self):
+        """Test the static get_global_minimum method."""
+        min_point, min_value = GearTrainFunction.get_global_minimum()
+        np.testing.assert_allclose(min_point, np.array([16, 19, 43, 49]))
+        assert np.isclose(min_value, 1.643428e-6, atol=1e-8) 

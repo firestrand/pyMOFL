@@ -5,7 +5,9 @@ Tests for the Perm function.
 import pytest
 import numpy as np
 from pyMOFL.functions.multimodal import PermFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
 
 
 class TestPermFunction:
@@ -17,16 +19,23 @@ class TestPermFunction:
         func = PermFunction()
         assert func.dimension == 5
         assert func.beta == 0.5
-        assert np.array_equal(func.bounds, np.array([[-5, 5]] * 5))
+        np.testing.assert_allclose(func.initialization_bounds.low, [-5, -5, -5, -5, -5])
+        np.testing.assert_allclose(func.initialization_bounds.high, [5, 5, 5, 5, 5])
+        np.testing.assert_allclose(func.operational_bounds.low, [-5, -5, -5, -5, -5])
+        np.testing.assert_allclose(func.operational_bounds.high, [5, 5, 5, 5, 5])
         
         # Custom beta
         func = PermFunction(beta=0.75)
         assert func.beta == 0.75
         
         # Custom bounds
-        custom_bounds = np.array([[-10, 10]] * 5)
-        func = PermFunction(bounds=custom_bounds)
-        assert np.array_equal(func.bounds, custom_bounds)
+        custom_init_bounds = Bounds(low=np.array([-10, -10, -10, -10, -10]), high=np.array([10, 10, 10, 10, 10]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-10, -10, -10, -10, -10]), high=np.array([10, 10, 10, 10, 10]), mode=BoundModeEnum.OPERATIONAL)
+        func = PermFunction(initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-10, -10, -10, -10, -10])
+        np.testing.assert_allclose(func.initialization_bounds.high, [10, 10, 10, 10, 10])
+        np.testing.assert_allclose(func.operational_bounds.low, [-10, -10, -10, -10, -10])
+        np.testing.assert_allclose(func.operational_bounds.high, [10, 10, 10, 10, 10])
     
     def test_evaluate_global_minimum(self):
         """Test the function value at the global minimum."""
@@ -43,7 +52,7 @@ class TestPermFunction:
         
         # Test with a bias using decorator
         bias_value = 0.1
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         assert biased_func.evaluate(x_opt) == pytest.approx(bias_value, abs=1e-10)
     
     def test_integer_rounding(self):
@@ -73,7 +82,7 @@ class TestPermFunction:
         
         # Test with bias using decorator
         bias_value = 5.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         assert biased_func.evaluate(x1) == pytest.approx(func.evaluate(x1) + bias_value)
         assert biased_func.evaluate(x2) == pytest.approx(func.evaluate(x2) + bias_value)
         assert biased_func.evaluate(x3) == pytest.approx(func.evaluate(x3) + bias_value)
@@ -103,7 +112,7 @@ class TestPermFunction:
             
         # Test with bias using decorator
         bias_value = 2.5
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_results = biased_func.evaluate_batch(X)
         np.testing.assert_allclose(biased_results, results + bias_value)
     

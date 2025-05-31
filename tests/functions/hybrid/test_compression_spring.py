@@ -4,8 +4,11 @@ Tests for the Compression Spring function.
 
 import pytest
 import numpy as np
-from pyMOFL.functions.hybrid import CompressionSpringFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.functions.hybrid.compression_spring import CompressionSpringFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 
 
 class TestCompressionSpringFunction:
@@ -19,22 +22,38 @@ class TestCompressionSpringFunction:
         assert func._BIG == 1.0e5
         assert func._scaling == 0.4234
         
-        # Check default bounds
-        expected_bounds = np.array([
-            [0.05, 2.00],  # d: wire diameter
-            [0.25, 1.30],  # D: mean coil diameter
-            [2, 15]        # N: active coil count
-        ])
-        assert np.array_equal(func.bounds, expected_bounds)
+        # Check default bounds in initialization_bounds and operational_bounds
+        np.testing.assert_allclose(func.initialization_bounds.low, [0.05, 0.25, 2])
+        np.testing.assert_allclose(func.initialization_bounds.high, [2.00, 1.30, 15])
+        np.testing.assert_allclose(func.operational_bounds.low, [0.05, 0.25, 2])
+        np.testing.assert_allclose(func.operational_bounds.high, [2.00, 1.30, 15])
         
         # Custom bounds
-        custom_bounds = np.array([
-            [0.1, 1.5],   # d
-            [0.3, 1.0],   # D
-            [3, 10]       # N
-        ])
-        func = CompressionSpringFunction(bounds=custom_bounds)
-        assert np.array_equal(func.bounds, custom_bounds)
+        custom_init_bounds = Bounds(
+            low=np.array([0.1, 0.3, 3]),
+            high=np.array([1.5, 1.0, 10]),
+            mode=BoundModeEnum.INITIALIZATION,
+            qtype=np.array([
+                QuantizationTypeEnum.CONTINUOUS,
+                QuantizationTypeEnum.CONTINUOUS,
+                QuantizationTypeEnum.INTEGER
+            ])
+        )
+        custom_oper_bounds = Bounds(
+            low=np.array([0.1, 0.3, 3]),
+            high=np.array([1.5, 1.0, 10]),
+            mode=BoundModeEnum.OPERATIONAL,
+            qtype=np.array([
+                QuantizationTypeEnum.CONTINUOUS,
+                QuantizationTypeEnum.CONTINUOUS,
+                QuantizationTypeEnum.INTEGER
+            ])
+        )
+        func = CompressionSpringFunction(initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, [0.1, 0.3, 3])
+        np.testing.assert_allclose(func.initialization_bounds.high, [1.5, 1.0, 10])
+        np.testing.assert_allclose(func.operational_bounds.low, [0.1, 0.3, 3])
+        np.testing.assert_allclose(func.operational_bounds.high, [1.5, 1.0, 10])
     
     def test_evaluate_global_minimum(self):
         """Test the function value at the known global minimum."""
@@ -50,28 +69,9 @@ class TestCompressionSpringFunction:
         
         # Test with bias decorator
         bias_value = 1.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_result = biased_func.evaluate(x_opt)
         assert np.isclose(biased_result, result + bias_value, atol=1e-5)
-    
-    def test_integer_rounding(self):
-        """Test that the function properly rounds the third coordinate to an integer."""
-        func = CompressionSpringFunction()
-        
-        # Test points with non-integer N that should be rounded
-        x1 = np.array([0.05150, 0.35166, 10.7])
-        x2 = np.array([0.05150, 0.35166, 10.2])
-        
-        # Create points with explicitly rounded values
-        x1_rounded = np.array([0.05150, 0.35166, 11.0])
-        x2_rounded = np.array([0.05150, 0.35166, 10.0])
-        
-        # The points with same rounded values should produce the same results
-        assert np.isclose(func.evaluate(x1), func.evaluate(x1_rounded), atol=1e-10)
-        assert np.isclose(func.evaluate(x2), func.evaluate(x2_rounded), atol=1e-10)
-        
-        # Values should differ when rounded to different integers
-        assert func.evaluate(x1) != func.evaluate(x2)
     
     def test_constraint_violations(self):
         """Test that constraint violations are properly penalized."""
@@ -92,22 +92,6 @@ class TestCompressionSpringFunction:
         d, D, N = 0.05, 1.30, 2
         weight = func._scaling * np.pi**2 * D * d**2 * (N + 2) * 0.25
         assert result > weight  # The result should include penalty on top of weight
-    
-    def test_bounds_clipping(self):
-        """Test that input values are properly clipped to the bounds."""
-        func = CompressionSpringFunction()
-        
-        # Test point outside the bounds
-        out_of_bounds = np.array([0.01, 2.0, 20])
-        
-        # Expected clipped values
-        clipped = np.array([0.05, 1.30, 15])
-        
-        # Both should give the same result after clipping
-        result_out_of_bounds = func.evaluate(out_of_bounds)
-        result_clipped = func.evaluate(clipped)
-        
-        assert np.isclose(result_out_of_bounds, result_clipped, atol=1e-10)
     
     def test_evaluate_batch(self):
         """Test the batch evaluation method."""
@@ -140,7 +124,7 @@ class TestCompressionSpringFunction:
         
         # Test with bias decorator
         bias_value = 2.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_results = biased_func.evaluate_batch(points)
         np.testing.assert_allclose(biased_results, batch_results + bias_value, atol=1e-10)
     

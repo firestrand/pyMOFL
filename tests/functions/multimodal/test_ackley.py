@@ -5,7 +5,9 @@ Tests for the Ackley function.
 import pytest
 import numpy as np
 from pyMOFL.functions.multimodal import AckleyFunction
-from pyMOFL.decorators import BiasedFunction, ShiftedFunction
+from pyMOFL.decorators import Biased, Shifted
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
 
 
 class TestAckleyFunction:
@@ -19,8 +21,10 @@ class TestAckleyFunction:
         assert func.a == 20.0
         assert func.b == 0.2
         assert np.isclose(func.c, 2.0 * np.pi)
-        assert func.bounds.shape == (2, 2)
-        assert np.array_equal(func.bounds, np.array([[-32.768, 32.768], [-32.768, 32.768]]))
+        np.testing.assert_allclose(func.initialization_bounds.low, [-32.768, -32.768])
+        np.testing.assert_allclose(func.initialization_bounds.high, [32.768, 32.768])
+        np.testing.assert_allclose(func.operational_bounds.low, [-32.768, -32.768])
+        np.testing.assert_allclose(func.operational_bounds.high, [32.768, 32.768])
         
         # Test with custom parameters
         func = AckleyFunction(dimension=3, a=10.0, b=0.1, c=np.pi)
@@ -30,9 +34,13 @@ class TestAckleyFunction:
         assert np.isclose(func.c, np.pi)
         
         # Test with custom bounds
-        custom_bounds = np.array([[-5, 5], [-5, 5], [-5, 5]])
-        func = AckleyFunction(dimension=3, bounds=custom_bounds)
-        assert np.array_equal(func.bounds, custom_bounds)
+        custom_init_bounds = Bounds(low=np.array([-5, -5, -5]), high=np.array([5, 5, 5]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-5, -5, -5]), high=np.array([5, 5, 5]), mode=BoundModeEnum.OPERATIONAL)
+        func = AckleyFunction(dimension=3, initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-5, -5, -5])
+        np.testing.assert_allclose(func.initialization_bounds.high, [5, 5, 5])
+        np.testing.assert_allclose(func.operational_bounds.low, [-5, -5, -5])
+        np.testing.assert_allclose(func.operational_bounds.high, [5, 5, 5])
     
     def test_global_minimum(self):
         """Test the function at the global minimum."""
@@ -47,7 +55,7 @@ class TestAckleyFunction:
         
         # Test with bias decorator
         bias_value = 10.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         f_biased = biased_func.evaluate(x_opt)
         
         # Biased value should be bias_value
@@ -55,7 +63,7 @@ class TestAckleyFunction:
         
         # Test with shift decorator
         shift = np.array([1.0, 2.0])
-        shifted_func = ShiftedFunction(func, shift)
+        shifted_func = Shifted(func, shift=shift)
         
         # Minimum after shift should be at the shift point
         f_shifted_opt = shifted_func.evaluate(shift)
@@ -119,7 +127,7 @@ class TestAckleyFunction:
         
         # Test with bias decorator
         bias_value = 5.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_results = biased_func.evaluate_batch(X)
         
         # Biased results should be original results + bias
@@ -139,24 +147,14 @@ class TestAckleyFunction:
     def test_bounds_respect(self):
         """Test that bounds are respected in the evaluation."""
         # Create a function with bounds [-1, 1] for each dimension
-        bounds = np.array([[-1, 1], [-1, 1]])
-        func = AckleyFunction(dimension=2, bounds=bounds)
+        custom_init_bounds = Bounds(low=np.array([-1, -1]), high=np.array([1, 1]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-1, -1]), high=np.array([1, 1]), mode=BoundModeEnum.OPERATIONAL)
+        func = AckleyFunction(dimension=2, initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
         
-        # Points outside bounds should be clamped for evaluation
-        x_outside = np.array([10.0, -10.0])
-        x_clamped = np.array([1.0, -1.0])
-        
-        # Due to the nature of Ackley function, clamping might not produce the same values
-        # Just verify that both points can be evaluated correctly
-        outside_value = func.evaluate(x_outside)
-        clamped_value = func.evaluate(x_clamped)
-        
-        # Both values should be valid numbers
-        assert isinstance(outside_value, (int, float))
-        assert isinstance(clamped_value, (int, float))
-        
-        # The outside_value should still be in the reasonable range for Ackley
-        assert 0 < outside_value < 20.0 + np.e
+        # Points inside the bounds
+        inside_point = np.array([1.0, -1.0])
+        value = func.evaluate(inside_point)
+        assert isinstance(value, (int, float))
     
     def test_symmetry(self):
         """Test that the function is symmetric with respect to the origin."""

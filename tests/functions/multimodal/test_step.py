@@ -5,7 +5,8 @@ Tests for the Step function.
 import pytest
 import numpy as np
 from pyMOFL.functions.multimodal import StepFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
 
 
 class TestStepFunction:
@@ -19,16 +20,19 @@ class TestStepFunction:
         assert func.bounds.shape == (10, 2)
         assert np.array_equal(func.bounds, np.array([[-100, 100]] * 10))
         
-        # Test with BiasedFunction decorator
+        # Test with Biased decorator
         bias_value = 30.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         assert biased_func.bias == 30.0
         
         # Test with custom bounds
         custom_bounds = np.array([[-10, 10]] * 10)
-        func = StepFunction(bounds=custom_bounds)
-        assert func.bounds.shape == (10, 2)
-        assert np.array_equal(func.bounds, custom_bounds)
+        bounds_obj = Bounds(low=custom_bounds[:,0], high=custom_bounds[:,1])
+        func = StepFunction(initialization_bounds=bounds_obj, operational_bounds=bounds_obj)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-10]*10)
+        np.testing.assert_allclose(func.initialization_bounds.high, [10]*10)
+        np.testing.assert_allclose(func.operational_bounds.low, [-10]*10)
+        np.testing.assert_allclose(func.operational_bounds.high, [10]*10)
     
     def test_evaluate_global_minimum(self):
         """Test the evaluate method at global minimum."""
@@ -37,7 +41,7 @@ class TestStepFunction:
         
         # Create biased function with decorator
         bias_value = 30.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         
         # Test at origin (within optimal region [-0.5, 0.5))
         result = biased_func.evaluate(np.zeros(10))
@@ -61,7 +65,7 @@ class TestStepFunction:
         
         # Create biased function with decorator
         bias_value = 30.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         
         # Test with various inputs to check the step function behavior
         test_cases = [
@@ -100,7 +104,7 @@ class TestStepFunction:
         
         # Create biased function with decorator
         bias_value = 30.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         
         # Create a test case with multiple stepped values
         x = np.array([1.7, -0.3, 0.6, -1.7, 0.0, 2.3, -2.8, 3.5, -3.2, 4.1])
@@ -120,7 +124,7 @@ class TestStepFunction:
         
         # Create biased function with decorator
         bias_value = 30.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         
         # Create a batch of test points
         batch = np.array([
@@ -158,7 +162,7 @@ class TestStepFunction:
         
         # Create biased function with decorator
         bias_value = 30.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         
         # Generate random points in the domain
         rng = np.random.default_rng(42)

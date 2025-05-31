@@ -5,7 +5,9 @@ Tests for the Rosenbrock function.
 import pytest
 import numpy as np
 from pyMOFL.functions.unimodal import RosenbrockFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.decorators import Biased
+from pyMOFL.core.bounds import Bounds
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
 
 
 class TestRosenbrockFunction:
@@ -16,15 +18,22 @@ class TestRosenbrockFunction:
         # Test with default bounds
         func = RosenbrockFunction(dimension=2)
         assert func.dimension == 2
-        assert func.bounds.shape == (2, 2)
-        assert np.array_equal(func.bounds, np.array([[-30, 30], [-30, 30]]))
+        assert func.initialization_bounds.low.shape == (2,)
+        assert func.initialization_bounds.high.shape == (2,)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-30, -30])
+        np.testing.assert_allclose(func.initialization_bounds.high, [30, 30])
+        np.testing.assert_allclose(func.operational_bounds.low, [-30, -30])
+        np.testing.assert_allclose(func.operational_bounds.high, [30, 30])
         
         # Test with custom bounds
-        custom_bounds = np.array([[-10, 10], [-5, 5]])
-        func = RosenbrockFunction(dimension=2, bounds=custom_bounds)
+        custom_init_bounds = Bounds(low=np.array([-10, -5]), high=np.array([10, 5]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-10, -5]), high=np.array([10, 5]), mode=BoundModeEnum.OPERATIONAL)
+        func = RosenbrockFunction(dimension=2, initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
         assert func.dimension == 2
-        assert func.bounds.shape == (2, 2)
-        assert np.array_equal(func.bounds, custom_bounds)
+        np.testing.assert_allclose(func.initialization_bounds.low, [-10, -5])
+        np.testing.assert_allclose(func.initialization_bounds.high, [10, 5])
+        np.testing.assert_allclose(func.operational_bounds.low, [-10, -5])
+        np.testing.assert_allclose(func.operational_bounds.high, [10, 5])
     
     def test_global_minimum(self):
         """Test the function at its global minimum."""
@@ -44,7 +53,7 @@ class TestRosenbrockFunction:
             
             # Test with bias
             bias_value = 10.0
-            biased_func = BiasedFunction(func, bias=bias_value)
+            biased_func = Biased(func, bias=bias_value)
             np.testing.assert_allclose(biased_func.evaluate(min_point), min_value + bias_value)
     
     def test_function_values(self):
@@ -69,7 +78,7 @@ class TestRosenbrockFunction:
         
         # Test with bias decorator
         bias_value = 50.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         for point, expected in test_cases:
             np.testing.assert_allclose(biased_func.evaluate(point), expected + bias_value)
     
@@ -92,7 +101,7 @@ class TestRosenbrockFunction:
         
         # Test with bias decorator
         bias_value = 30.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         for point, expected in test_cases:
             np.testing.assert_allclose(biased_func.evaluate(point), expected + bias_value)
     
@@ -119,7 +128,7 @@ class TestRosenbrockFunction:
         
         # Test with bias decorator
         bias_value = 25.0
-        biased_func = BiasedFunction(func, bias=bias_value)
+        biased_func = Biased(func, bias=bias_value)
         biased_results = biased_func.evaluate_batch(points)
         np.testing.assert_allclose(biased_results, expected + bias_value)
     
@@ -137,8 +146,9 @@ class TestRosenbrockFunction:
     def test_bounds_respect(self):
         """Test that bounds are properly respected."""
         # Create function with specific bounds
-        bounds = np.array([[-10, 10], [-10, 10]])
-        func = RosenbrockFunction(dimension=2, bounds=bounds)
+        custom_init_bounds = Bounds(low=np.array([-10, -10]), high=np.array([10, 10]), mode=BoundModeEnum.INITIALIZATION)
+        custom_oper_bounds = Bounds(low=np.array([-10, -10]), high=np.array([10, 10]), mode=BoundModeEnum.OPERATIONAL)
+        func = RosenbrockFunction(dimension=2, initialization_bounds=custom_init_bounds, operational_bounds=custom_oper_bounds)
         
         # Points at the bounds
         edge_points = [
