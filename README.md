@@ -1,5 +1,7 @@
 # pyMOFL: Python Modular Optimization Function Library
 
+![coverage](coverage.svg)
+
 A composable optimization function library for benchmarking optimization algorithms.
 
 ## Overview
@@ -195,6 +197,10 @@ Mathematically:
 - `RotatedFunction(ShiftedFunction(base))` computes `f(R·x-s)`
 
 These expressions are not mathematically equivalent due to the non-commutativity of vector rotation and subtraction.
+
+## Test Coverage
+
+Run `scripts/generate_coverage.sh` to execute the test suite, generate `coverage.xml`, and update `coverage.svg`.
 
 ## License
 
