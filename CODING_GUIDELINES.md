@@ -43,6 +43,11 @@ This document outlines the coding standards and best practices for contributors 
 - Implement abstract methods properly:
   - `evaluate(x)` for single-point evaluation
   - Consider overriding `evaluate_batch(X)` for vectorized operation
+- **Bounds are metadata only:**
+  - The `initialization_bounds` and `operational_bounds` properties are pure data objects (min/max per dimension).
+  - No enforcement, quantization, or projection logic is present in `Bounds`.
+  - Enforcement/quantization is opt-in via the `Quantized` decorator.
+  - Callers are responsible for handling bounds as appropriate for their algorithm (e.g., reflection, random jump, velocity reset, etc.).
 
 ### Function Implementations
 
@@ -51,9 +56,9 @@ This document outlines the coding standards and best practices for contributors 
   - These methods only check shape and type (they do not ravel or mutate input).
 - Use vectorized NumPy operations for performance
 - Include references to academic sources
-- Set appropriate default bounds for each function
+- Set appropriate default bounds for each function (as metadata only)
 - Support both single and batch evaluations
-- Do not include transformations (bias, shift, rotation) in the base function implementation
+- Do not include transformations (bias, shift, rotation, quantization) in the base function implementation
 - For modifications to the function's behavior, use the decorator pattern
 
 ### Decorators
@@ -61,10 +66,12 @@ This document outlines the coding standards and best practices for contributors 
 - Implement decorators as subclasses of `InputTransformingFunction` or `OutputTransformingFunction` (both inherit from `ComposableFunction`).
 - **InputTransformingFunction**: Use for decorators that transform the input before calling the base function (e.g., `Shifted`, `Rotated`, `Scaled`).
 - **OutputTransformingFunction**: Use for decorators that transform the output of the base function (e.g., `Biased`, `Noise`, `MaxAbsolute`).
+- **QuantizedFunction**: Use for quantization (integer, step, etc.). Only this decorator (and its subclasses) should perform quantization or value projection.
 - Do **not** override `evaluate` or `evaluate_batch` in decorator subclasses; only implement `_apply` and `_apply_batch`.
 - Maintain the dimension and bounds properties correctly (delegated to base function if present).
 - Use composition pattern: wrap base function and delegate evaluation.
 - Each decorator should handle a single transformation concern.
+- **No enforcement or projection is performed by the library unless the Quantized decorator is used.**
 
 #### Example Decorator Usage
 
@@ -84,11 +91,13 @@ composed = Biased(base_function=Shifted(base_function=SphereFunction(dimension=2
 - Never override `evaluate` or `evaluate_batch` in subclasses of `InputTransformingFunction` or `OutputTransformingFunction`.
 - Only implement `_apply` and `_apply_batch`.
 - This pattern ensures DRY, KISS, and SOLID, and makes the codebase easy to extend and maintain.
+- **Enforcement/quantization is opt-in via Quantized.**
 
 ### Function Transformations
 
 - Always use decorators for transformations rather than modifying function implementations
 - For bias, use the `BiasedFunction` decorator instead of adding bias in the function's `evaluate` method
+- For quantization, use the `QuantizedFunction` decorator. Only this decorator (and its subclasses) should perform quantization or value projection.
 - Decorator order matters and should be clearly documented when composing multiple transformations
 - Testing should include verifying proper behavior with various combinations of decorators
 

@@ -14,7 +14,8 @@ pyMOFL is a Python library that provides a collection of benchmark functions com
 - **Composability**: Build complex benchmark functions (e.g., CEC composite functions) by assembling basic functions with transformation decorators.
 - **Performance**: Utilize vectorized NumPy operations for high-speed execution.
 - **Extensibility**: Provide a clear, consistent interface that users can extend to define new functions, hybrids, or composites.
-- **Decorator Pattern**: Apply transformations like shifting, rotation, and bias using a consistent decorator approach.
+- **Decorator Pattern**: Apply transformations like shifting, rotation, quantization, and bias using a consistent decorator approach.
+- **Bounds as Metadata**: Bounds are metadata only (min/max per dimension); enforcement/quantization is opt-in via decorators.
 
 ## Installation
 
@@ -38,6 +39,9 @@ from pyMOFL.functions.multimodal import RastriginFunction
 sphere = SphereFunction(dimension=2)
 print(f"Sphere function at [0, 0]: {sphere.evaluate(np.array([0, 0]))}")
 
+# Bounds are metadata only; the library does not enforce or project values.
+print(f"Sphere function bounds: {sphere.initialization_bounds}")
+
 # Create a 2D Rastrigin function
 rastrigin = RastriginFunction(dimension=2)
 print(f"Rastrigin function at [0, 0]: {rastrigin.evaluate(np.array([0, 0]))}")
@@ -50,10 +54,17 @@ pyMOFL uses a decorator pattern for applying transformations to optimization fun
 ```python
 import numpy as np
 from pyMOFL.functions.unimodal import SphereFunction
-from pyMOFL.decorators import ShiftedFunction, RotatedFunction, BiasedFunction
+from pyMOFL.decorators import ShiftedFunction, RotatedFunction, BiasedFunction, QuantizedFunction
 
 # Create a basic function
 sphere = SphereFunction(dimension=2)
+
+# Add quantization (integer values only)
+quantized_sphere = QuantizedFunction(sphere, quantization_type='integer')
+print(f"Quantized Sphere at [1.7, 2.3]: {quantized_sphere.evaluate(np.array([1.7, 2.3]))}")  # 1, 2
+
+# Without QuantizedFunction, the library does not enforce or project values.
+print(f"Sphere at [1.7, 2.3]: {sphere.evaluate(np.array([1.7, 2.3]))}")  # 1.7, 2.3
 
 # Add bias to shift the function value (not the position)
 biased_sphere = BiasedFunction(sphere, bias=10.0)
@@ -157,11 +168,13 @@ pyMOFL uses a decorator pattern for transforming functions, which offers several
 2. **Composability**: Easily combine multiple transformations
 3. **Separation of Concerns**: Core function behavior is separate from transformations
 4. **Extensibility**: Add new transformations without modifying existing functions
+5. **Opt-in Enforcement**: Bounds and quantization are only enforced if the function is wrapped with the appropriate decorator (e.g., QuantizedFunction). Otherwise, callers are responsible for handling bounds and quantization as appropriate for their algorithm.
 
 Available decorators:
 - `ShiftedFunction`: Shifts the function's optimum position
 - `RotatedFunction`: Rotates the function's landscape 
 - `BiasedFunction`: Adds a constant value to the function output
+- `QuantizedFunction`: Restricts the function's output to integer values
 
 The order of decorators matters and produces different results depending on the function:
 - `BiasedFunction(ShiftedFunction(f))`: Shifts the function first, then adds bias
@@ -205,3 +218,7 @@ Run `scripts/generate_coverage.sh` to execute the test suite, generate `coverage
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Note on Bounds and Quantization
+
+**Bounds are metadata only.** The library does not enforce or project values to bounds unless you explicitly use the `QuantizedFunction` decorator. Callers are responsible for handling bounds and quantization unless opt-in decorators are used. This allows maximum flexibility for different optimization strategies (e.g., reflection, random jump, velocity reset, etc.).
