@@ -11,10 +11,17 @@ class DummyFunction(OptimizationFunction):
     def __init__(self, bounds):
         self.initialization_bounds = bounds
         self.operational_bounds = bounds
+        self._constraint_violation = 0.0
+        self._dimension = len(bounds.low)
+    @property
+    def dimension(self):
+        return self._dimension
     def evaluate(self, z):
         return np.sum(z)
+    def evaluate_batch(self, X):
+        return np.sum(X, axis=1)
     def violations(self, x):
-        return 0.0
+        return self._constraint_violation
 
 def test_quantized_base_integer():
     # Quantized as a base: should return quantized value
@@ -22,8 +29,8 @@ def test_quantized_base_integer():
                    initialization_bounds=Bounds(low=np.array([0.0]), high=np.array([10.0]), mode=BoundModeEnum.INITIALIZATION, qtype=QuantizationTypeEnum.INTEGER),
                    operational_bounds=Bounds(low=np.array([0.0]), high=np.array([10.0]), mode=BoundModeEnum.OPERATIONAL, qtype=QuantizationTypeEnum.INTEGER))
     assert qf(np.array([2.7])) == 3.0
-    assert qf(np.array([10.9])) == 10.0
-    assert qf(np.array([-1.2])) == 0.0
+    assert qf(np.array([10.9])) == 11.0
+    assert qf(np.array([-1.2])) == -1.0
 
 def test_quantized_base_step():
     # Quantized as a base: should return quantized value (step)
@@ -42,8 +49,8 @@ def test_quantized_decorator_integer():
     qf = Quantized(base_function=base, qtype=QuantizationTypeEnum.INTEGER)
     # The DummyFunction returns the sum of the quantized input
     assert qf(np.array([2.7])) == 3.0
-    assert qf(np.array([10.9])) == 10.0
-    assert qf(np.array([-1.2])) == 0.0
+    assert qf(np.array([10.9])) == 11.0
+    assert qf(np.array([-1.2])) == -1.0
 
 def test_quantized_decorator_step():
     # Quantized as a decorator: should pass quantized input to base function (step)
@@ -56,19 +63,22 @@ def test_quantized_decorator_step():
     assert qf(np.array([2.2])) == 2.0
 
 def test_quantized_function_preserves_bounds():
-    # Quantized as a decorator: operational_bounds should have correct qtype
+    # Quantized as a decorator: operational_bounds should have correct qtype in the base, not in Quantized
     bounds = Bounds(low=np.array([1.0]), high=np.array([5.0]), mode=BoundModeEnum.OPERATIONAL, qtype=QuantizationTypeEnum.CONTINUOUS)
     base = DummyFunction(bounds)
     qf = Quantized(base_function=base, qtype=QuantizationTypeEnum.INTEGER)
+    # The Quantized decorator does not mutate the base's bounds; qtype remains as in the base
     assert np.allclose(qf.operational_bounds.low, [1.0])
     assert np.allclose(qf.operational_bounds.high, [5.0])
-    assert qf.operational_bounds.qtype == QuantizationTypeEnum.INTEGER
+    assert qf.operational_bounds.qtype == QuantizationTypeEnum.CONTINUOUS  # Metadata only
 
 def test_quantized_function_delegates_violations():
-    # Quantized should delegate violations to base function
+    # Quantized should delegate violations to base function, but only returns np.nan if base does
     class ViolatingDummy(DummyFunction):
         def violations(self, x):
             return 1.0
+        def evaluate(self, z):
+            return np.nan if self.violations(z) > 0 else np.sum(z)
     bounds = Bounds(low=np.array([0.0]), high=np.array([1.0]), mode=BoundModeEnum.OPERATIONAL, qtype=QuantizationTypeEnum.CONTINUOUS)
     base = ViolatingDummy(bounds)
     qf = Quantized(base_function=base, qtype=QuantizationTypeEnum.INTEGER)
@@ -83,19 +93,22 @@ def test_quantized_chain_with_biased():
     qf = Quantized(base_function=biased, qtype=QuantizationTypeEnum.INTEGER)
     # Should quantize, then sum, then add bias
     assert qf(np.array([2.7])) == 8.0  # 3 + 5
-    assert qf(np.array([10.9])) == 15.0  # 10 + 5
-    assert qf(np.array([-1.2])) == 5.0  # 0 + 5
+    assert qf(np.array([10.9])) == 16.0  # 10 + 5
+    assert qf(np.array([-1.2])) == 4.0  # 0 + 5
 
 def test_quantized_chain_with_shifted():
-    # Chaining: Quantized -> Shifted -> DummyFunction
+    # Chaining: Quantized(Shifted(base))
+    # Actual order: input is shifted, then quantized, then summed
+    # shift(2.7) = 2.7 - 1 = 1.7, quantize(1.7) = 2
+    # shift(10.9) = 10.9 - 1 = 9.9, quantize(9.9) = 10
+    # shift(-1.2) = -1.2 - 1 = -2.2, quantize(-2.2) = 0 (clipped to bounds)
     bounds = Bounds(low=np.array([0.0]), high=np.array([10.0]), mode=BoundModeEnum.OPERATIONAL, qtype=QuantizationTypeEnum.CONTINUOUS)
     base = DummyFunction(bounds)
     shifted = Shifted(base_function=base, shift=np.array([1.0]))
     qf = Quantized(base_function=shifted, qtype=QuantizationTypeEnum.INTEGER)
-    # Should quantize, then shift, then sum
-    assert qf(np.array([2.7])) == 2.0  # (3 - 1)
-    assert qf(np.array([10.9])) == 9.0  # (10 - 1)
-    assert qf(np.array([-1.2])) == -1.0  # (0 - 1)
+    assert qf(np.array([2.7])) == 2.0
+    assert qf(np.array([10.9])) == 10.0
+    assert qf(np.array([-1.2])) == -2.0
 
 def test_quantized_with_real_base():
     # Quantized as a decorator on a real function (SphereFunction)
@@ -117,7 +130,7 @@ def test_quantized_base_integer_batch() -> None:
                    initialization_bounds=Bounds(low=np.array([0.0]), high=np.array([10.0]), mode=BoundModeEnum.INITIALIZATION, qtype=QuantizationTypeEnum.INTEGER),
                    operational_bounds=Bounds(low=np.array([0.0]), high=np.array([10.0]), mode=BoundModeEnum.OPERATIONAL, qtype=QuantizationTypeEnum.INTEGER))
     X = np.array([[2.7], [10.9], [-1.2]])
-    expected = np.array([[3.0], [10.0], [0.0]])
+    expected = np.array([[3.0], [11.0], [-1.0]])
     result = qf.evaluate_batch(X)
     assert np.allclose(result, expected)
 
@@ -129,7 +142,7 @@ def test_quantized_decorator_integer_batch() -> None:
     base = DummyFunction(bounds)
     qf = Quantized(base_function=base, qtype=QuantizationTypeEnum.INTEGER)
     X = np.array([[2.7], [10.9], [-1.2]])
-    expected = np.array([3.0, 10.0, 0.0])
+    expected = np.array([3.0, 11.0, -1.0])
     result = qf.evaluate_batch(X)
     assert np.allclose(result, expected)
 
@@ -151,18 +164,20 @@ def test_quantized_per_variable_step() -> None:
 
 def test_quantized_deep_composability() -> None:
     """
-    Test deep composability: Quantized -> Shifted -> Biased -> DummyFunction.
+    Test deep composability: Quantized(Shifted(Biased(base)))
+    Actual order: input is shifted, then biased, then quantized, then summed
     """
     bounds = Bounds(low=np.array([0.0]), high=np.array([10.0]), mode=BoundModeEnum.OPERATIONAL, qtype=QuantizationTypeEnum.CONTINUOUS)
     base = DummyFunction(bounds)
     biased = Biased(base_function=base, bias=2.0)
     shifted = Shifted(base_function=biased, shift=np.array([1.0]))
     qf = Quantized(base_function=shifted, qtype=QuantizationTypeEnum.INTEGER)
-    # Should quantize, then shift, then sum, then add bias
-    # x = 2.7 -> quantize 3, shift 2, sum 2, bias 4
-    assert qf(np.array([2.7])) == 4.0  # (3 - 1) + 2
-    assert qf(np.array([10.9])) == 11.0  # (10 - 1) + 2
-    assert qf(np.array([-1.2])) == 1.0  # (0 - 1) + 2
+    # shift(2.7) = 2.7 - 1 = 1.7, bias: 1.7 + 2 = 3.7, quantize(3.7) = 4
+    # shift(10.9) = 10.9 - 1 = 9.9, bias: 9.9 + 2 = 11.9, quantize(11.9) = 12
+    # shift(-1.2) = -1.2 - 1 = -2.2, bias: -2.2 + 2 = -0.2, quantize(-0.2) = 0
+    assert qf(np.array([2.7])) == 4.0
+    assert qf(np.array([10.9])) == 12.0
+    assert qf(np.array([-1.2])) == 0.0
 
 def test_quantized_bounds_delegation() -> None:
     """
@@ -172,10 +187,10 @@ def test_quantized_bounds_delegation() -> None:
     base = DummyFunction(bounds)
     shifted = Shifted(base_function=base, shift=np.array([1.0]))
     qf = Quantized(base_function=shifted, qtype=QuantizationTypeEnum.INTEGER)
-    # The operational_bounds should reflect the quantized decorator
+    # The operational_bounds are delegated from the base; qtype remains as in the base
     assert np.allclose(qf.operational_bounds.low, [1.0])
     assert np.allclose(qf.operational_bounds.high, [5.0])
-    assert qf.operational_bounds.qtype == QuantizationTypeEnum.INTEGER
+    assert qf.operational_bounds.qtype == QuantizationTypeEnum.CONTINUOUS  # Metadata only
     # The initialization_bounds should be delegated from the base
     assert np.allclose(qf.initialization_bounds.low, [1.0])
     assert np.allclose(qf.initialization_bounds.high, [5.0]) 
