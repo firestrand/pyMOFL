@@ -27,7 +27,9 @@ from ..core.composable_function import OutputTransformingFunction
 from ..core.bounds import Bounds
 from ..core.bound_mode_enum import BoundModeEnum
 from ..core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.registry import register
 
+@register("MaxAbsolute")
 class MaxAbsolute(OutputTransformingFunction):
     """
     MaxAbsolute: Output-transforming decorator for max-absolute transformation.

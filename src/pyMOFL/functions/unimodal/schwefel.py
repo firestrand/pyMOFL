@@ -18,9 +18,9 @@ from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 from pyMOFL.core.function import OptimizationFunction
-from pyMOFL.base import register_function
+from pyMOFL.registry import register
 
-@register_function("Schwefel1.2")
+@register("Schwefel1.2")
 class SchwefelFunction12(OptimizationFunction):
     """
     Schwefel's Problem 1.2 function.
@@ -124,7 +124,7 @@ class SchwefelFunction12(OptimizationFunction):
         global_min_value = 0.0
         return global_min_point, global_min_value
 
-@register_function("Schwefel2.6")
+@register("Schwefel2.6")
 class SchwefelFunction26(OptimizationFunction):
     """
     Schwefel's Problem 2.6 base function.

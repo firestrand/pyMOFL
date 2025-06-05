@@ -47,4 +47,10 @@ def test_enforce_projects_to_bounds():
     bounds = Bounds(low=np.array([0.0]), high=np.array([1.0]))
     f = DummyFunction(bounds)
     enforced = f._enforce(np.array([2.0]))
-    assert np.allclose(enforced, [1.0]) 
+    assert np.allclose(enforced, [1.0])
+
+def test_no_enforcement_in_base():
+    f = DummyFunction(dimension=2)
+    x = np.array([1.5, 2.5])
+    # Should not enforce or quantize
+    assert f(x) == 4.0 

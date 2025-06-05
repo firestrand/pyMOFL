@@ -16,4 +16,7 @@ from .base import OptimizationFunction
 from . import functions
 from . import decorators
 from . import composites
-from . import utils 
+from . import utils
+from pyMOFL.registry import scan_package
+
+scan_package() 

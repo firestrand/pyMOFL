@@ -17,9 +17,9 @@ from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 from pyMOFL.core.function import OptimizationFunction
-from pyMOFL.base import register_function
+from pyMOFL.registry import register
 
-@register_function("Rosenbrock")
+@register("Rosenbrock")
 class RosenbrockFunction(OptimizationFunction):
     """
     Rosenbrock function.

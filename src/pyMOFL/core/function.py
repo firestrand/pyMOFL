@@ -26,31 +26,21 @@ class OptimizationFunction(ABC):
 
     def __call__(self, x: NDArray[Any]) -> float:
         """
-        Evaluate the function at x, enforcing operational bounds and constraints.
-        Returns np.nan if constraints are violated.
+        Evaluate the function at x. Bounds are metadata only; no enforcement is performed.
+        Returns np.nan if constraints are violated (as determined by evaluate or violations).
         """
-        x_proj = self._enforce(x)
-        if np.any(np.isnan(x_proj)):
+        x = self._validate_input(x)
+        result = self.evaluate(x)
+        if np.any(np.isnan(result)):
             return np.nan
-        return self.evaluate(x_proj)
+        return result
 
     @abstractmethod
     def evaluate(self, z: NDArray[Any]) -> float:
         """
-        Evaluate the function at a (possibly repaired) point z.
+        Evaluate the function at a point z.
         """
         pass
-
-    def _enforce(self, x: NDArray[Any]) -> NDArray[Any]:
-        """
-        Enforce operational bounds and constraints on x.
-        Returns np.nan if constraints are violated.
-        """
-        if self.operational_bounds is not None:
-            x = self.operational_bounds.project(x)
-        if self.violations(x) > 0:
-            return np.full_like(x, np.nan)
-        return x
 
     def violations(self, x: NDArray[Any]) -> float:
         """

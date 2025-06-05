@@ -10,7 +10,7 @@ from pyMOFL.composites import HybridFunction
 from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
-from pyMOFL.decorators import Quantized
+from pyMOFL.decorators import Quantized, Shifted, Biased
 
 
 class TestHybridFunction:
@@ -122,9 +122,6 @@ class TestHybridFunction:
     
     def test_decorator_compatibility(self):
         """Test hybrid function with decorated (shifted, biased) components and quantized bounds."""
-        from pyMOFL.decorators import Biased, Shifted
-        from pyMOFL.core.quantized_function import QuantizedFunction
-        from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
         sphere = SphereFunction(dimension=2)
         shifted = Shifted(base_function=sphere, shift=np.array([1.0, 1.0]))
         biased = Biased(base_function=shifted, bias=5.0)

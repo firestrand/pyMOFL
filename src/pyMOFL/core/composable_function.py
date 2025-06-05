@@ -114,17 +114,15 @@ class ComposableFunction(OptimizationFunction):
 
     def __call__(self, x: NDArray[Any]) -> float:
         """
-        Evaluate the function at x, enforcing operational bounds and constraints.
-        Returns np.nan if constraints are violated.
+        Evaluate the function at x. Bounds are metadata only; no enforcement is performed.
         Applies input transformation if this is an InputTransformingFunction.
+        Returns np.nan if constraints are violated (as determined by evaluate or violations).
         """
-        # If this is an InputTransformingFunction, apply input transformation before enforcement
-        if isinstance(self, InputTransformingFunction):
-            x = self._apply(x)
-        x_proj = self._enforce(x)
-        if np.any(np.isnan(x_proj)):
+        x = self._validate_input(x)
+        result = self.evaluate(x)
+        if np.any(np.isnan(result)):
             return np.nan
-        return self.evaluate(x_proj)
+        return result
 
 class InputTransformingFunction(ComposableFunction):
     """
@@ -154,14 +152,15 @@ class InputTransformingFunction(ComposableFunction):
 
     def __call__(self, x: NDArray[Any]) -> float:
         """
-        Evaluate the function at x, enforcing operational bounds and constraints.
-        Always applies input transformation (_apply) before enforcement and evaluation.
+        Evaluate the function at x. Always applies input transformation (_apply) before evaluation.
+        Bounds are metadata only; no enforcement is performed.
+        Returns np.nan if constraints are violated (as determined by evaluate or violations).
         """
-        x = self._apply(x)
-        x_proj = self._enforce(x)
-        if np.any(np.isnan(x_proj)):
+        x = self._validate_input(x)
+        result = self.evaluate(x)
+        if np.any(np.isnan(result)):
             return np.nan
-        return self.evaluate(x_proj)
+        return result
 
 class OutputTransformingFunction(ComposableFunction):
     """

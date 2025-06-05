@@ -17,10 +17,10 @@ from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 from pyMOFL.core.function import OptimizationFunction
-from pyMOFL.base import register_function
+from pyMOFL.registry import register
 
 
-@register_function("Rastrigin")
+@register("Rastrigin")
 class RastriginFunction(OptimizationFunction):
     """
     Rastrigin function: f(x) = 10*n + sum(x_i^2 - 10*cos(2*pi*x_i))

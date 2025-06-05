@@ -1,5 +1,5 @@
 """
-Bounds dataclass for representing variable bounds, quantization, and enforcement mode.
+Bounds dataclass for representing variable bounds as metadata only.
 """
 from dataclasses import dataclass, field
 import numpy as np
@@ -11,7 +11,7 @@ from typing import Any
 @dataclass(frozen=True)
 class Bounds:
     """
-    Represents bounds, quantization, and enforcement mode for optimization variables.
+    Represents bounds for optimization variables as metadata only.
 
     Attributes
     ----------
@@ -22,34 +22,17 @@ class Bounds:
     mode : BoundModeEnum
         Whether these bounds are for initialization or operational use.
     qtype : QuantizationTypeEnum
-        Quantization type (continuous, integer, step).
+        Quantization type (continuous, integer, step). Metadata only; not enforced.
     step : float
-        Step size for STEP quantization (ignored otherwise).
+        Step size for STEP quantization (metadata only).
+    
+    Note
+    ----
+    This class is a pure data object. It does not perform any enforcement, quantization, or projection.
+    Enforcement/quantization is opt-in via the Quantized decorator.
     """
     low: NDArray[Any]
     high: NDArray[Any]
     mode: BoundModeEnum = BoundModeEnum.OPERATIONAL
     qtype: QuantizationTypeEnum = QuantizationTypeEnum.CONTINUOUS
-    step: float = 1.0
-
-    def project(self, x: NDArray[Any]) -> NDArray[Any]:
-        """
-        Repair helper that snaps/clips input into the legal region according to quantization and bounds.
-        Supports per-variable quantization if qtype is an array.
-        """
-        x_proj = np.array(x, dtype=float)
-        # Handle per-variable quantization
-        if isinstance(self.qtype, np.ndarray) or (hasattr(self.qtype, '__len__') and not isinstance(self.qtype, str)):
-            x_proj = x_proj.copy()
-            for i, q in enumerate(self.qtype):
-                if q == QuantizationTypeEnum.INTEGER:
-                    x_proj[i] = np.rint(x_proj[i])
-                elif q == QuantizationTypeEnum.STEP:
-                    x_proj[i] = np.round((x_proj[i] - self.low[i]) / self.step) * self.step + self.low[i]
-            return np.clip(x_proj, self.low, self.high)
-        else:
-            if self.qtype == QuantizationTypeEnum.INTEGER:
-                x_proj = np.rint(x_proj)
-            elif self.qtype == QuantizationTypeEnum.STEP:
-                x_proj = np.round((x_proj - self.low) / self.step) * self.step + self.low
-            return np.clip(x_proj, self.low, self.high) 
+    step: float = 1.0 

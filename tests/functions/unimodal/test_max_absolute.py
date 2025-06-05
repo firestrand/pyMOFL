@@ -11,6 +11,7 @@ from pyMOFL.decorators import Biased
 from pyMOFL.core.function import OptimizationFunction
 import warnings
 from pyMOFL.decorators.max_absolute import MaxAbsolute
+from pyMOFL.decorators.quantized import Quantized
 
 class IdentityFunction(OptimizationFunction):
     def __init__(self, dimension, initialization_bounds=None, operational_bounds=None):
@@ -37,9 +38,15 @@ class TestMaxAbsolute:
     def test_base_quantization(self):
         op_bounds = Bounds(low=np.array([0]), high=np.array([10]), qtype=QuantizationTypeEnum.INTEGER)
         func = MaxAbsolute(dimension=1, operational_bounds=op_bounds)
-        assert func(np.array([2.7])) == 3.0
-        assert func(np.array([10.9])) == 10.0
-        assert func(np.array([-1.2])) == 0.0
+        # No quantization unless Quantized is used
+        assert func(np.array([2.7])) == 2.7
+        assert func(np.array([10.9])) == 10.9
+        assert func(np.array([-1.2])) == 1.2
+        # Now test with Quantized
+        qfunc = Quantized(base_function=func, qtype=QuantizationTypeEnum.INTEGER)
+        assert qfunc(np.array([2.7])) == 3.0
+        assert qfunc(np.array([10.9])) == 10.0
+        assert qfunc(np.array([-1.2])) == 0.0
     def test_decorator_basic(self):
         base = IdentityFunction(2)
         func = MaxAbsolute(base_function=base)
@@ -55,9 +62,15 @@ class TestMaxAbsolute:
         op_bounds = Bounds(low=np.array([0]), high=np.array([10]), qtype=QuantizationTypeEnum.INTEGER)
         base = IdentityFunction(1, operational_bounds=op_bounds)
         func = MaxAbsolute(base_function=base)
-        assert func(np.array([2.7])) == 3.0
-        assert func(np.array([10.9])) == 10.0
-        assert func(np.array([-1.2])) == 0.0
+        # No quantization unless Quantized is used
+        assert func(np.array([2.7])) == 2.7
+        assert func(np.array([10.9])) == 10.9
+        assert func(np.array([-1.2])) == 1.2
+        # Now test with Quantized
+        qfunc = Quantized(base_function=func, qtype=QuantizationTypeEnum.INTEGER)
+        assert qfunc(np.array([2.7])) == 3.0
+        assert qfunc(np.array([10.9])) == 10.0
+        assert qfunc(np.array([-1.2])) == 0.0
     def test_bounds_and_properties(self):
         func = MaxAbsolute(dimension=2)
         assert func.bounds.shape == (2, 2)

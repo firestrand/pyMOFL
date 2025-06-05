@@ -17,10 +17,10 @@ from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 from pyMOFL.core.function import OptimizationFunction
-from pyMOFL.base import register_function
+from pyMOFL.registry import register
 
 
-@register_function("Ackley")
+@register("Ackley")
 class AckleyFunction(OptimizationFunction):
     """
     Ackley function: f(x) = -20·exp(-0.2·sqrt(sum(x_i^2)/D)) - exp(sum(cos(2π·x_i))/D) + 20 + e
