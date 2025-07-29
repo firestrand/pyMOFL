@@ -17,8 +17,10 @@ from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 from pyMOFL.core.function import OptimizationFunction
+from pyMOFL.registry import register
 
 
+@register("SchwefelFunction213")
 class SchwefelFunction213(OptimizationFunction):
     """
     Schwefel's Problem 2.13 function: f(x) = sum((A_i - B_i(x))^2)

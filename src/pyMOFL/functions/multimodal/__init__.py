@@ -15,7 +15,7 @@ from .griewank import GriewankFunction
 from .ackley import AckleyFunction
 from .weierstrass import WeierstrassFunction
 from .schwefel_2_13 import SchwefelFunction213
-from .scaffer_f6 import SchafferF6Function, ScafferF6Function
+from .schaffer_f6 import SchafferF6Function
 
 __all__ = [
     "RastriginFunction",
@@ -28,8 +28,7 @@ __all__ = [
     "AckleyFunction",
     "WeierstrassFunction",
     "SchwefelFunction213",
-    "SchafferF6Function",
-    "ScafferF6Function"
+    "SchafferF6Function"
 ]
 
 

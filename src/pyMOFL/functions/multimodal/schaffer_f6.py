@@ -18,7 +18,10 @@ from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 from pyMOFL.core.function import OptimizationFunction
+from pyMOFL.registry import register
 
+@register("SchafferF6Function")
+@register("schafferF6Function")
 class SchafferF6Function(OptimizationFunction):
     """
     Schaffer's F6 function.
@@ -135,4 +138,4 @@ class SchafferF6Function(OptimizationFunction):
         return global_min_point, global_min_value
 
 # For backward compatibility and simpler importing
-ScafferF6Function = SchafferF6Function  # Common alternative spelling 
+schafferF6Function = SchafferF6Function  # Common alternative spelling 

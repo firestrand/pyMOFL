@@ -1,0 +1,215 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["suite_id", "name", "description", "functions"],
+  "properties": {
+    "suite_id": {
+      "type": "string",
+      "description": "Unique identifier for the benchmark suite (e.g., 'cec2022_suite')"
+    },
+    "name": {
+      "type": "string",
+      "description": "Descriptive name of the benchmark suite, including the benchmark family (e.g., 'CEC 2022 Benchmark Suite', 'BBOB Suite')"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description or reference information about the suite"
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the benchmark suite definition",
+      "default": "1.0"
+    },
+    "functions": {
+      "type": "array",
+      "description": "List of benchmark functions within this suite",
+      "items": { "$ref": "#/definitions/benchmark_function" },
+      "minItems": 1
+    }
+  },
+  "definitions": {
+    "benchmark_function": {
+      "type": "object",
+      "required": ["id", "function", "dimensions", "search_space"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for each benchmark function"
+        },
+        "function": { "$ref": "#/definitions/nested_function" },
+        "dimensions": { "$ref": "#/definitions/dimensions" },
+        "search_space": { "$ref": "#/definitions/search_space" },
+        "initialization_range": { "$ref": "#/definitions/initialization_range" },
+        "termination_criteria": { "$ref": "#/definitions/termination_criteria" },
+        "category": {
+          "type": ["string", "null"],
+          "description": "Category metadata of the benchmark function",
+          "enum": ["Unimodal", "Multimodal", "Expanded", "Hybrid Composition", "Pseudo-Real", "Custom"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "nested_function": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { 
+          "type": "string",
+          "description": "Type of function or transformation to apply"
+        },
+        "parameters": { 
+          "type": "object",
+          "description": "Parameters specific to the function type",
+          "properties": {
+            "value": { 
+              "type": ["number", "string"],
+              "description": "Value parameter (for bias, offset, etc.)"
+            },
+            "vector": {
+              "type": "string",
+              "description": "Path to vector file or vector identifier"
+            },
+            "matrix": {
+              "type": "string", 
+              "description": "Path to matrix file or matrix identifier"
+            },
+            "sigma": {
+              "oneOf": [
+                { "type": "number" },
+                { "type": "array", "items": { "type": "number" } }
+              ],
+              "description": "Spreading constant for weight calculation"
+            },
+            "lambda": {
+              "oneOf": [
+                { "type": "number" },
+                { "type": "array", "items": { "type": "number" } }
+              ],
+              "description": "Scaling factor for scale transformation"
+            },
+            "f_max": {
+              "type": ["number", "string"],
+              "description": "Maximum function value for normalization"
+            },
+            "C": {
+              "type": "number",
+              "description": "Coverage parameter for composition"
+            },
+            "num_functions": {
+              "type": "integer",
+              "description": "Number of functions in composition"
+            },
+            "rotation_matrices": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Paths to rotation matrices for each component"
+            }
+          },
+          "additionalProperties": true
+        },
+        "function": { "$ref": "#/definitions/nested_function" },
+        "functions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/nested_function" }
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/constraint" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "dimensions": {
+      "type": "object",
+      "required": ["supported", "default", "custom_dimensions"],
+      "properties": {
+        "supported": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "minItems": 1
+        },
+        "default": { "type": "integer" },
+        "custom_dimensions": {
+          "type": "object",
+          "required": ["min", "step"],
+          "properties": {
+            "min": { "type": "integer" },
+            "max": { "type": ["integer", "null"] },
+            "step": { "type": "integer" },
+            "quantization": { "type": ["number", "null"], "default": null }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "search_space": {
+      "type": "object",
+      "required": ["default_bounds"],
+      "properties": {
+        "default_bounds": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": ["number", "null"] },
+            "max": { "type": ["number", "null"] }
+          }
+        },
+        "per_dimension_bounds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["min", "max"],
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" }
+            }
+          }
+        },
+        "boundary_condition": {
+          "type": ["string", "null"],
+          "enum": ["clip", "wrap", "reflect"],
+          "default": "clip"
+        }
+      },
+      "additionalProperties": false
+    },
+    "initialization_range": {
+      "type": ["object", "null"],
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "per_dimension": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["min", "max"],
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "termination_criteria": {
+      "type": ["object", "null"],
+      "properties": {
+        "error_threshold": { "type": "number", "default": 1e-8 },
+        "max_FES_multiplier": { "type": "integer" },
+        "max_FES": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "constraint": {
+      "type": "object",
+      "required": ["type", "expression"],
+      "properties": {
+        "type": { "type": "string", "enum": ["inequality", "equality"] },
+        "expression": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

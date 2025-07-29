@@ -1,0 +1,1487 @@
+{
+    "suite_id": "cec2005_suite",
+    "name": "CEC 2005 Benchmark Suite",
+    "description": "Benchmark functions from the CEC 2005 special session on real-parameter optimization at the IEEE Congress on Evolutionary Computation.",
+    "version": "1.0",
+    "functions": [ {
+        "id": "cec05_f01_shifted_sphere",
+        "category": "Unimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -450
+            },
+            "function": {
+                "type": "sphere",
+                "parameters": {},
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f01/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -100,
+                "max": 100
+            }
+        }
+    }, {
+        "id": "cec05_f02_shifted_schwefel_1_2",
+        "category": "Unimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -450
+            },
+            "function": {
+                "type": "schwefel_1_2",
+                "parameters": {},
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f02/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -100,
+                "max": 100
+            }
+        }
+    }, {
+        "id": "cec05_f03_shifted_rotated_high_conditioned_elliptic",
+        "category": "Unimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -450
+            },
+            "function": {
+                "type": "high_conditioned_elliptic",
+                "parameters": {
+                    "condition": 1000000.0
+                },
+                "function": {
+                    "type": "rotate",
+                    "parameters": {
+                        "matrix": "f03/matrix_rotation_D{dim}.txt"
+                    },
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f03/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -100,
+                "max": 100
+            }
+        }
+    }, {
+        "id": "cec05_f04_shifted_schwefel_1_2_with_noise",
+        "category": "Unimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -450
+            },
+            "function": {
+                "type": "noise",
+                "parameters": {
+                    "model": "multiplicative",
+                    "factor": 0.4,
+                    "distribution": "absolute_normal"
+                },
+                "function": {
+                    "type": "schwefel_1_2",
+                    "parameters": {},
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f04/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -100,
+                "max": 100
+            }
+        }
+    }, {
+        "id": "cec05_f05_schwefel_2_6_global_optimum_on_bounds",
+        "category": "Unimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -310
+            },
+            "function": {
+                "type": "schwefel_2_6",
+                "parameters": {
+                    "matrix_A": "f05/matrix_data_A_D50.txt"
+                },
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f05/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -100,
+                "max": 100
+            }
+        }
+    }, {
+        "id": "cec05_f06_shifted_rosenbrock",
+        "category": "Multimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 390
+            },
+            "function": {
+                "type": "rosenbrock",
+                "parameters": {},
+                "function": {
+                    "type": "offset",
+                    "parameters": {
+                        "value": 1
+                    },
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f06/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -100,
+                "max": 100
+            }
+        }
+    }, {
+        "id": "cec05_f07_shifted_rotated_griewank_without_bounds",
+        "category": "Multimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -180
+            },
+            "function": {
+                "type": "griewank",
+                "parameters": {},
+                "function": {
+                    "type": "rotate",
+                    "parameters": {
+                        "matrix": "f07/matrix_rotation_D{dim}.txt",
+                        "condition": 3,
+                        "noise": 0.3
+                    },
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f07/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": null,
+                "max": null
+            }
+        },
+        "initialization_range": {
+            "min": 0,
+            "max": 600
+        }
+    }, {
+        "id": "cec05_f08_shifted_rotated_ackley_global_optimum_on_bounds",
+        "category": "Multimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -140
+            },
+            "function": {
+                "type": "ackley",
+                "parameters": {},
+                "function": {
+                    "type": "rotate",
+                    "parameters": {
+                        "matrix": "f08/matrix_rotation_D{dim}.txt",
+                        "condition": 100
+                    },
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f08/vector_shift_D50.txt",
+                            "bounds_mapping": "alternate"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -32,
+                "max": 32
+            }
+        }
+    }, {
+        "id": "cec05_f09_shifted_rastrigin",
+        "category": "Multimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -330
+            },
+            "function": {
+                "type": "rastrigin",
+                "parameters": {},
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f09/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f10_shifted_rotated_rastrigin",
+        "category": "Multimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -330
+            },
+            "function": {
+                "type": "rastrigin",
+                "parameters": {},
+                "function": {
+                    "type": "rotate",
+                    "parameters": {
+                        "matrix": "f10/matrix_rotation_D{dim}.txt",
+                        "condition": 2
+                    },
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f10/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f11_shifted_rotated_weierstrass",
+        "category": "Multimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 90
+            },
+            "function": {
+                "type": "weierstrass",
+                "parameters": {
+                    "a": 0.5,
+                    "b": 3,
+                    "k_max": 20
+                },
+                "function": {
+                    "type": "rotate",
+                    "parameters": {
+                        "matrix": "f11/matrix_rotation_D{dim}.txt",
+                        "condition": 5
+                    },
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f11/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -0.5,
+                "max": 0.5
+            }
+        }
+    }, {
+        "id": "cec05_f12_schwefel_2_13",
+        "category": "Multimodal",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -460
+            },
+            "function": {
+                "type": "schwefel_2_13",
+                "parameters": {
+                    "matrix_A": "f12/matrix_data_A_D50.txt",
+                    "matrix_B": "f12/matrix_data_B_D50.txt",
+                    "alpha": "f12/vector_alpha_D50.txt"
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -3.141592653589793,
+                "max": 3.141592653589793
+            }
+        }
+    }, {
+        "id": "cec05_f13_expanded_griewank_rosenbrock",
+        "category": "Expanded",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -130
+            },
+            "function": {
+                "type": "expanded",
+                "parameters": {
+                    "inner_function": "griewank_of_rosenbrock",
+                    "expansion_type": "F8F2"
+                },
+                "function": {
+                    "type": "offset",
+                    "parameters": {
+                        "value": 1
+                    },
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f13/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f14_shifted_rotated_expanded_scaffer_f6",
+        "category": "Expanded",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": -300
+            },
+            "function": {
+                "type": "expanded",
+                "parameters": {
+                    "inner_function": "scaffer_f6",
+                    "expansion_type": "consecutive_pairs"
+                },
+                "function": {
+                    "type": "rotate",
+                    "parameters": {
+                        "matrix": "f14/matrix_rotation_D{dim}.txt",
+                        "condition": 3
+                    },
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f14/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -100,
+                "max": 100
+            }
+        }
+    }, {
+        "id": "cec05_f15_hybrid_composition_1",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 120
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 1, 1, 10, 10, 5, 5, 20, 20, 50, 50 ],
+                    "lambda": [ 0.005, 0.005, 0.0025, 0.0025, 0.001667, 0.001667, 0.00125, 0.00125, 0.001, 0.001 ]
+                },
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f15/vector_shift_D50.txt"
+                    }
+                },
+                "functions": [ {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                } ]
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f16_rotated_hybrid_composition_1",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 120
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 1, 1, 10, 10, 5, 5, 20, 20, 50, 50 ],
+                    "lambda": [ 0.005, 0.005, 0.0025, 0.0025, 0.001667, 0.001667, 0.00125, 0.00125, 0.001, 0.001 ],
+                    "rotation_matrices": [ "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt", "f16/matrix_rotation_D{dim}.txt" ]
+                },
+                "functions": [ {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                } ],
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f16/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f17_rotated_hybrid_composition_1_noise",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 120
+            },
+            "function": {
+                "type": "noise",
+                "parameters": {
+                    "model": "multiplicative",
+                    "factor": 0.2,
+                    "distribution": "normal"
+                },
+                "function": {
+                    "type": "hybrid_composition",
+                    "parameters": {
+                        "num_functions": 10,
+                        "sigma": [ 1, 1, 10, 10, 5, 5, 20, 20, 50, 50 ],
+                        "lambda": [ 0.005, 0.005, 0.0025, 0.0025, 0.001667, 0.001667, 0.00125, 0.00125, 0.001, 0.001 ],
+                        "rotation_matrices": [ "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt", "f17/matrix_rotation_D{dim}.txt" ]
+                    },
+                    "functions": [ {
+                        "type": "rastrigin",
+                        "parameters": {}
+                    }, {
+                        "type": "rastrigin",
+                        "parameters": {}
+                    }, {
+                        "type": "weierstrass",
+                        "parameters": {
+                            "a": 0.5,
+                            "b": 3,
+                            "k_max": 20
+                        }
+                    }, {
+                        "type": "weierstrass",
+                        "parameters": {
+                            "a": 0.5,
+                            "b": 3,
+                            "k_max": 20
+                        }
+                    }, {
+                        "type": "griewank",
+                        "parameters": {}
+                    }, {
+                        "type": "griewank",
+                        "parameters": {}
+                    }, {
+                        "type": "ackley",
+                        "parameters": {}
+                    }, {
+                        "type": "ackley",
+                        "parameters": {}
+                    }, {
+                        "type": "sphere",
+                        "parameters": {}
+                    }, {
+                        "type": "sphere",
+                        "parameters": {}
+                    } ],
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f17/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f18_rotated_hybrid_composition_2",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 10
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 1, 1, 10, 10, 5, 5, 20, 20, 50, 50 ],
+                    "lambda": [ 0.005, 0.005, 0.0025, 0.0025, 0.001667, 0.001667, 0.00125, 0.00125, 0.001, 0.001 ],
+                    "rotation_matrices": [ "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt", "f18/matrix_rotation_D{dim}.txt" ]
+                },
+                "functions": [ {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                } ],
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f18/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f19_rotated_hybrid_composition_2_narrow_basin",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 10
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 0.1, 2, 1.5, 1.5, 1, 1, 1.5, 1.5, 2, 2 ],
+                    "lambda": [ 0.0025, 0.005, 0.005, 0.0025, 0.00333, 0.001667, 0.0025, 0.00125, 0.002, 0.001 ],
+                    "rotation_matrices": [ "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt", "f19/matrix_rotation_D{dim}.txt" ]
+                },
+                "functions": [ {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                } ],
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f19/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f20_rotated_hybrid_composition_2_global_on_bounds",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 10
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 1, 1, 10, 10, 5, 5, 20, 20, 50, 50 ],
+                    "lambda": [ 0.005, 0.005, 0.0025, 0.0025, 0.001667, 0.001667, 0.00125, 0.00125, 0.001, 0.001 ],
+                    "rotation_matrices": [ "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt", "f20/matrix_rotation_D{dim}.txt" ],
+                    "global_optimum_on_bounds": true
+                },
+                "functions": [ {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                } ],
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f20/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f21_rotated_hybrid_composition_3",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 360
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 1, 1, 10, 10, 5, 5, 20, 20, 50, 50 ],
+                    "lambda": [ 1, 1, 10, 10, 0.005, 0.005, 50, 50, 25, 25 ],
+                    "rotation_matrices": [ "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt", "f21/matrix_rotation_D{dim}.txt" ]
+                },
+                "functions": [ {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "scaffer_f6",
+                        "expansion_type": "consecutive_pairs"
+                    }
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "scaffer_f6",
+                        "expansion_type": "consecutive_pairs"
+                    }
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "griewank_of_rosenbrock",
+                        "expansion_type": "F8F2"
+                    }
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "griewank_of_rosenbrock",
+                        "expansion_type": "F8F2"
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                } ],
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f21/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f22_rotated_hybrid_composition_3_high_condition_number",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 360
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 1, 1, 10, 10, 5, 5, 20, 20, 50, 50 ],
+                    "lambda": [ 1, 1, 10, 10, 0.005, 0.005, 50, 50, 25, 25 ],
+                    "rotation_matrices": [ "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt", "f22/matrix_rotation_sub_D{dim}.txt" ],
+                    "high_condition_number": true
+                },
+                "functions": [ {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "scaffer_f6",
+                        "expansion_type": "consecutive_pairs"
+                    }
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "scaffer_f6",
+                        "expansion_type": "consecutive_pairs"
+                    }
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "griewank_of_rosenbrock",
+                        "expansion_type": "F8F2"
+                    }
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "griewank_of_rosenbrock",
+                        "expansion_type": "F8F2"
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                } ],
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f22/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f23_non_continuous_rotated_hybrid_composition",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 360
+            },
+            "function": {
+                "type": "non_continuous",
+                "parameters": {},
+                "function": {
+                    "type": "hybrid_composition",
+                    "parameters": {
+                        "num_functions": 10,
+                        "sigma": [ 1, 1, 10, 10, 5, 5, 20, 20, 50, 50 ],
+                        "lambda": [ 1, 1, 10, 10, 0.005, 0.005, 50, 50, 25, 25 ],
+                        "rotation_matrices": [ "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt", "f23/matrix_rotation_D{dim}.txt" ]
+                    },
+                    "functions": [ {
+                        "type": "expanded",
+                        "parameters": {
+                            "inner_function": "scaffer_f6",
+                            "expansion_type": "consecutive_pairs"
+                        }
+                    }, {
+                        "type": "expanded",
+                        "parameters": {
+                            "inner_function": "scaffer_f6",
+                            "expansion_type": "consecutive_pairs"
+                        }
+                    }, {
+                        "type": "rastrigin",
+                        "parameters": {}
+                    }, {
+                        "type": "rastrigin",
+                        "parameters": {}
+                    }, {
+                        "type": "expanded",
+                        "parameters": {
+                            "inner_function": "griewank_of_rosenbrock",
+                            "expansion_type": "F8F2"
+                        }
+                    }, {
+                        "type": "expanded",
+                        "parameters": {
+                            "inner_function": "griewank_of_rosenbrock",
+                            "expansion_type": "F8F2"
+                        }
+                    }, {
+                        "type": "weierstrass",
+                        "parameters": {
+                            "a": 0.5,
+                            "b": 3,
+                            "k_max": 20
+                        }
+                    }, {
+                        "type": "weierstrass",
+                        "parameters": {
+                            "a": 0.5,
+                            "b": 3,
+                            "k_max": 20
+                        }
+                    }, {
+                        "type": "griewank",
+                        "parameters": {}
+                    }, {
+                        "type": "griewank",
+                        "parameters": {}
+                    } ],
+                    "function": {
+                        "type": "shift",
+                        "parameters": {
+                            "vector": "f23/vector_shift_D50.txt"
+                        }
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f24_rotated_hybrid_composition_4",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 260
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 1, 1, 1, 1, 1, 2, 2, 2, 2, 2 ],
+                    "lambda": [ 10, 0.025, 1, 0.015625, 1, 0.001, 0.002, 1, 0.001, 0.001667 ],
+                    "rotation_matrices": [ "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt", "f24/matrix_rotation_D{dim}.txt" ]
+                },
+                "functions": [ {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "scaffer_f6",
+                        "expansion_type": "consecutive_pairs"
+                    }
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "griewank_of_rosenbrock",
+                        "expansion_type": "F8F2"
+                    }
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "scaffer_f6",
+                        "expansion_type": "consecutive_pairs"
+                    }
+                }, {
+                    "type": "non_continuous_rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "high_conditioned_elliptic",
+                    "parameters": {
+                        "condition": 1000000.0
+                    }
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                } ],
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f24/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": -5,
+                "max": 5
+            }
+        }
+    }, {
+        "id": "cec05_f25_rotated_hybrid_composition_4_without_bounds",
+        "category": "Hybrid Composition",
+        "function": {
+            "type": "bias",
+            "parameters": {
+                "value": 260
+            },
+            "function": {
+                "type": "hybrid_composition",
+                "parameters": {
+                    "num_functions": 10,
+                    "sigma": [ 1, 1, 1, 1, 1, 2, 2, 2, 2, 2 ],
+                    "lambda": [ 10, 0.025, 1, 0.015625, 1, 0.001, 0.002, 1, 0.001, 0.001667 ],
+                    "rotation_matrices": [ "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt", "f25/matrix_rotation_D{dim}.txt" ]
+                },
+                "functions": [ {
+                    "type": "weierstrass",
+                    "parameters": {
+                        "a": 0.5,
+                        "b": 3,
+                        "k_max": 20
+                    }
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "scaffer_f6",
+                        "expansion_type": "consecutive_pairs"
+                    }
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "griewank_of_rosenbrock",
+                        "expansion_type": "F8F2"
+                    }
+                }, {
+                    "type": "ackley",
+                    "parameters": {}
+                }, {
+                    "type": "rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "griewank",
+                    "parameters": {}
+                }, {
+                    "type": "expanded",
+                    "parameters": {
+                        "inner_function": "scaffer_f6",
+                        "expansion_type": "consecutive_pairs"
+                    }
+                }, {
+                    "type": "non_continuous_rastrigin",
+                    "parameters": {}
+                }, {
+                    "type": "high_conditioned_elliptic",
+                    "parameters": {
+                        "condition": 1000000.0
+                    }
+                }, {
+                    "type": "sphere",
+                    "parameters": {}
+                } ],
+                "function": {
+                    "type": "shift",
+                    "parameters": {
+                        "vector": "f25/vector_shift_D50.txt"
+                    }
+                }
+            }
+        },
+        "dimensions": {
+            "supported": [ 2, 10, 30, 50 ],
+            "default": 10,
+            "custom_dimensions": {
+                "min": 2,
+                "max": null,
+                "step": 1
+            }
+        },
+        "search_space": {
+            "default_bounds": {
+                "min": null,
+                "max": null
+            }
+        },
+        "initialization_range": {
+            "min": 2,
+            "max": 5
+        }
+    } ]
+}
