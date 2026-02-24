@@ -4,20 +4,18 @@ Pytest configuration file for pyMOFL tests.
 This file contains common fixtures and settings for the test suite.
 """
 
-import pytest
 import numpy as np
-import sys
-import os
+import pytest
 
-# Add the src directory to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+# NOTE: Tests require the pyMOFL package to be installed in editable mode.
+# Run 'pip install -e .' in the project root if you see import errors.
 
 
 @pytest.fixture
 def random_vector():
     """
     Generate a random vector for testing.
-    
+
     Returns:
         np.ndarray: A random vector of length 2.
     """
@@ -28,7 +26,7 @@ def random_vector():
 def random_matrix():
     """
     Generate a random matrix for testing.
-    
+
     Returns:
         np.ndarray: A random matrix of shape (2, 2).
     """
@@ -39,8 +37,8 @@ def random_matrix():
 def random_batch():
     """
     Generate a random batch of vectors for testing.
-    
+
     Returns:
         np.ndarray: A random batch of 5 vectors of length 2.
     """
-    return np.random.rand(5, 2) 
+    return np.random.rand(5, 2)

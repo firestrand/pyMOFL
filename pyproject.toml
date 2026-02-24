@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "pyMOFL"
@@ -11,26 +11,78 @@ authors = [
     {name = "pyMOFL Team", email = "example@example.com"}
 ]
 license = {text = "MIT"}
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 dependencies = [
-    "numpy>=1.20.0",
-    "matplotlib>=3.4.0",
+    "numpy>=1.26.0",
+    "matplotlib>=3.8.0",
+    "typer>=0.15",
+    "rich>=13.0",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.9",
+    "ty>=0.0.1a7",
+    "jsonschema>=4.0",
+]
+cli = []
+
+[project.scripts]
+pymofl = "pyMOFL.cli:app"
+
 [project.urls]
 "Homepage" = "https://github.com/yourusername/pyMOFL"
-"Bug Tracker" = "https://github.com/yourusername/pyMOFL/issues" 
+"Bug Tracker" = "https://github.com/yourusername/pyMOFL/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pyMOFL"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--ignore=archive --ignore=utility_scripts"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "NPY", "UP", "B", "C4", "SIM", "RUF"]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "E741",   # ambiguous variable name (l, O, I in math code)
+    "N801",   # class name should use CapWords (Schwefel_2_13 etc. are math names)
+    "N803",   # argument name should be lowercase (X for matrices)
+    "N806",   # variable in function should be lowercase (X, D for matrices)
+    "N814",   # camelCase import alias (np as numpy convention)
+    "N999",   # invalid module name (pyMOFL is intentional)
+    "NPY002", # legacy np.random usage
+    "RUF002", # ambiguous unicode chars in docstrings (en-dashes in citations)
+    "RUF003", # ambiguous unicode chars in comments
+    "RUF009", # function call in dataclass default (Path.cwd() is intentional)
+    "RUF012", # mutable class-level default (frozen dicts used as constants)
+    "SIM108", # ternary operator suggestion (readability preference)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pyMOFL"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

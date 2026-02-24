@@ -1,224 +1,133 @@
 # pyMOFL: Python Modular Optimization Function Library
 
-![coverage](coverage.svg)
-
-A composable optimization function library for benchmarking optimization algorithms.
-
-## Overview
-
-pyMOFL is a Python library that provides a collection of benchmark functions commonly used in optimization research, along with tools for transforming and composing these functions to create complex benchmarks. The library is designed to be modular, extensible, and high-performance.
-
-## Features
-
-- **Modular Design**: Separate core mathematical functions from transformation and composition logic.
-- **Composability**: Build complex benchmark functions (e.g., CEC composite functions) by assembling basic functions with transformation decorators.
-- **Performance**: Utilize vectorized NumPy operations for high-speed execution.
-- **Extensibility**: Provide a clear, consistent interface that users can extend to define new functions, hybrids, or composites.
-- **Decorator Pattern**: Apply transformations like shifting, rotation, quantization, and bias using a consistent decorator approach.
-- **Bounds as Metadata**: Bounds are metadata only (min/max per dimension); enforcement/quantization is opt-in via decorators.
+`pyMOFL` is a modular benchmark-function library for optimization research.
+It now uses a **function-composition architecture** driven by declarative configs.
+The stack is managed with `uv`, and lint/type checks are run via `ruff` and `ty`.
 
 ## Installation
 
+From source:
+
 ```bash
-# Install from source
 git clone https://github.com/yourusername/pyMOFL.git
 cd pyMOFL
-pip install -e .
+uv sync
 ```
 
-## Usage
+Run the CLI with the project environment:
 
-### Basic Functions
+```bash
+uv run pymofl --help
+```
+
+## Project orientation
+
+- Core benchmark functions are first-class classes (e.g. `SphereFunction`).
+- Compositions are explicit: transformations are composed around a base function.
+- Suite descriptors live as JSON config under `src/pyMOFL/constants/.../*_suite.json`.
+- CEC/BBOB compatibility is handled via shared config conventions, not separate benchmark APIs.
+
+## Quick start (direct functions)
 
 ```python
 import numpy as np
-from pyMOFL.functions.unimodal import SphereFunction
-from pyMOFL.functions.multimodal import RastriginFunction
+from pyMOFL.functions.benchmark import SphereFunction, RastriginFunction
 
-# Create a 2D Sphere function
 sphere = SphereFunction(dimension=2)
-print(f"Sphere function at [0, 0]: {sphere.evaluate(np.array([0, 0]))}")
+print(sphere.evaluate(np.array([0.0, 0.0])))
 
-# Bounds are metadata only; the library does not enforce or project values.
-print(f"Sphere function bounds: {sphere.initialization_bounds}")
-
-# Create a 2D Rastrigin function
 rastrigin = RastriginFunction(dimension=2)
-print(f"Rastrigin function at [0, 0]: {rastrigin.evaluate(np.array([0, 0]))}")
+print(rastrigin.evaluate(np.array([1.0, 2.0])))
 ```
 
-### Function Transformations with Decorators
+## Compositions (shift, rotate, bias)
 
-pyMOFL uses a decorator pattern for applying transformations to optimization functions. This approach provides a consistent and composable way to transform functions.
+Transformations are composed explicitly in code via `ComposedFunction`.
 
 ```python
 import numpy as np
-from pyMOFL.functions.unimodal import SphereFunction
-from pyMOFL.decorators import ShiftedFunction, RotatedFunction, BiasedFunction, QuantizedFunction
-
-# Create a basic function
-sphere = SphereFunction(dimension=2)
-
-# Add quantization (integer values only)
-quantized_sphere = QuantizedFunction(sphere, quantization_type='integer')
-print(f"Quantized Sphere at [1.7, 2.3]: {quantized_sphere.evaluate(np.array([1.7, 2.3]))}")  # 1, 2
-
-# Without QuantizedFunction, the library does not enforce or project values.
-print(f"Sphere at [1.7, 2.3]: {sphere.evaluate(np.array([1.7, 2.3]))}")  # 1.7, 2.3
-
-# Add bias to shift the function value (not the position)
-biased_sphere = BiasedFunction(sphere, bias=10.0)
-print(f"Biased Sphere at [0, 0]: {biased_sphere.evaluate(np.array([0, 0]))}")  # 10.0
-
-# Shift the function's position (moves the optimum)
-shift = np.array([1.0, 2.0])
-shifted_sphere = ShiftedFunction(sphere, shift)
-print(f"Shifted Sphere at [1, 2]: {shifted_sphere.evaluate(np.array([1, 2]))}")  # 0.0
-
-# Rotate the function
-rotation_matrix = np.array([[0.866, -0.5], [0.5, 0.866]])  # 30-degree rotation
-rotated_sphere = RotatedFunction(sphere, rotation_matrix)
-
-# Combine multiple transformations (order matters!)
-# First shift, then bias
-shifted_then_biased = BiasedFunction(ShiftedFunction(sphere, shift), bias=5.0)
-print(f"Shifted then biased at [1, 2]: {shifted_then_biased.evaluate(np.array([1, 2]))}")  # 5.0
-
-# First bias, then shift (equivalent result for sphere function)
-biased_then_shifted = ShiftedFunction(BiasedFunction(sphere, bias=5.0), shift)
-print(f"Biased then shifted at [1, 2]: {biased_then_shifted.evaluate(np.array([1, 2]))}")  # 5.0
-```
-
-### Multiple Transformations Example
-
-Here's an example of combining multiple transformations to create a more complex function:
-
-```python
-import numpy as np
-from pyMOFL.functions.multimodal import RastriginFunction
-from pyMOFL.decorators import ShiftedFunction, RotatedFunction, BiasedFunction
-
-# Create a basic Rastrigin function
-rastrigin = RastriginFunction(dimension=2)
-
-# Create a rotation matrix (45-degree rotation)
-theta = np.pi/4
-rotation_matrix = np.array([
-    [np.cos(theta), -np.sin(theta)],
-    [np.sin(theta), np.cos(theta)]
-])
-
-# Apply multiple transformations:
-# 1. Shift the function's optimum position
-# 2. Rotate the function landscape
-# 3. Add a bias to the function value
-shift = np.array([2.0, 3.0])
-bias = 100.0
-
-# Chain decorators (order matters!)
-transformed_function = BiasedFunction(
-    RotatedFunction(
-        ShiftedFunction(rastrigin, shift),
-        rotation_matrix
-    ),
-    bias
+from pyMOFL.functions.benchmark import SphereFunction
+from pyMOFL.functions.transformations import (
+    BiasTransform,
+    ComposedFunction,
+    RotateTransform,
+    ShiftTransform,
 )
 
-# Evaluate the transformed function
-original_optimum = np.array([0, 0])  # Original optimum for Rastrigin
-shifted_optimum = np.array([2, 3])   # New optimum after shifting
+shift = np.array([1.0, 2.0])
+rotation = np.array([[0.8660254, -0.5], [0.5, 0.8660254]])
 
-print(f"Original at [0, 0]: {rastrigin.evaluate(original_optimum)}")                  # 0.0
-print(f"Transformed at original: {transformed_function.evaluate(original_optimum)}")  # Not minimum
-print(f"Transformed at shifted: {transformed_function.evaluate(shifted_optimum)}")    # 100.0 (bias)
+base = SphereFunction(dimension=2)
+composed = ComposedFunction(
+    base_function=base,
+    input_transforms=[
+        ShiftTransform(shift),
+        RotateTransform(rotation),
+    ],
+    output_transforms=[BiasTransform(100.0)],
+)
+
+print(composed.evaluate(np.array([1.0, 2.0])))
 ```
 
-### Composite Functions
+The same structure is represented in JSON config as nested transform/function nodes.
+
+## Config-driven construction (recommended for CEC/BBOB-style workloads)
+
+`FunctionFactory` builds functions from config objects.
 
 ```python
-import numpy as np
-from pyMOFL.functions.unimodal import SphereFunction, RosenbrockFunction
-from pyMOFL.functions.multimodal import RastriginFunction
-from pyMOFL.composites import CompositeFunction
-from pyMOFL.decorators import BiasedFunction
+from pyMOFL.factories import DataLoader, FunctionFactory, FunctionRegistry
+from pathlib import Path
 
-# Create component functions
-sphere = SphereFunction(dimension=2)
-rastrigin = RastriginFunction(dimension=2)
-rosenbrock = RosenbrockFunction(dimension=2)
+loader = DataLoader(base_path=Path("src/pyMOFL/constants/cec/2005"))
+factory = FunctionFactory(data_loader=loader, registry=FunctionRegistry())
 
-# Apply bias to component functions using decorators
-biased_rastrigin = BiasedFunction(rastrigin, bias=100.0)
-biased_rosenbrock = BiasedFunction(rosenbrock, bias=200.0)
+cfg = {
+    "type": "bias",
+    "parameters": {"value": -450.0},
+    "function": {
+        "type": "rotate",
+        "parameters": {"matrix": "f03/matrix_rotation_D{dim}.txt"},
+        "function": {
+            "type": "shift",
+            "parameters": {"vector": "f03/vector_shift_D{dim}.txt"},
+            "function": {
+                "type": "sphere",
+                "parameters": {"dimension": 10},
+            },
+        },
+    },
+}
 
-# Create a composite function
-components = [sphere, biased_rastrigin, biased_rosenbrock]
-sigmas = [1.0, 2.0, 3.0]
-lambdas = [1.0, 1.0, 1.0]
-composite = CompositeFunction(components, sigmas, lambdas)
-
-print(f"Composite function at [0, 0]: {composite.evaluate(np.array([0, 0]))}")
+func = factory.create_function(cfg)
 ```
 
-## Decorator Pattern for Function Transformations
+This pattern is how the shipped suite JSONs describe complex variants.
 
-pyMOFL uses a decorator pattern for transforming functions, which offers several advantages:
+## Suite utility CLI (generic)
 
-1. **Consistency**: All transformations follow the same pattern
-2. **Composability**: Easily combine multiple transformations
-3. **Separation of Concerns**: Core function behavior is separate from transformations
-4. **Extensibility**: Add new transformations without modifying existing functions
-5. **Opt-in Enforcement**: Bounds and quantization are only enforced if the function is wrapped with the appropriate decorator (e.g., QuantizedFunction). Otherwise, callers are responsible for handling bounds and quantization as appropriate for their algorithm.
+`suite` is the utility surface, intentionally benchmark-family agnostic:
 
-Available decorators:
-- `ShiftedFunction`: Shifts the function's optimum position
-- `RotatedFunction`: Rotates the function's landscape 
-- `BiasedFunction`: Adds a constant value to the function output
-- `QuantizedFunction`: Restricts the function's output to integer values
+```bash
+# list functions from the bundled CEC 2005 suite config
+uv run pymofl suite list --suite-id cec2005_suite
 
-The order of decorators matters and produces different results depending on the function:
-- `BiasedFunction(ShiftedFunction(f))`: Shifts the function first, then adds bias
-- `ShiftedFunction(BiasedFunction(f))`: Adds bias first, then shifts the function
+# validate that all referenced suite resources exist
+uv run pymofl suite validate --suite-id cec2005_suite
 
-Recommended ordering for most scenarios:
-1. Apply `ShiftedFunction` first to move the optimum
-2. Apply `RotatedFunction` next to rotate the landscape
-3. Apply `BiasedFunction` last to shift the function value
-
-## Decorator Composition and Transformation Order
-
-When composing decorators in Python, it's important to understand that transformations are applied in **reverse order** during evaluation:
-
-```python
-# When we write this:
-transformed = RotatedFunction(ShiftedFunction(base, shift), rotation)
-
-# The transformations actually apply in this order:
-# 1. Rotate first: z = R·x
-# 2. Shift second: z = z - s = R·x - s
+# validate a custom suite file
+uv run pymofl suite validate --suite /path/to/bbob_suite.json --suite-dir /path/to/bbob/resources --strict
 ```
 
-This counterintuitive behavior is due to how function composition works. For CEC benchmark functions, the standard approach is to apply shift first, then rotation, which produces `R·(x-s)`. This can be achieved by applying decorators in the following order:
+There is no benchmark-specific `cec` CLI group anymore.
 
-```python
-# This produces the correct f(R·(x-s)) for CEC benchmarks:
-transformed = ShiftedFunction(RotatedFunction(base, rotation), shift)
-```
+## Notes
 
-Mathematically:
-- `ShiftedFunction(RotatedFunction(base))` computes `f(R·(x-s))`
-- `RotatedFunction(ShiftedFunction(base))` computes `f(R·x-s)`
-
-These expressions are not mathematically equivalent due to the non-commutativity of vector rotation and subtraction.
-
-## Test Coverage
-
-Run `scripts/generate_coverage.sh` to execute the test suite, generate `coverage.xml`, and update `coverage.svg`.
+- Bounds are metadata unless you explicitly wrap/transform with quantization or enforce bounds in your optimizer.
+- For quantization, use `Quantized` from `pyMOFL.functions.transformations`.
+- `setup.py` is not part of this workflow; package/build is driven from `pyproject.toml` and `uv`.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Note on Bounds and Quantization
-
-**Bounds are metadata only.** The library does not enforce or project values to bounds unless you explicitly use the `QuantizedFunction` decorator. Callers are responsible for handling bounds and quantization unless opt-in decorators are used. This allows maximum flexibility for different optimization strategies (e.g., reflection, random jump, velocity reset, etc.).
+MIT License. See `LICENSE`.

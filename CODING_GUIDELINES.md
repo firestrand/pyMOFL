@@ -20,7 +20,7 @@ This document outlines the coding standards and best practices for contributors 
 
 ## Code Style
 
-1. **Python Version**: Code must be compatible with Python 3.8+
+1. **Python Version**: Code must be compatible with Python 3.12+ (use PEP 604 `X | None` syntax, `list[T]`/`dict[K, V]` built-in generics)
 2. **Imports**:
    - Use absolute imports for external packages
    - Use relative imports for internal modules
@@ -141,8 +141,9 @@ composed = Biased(base_function=Shifted(base_function=SphereFunction(dimension=2
 
 1. Implement new functions/features in dedicated files/modules
 2. Write corresponding tests
-3. Ensure all tests pass and maintain 100% test coverage
-4. Update documentation to reflect new functionality
+3. Run `uv run ruff format src/ tests/` and `uv run ruff check src/ tests/ --fix`
+4. Ensure all tests pass (`uv run pytest`) and maintain high test coverage
+5. Update documentation to reflect new functionality
 
 ## Performance Considerations
 
@@ -235,7 +236,7 @@ yourproject/
 └── pyproject.toml
 ```
 
-* `src/` is **not** on `sys.path` by default, so nothing inside it is import-able until the project is *installed* (`pip install -e .`). This prevents the "it works on my machine" problem where you accidentally import from the working directory instead of the installed wheel. ([Python Packaging][1])
+* `src/` is **not** on `sys.path` by default, so nothing inside it is import-able until the project is *installed* (`uv sync`). This prevents the "it works on my machine" problem where you accidentally import from the working directory instead of the installed wheel. ([Python Packaging][1])
 
 ### 2. Inside the package: **import by package name**, not by path
 
@@ -252,7 +253,7 @@ Avoid `sys.path` hacks or references such as `import src.yourpkg…`—they coup
 
 ```bash
 # once per virtual-env
-pip install -e .
+uv sync --extra dev
 ```
 
 ```python

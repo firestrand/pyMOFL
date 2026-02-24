@@ -5,11 +5,11 @@
   "properties": {
     "suite_id": {
       "type": "string",
-      "description": "Unique identifier for the benchmark suite (e.g., 'cec2022_suite')"
+      "description": "Unique identifier for the benchmark suite (e.g., 'cec2005_suite')"
     },
     "name": {
       "type": "string",
-      "description": "Descriptive name of the benchmark suite, including the benchmark family (e.g., 'CEC 2022 Benchmark Suite', 'BBOB Suite')"
+      "description": "Descriptive name of the benchmark suite, including the benchmark family (e.g., 'CEC 2005 Benchmark Suite', 'BBOB Suite')"
     },
     "description": {
       "type": "string",
@@ -27,6 +27,7 @@
       "minItems": 1
     }
   },
+  "additionalProperties": false,
   "definitions": {
     "benchmark_function": {
       "type": "object",
@@ -49,63 +50,19 @@
       },
       "additionalProperties": false
     },
+
     "nested_function": {
       "type": "object",
       "required": ["type"],
       "properties": {
-        "type": { 
+        "type": {
           "type": "string",
-          "description": "Type of function or transformation to apply"
+          "description": "Type of function or transformation to apply",
+          "minLength": 1
         },
-        "parameters": { 
+        "parameters": {
           "type": "object",
-          "description": "Parameters specific to the function type",
-          "properties": {
-            "value": { 
-              "type": ["number", "string"],
-              "description": "Value parameter (for bias, offset, etc.)"
-            },
-            "vector": {
-              "type": "string",
-              "description": "Path to vector file or vector identifier"
-            },
-            "matrix": {
-              "type": "string", 
-              "description": "Path to matrix file or matrix identifier"
-            },
-            "sigma": {
-              "oneOf": [
-                { "type": "number" },
-                { "type": "array", "items": { "type": "number" } }
-              ],
-              "description": "Spreading constant for weight calculation"
-            },
-            "lambda": {
-              "oneOf": [
-                { "type": "number" },
-                { "type": "array", "items": { "type": "number" } }
-              ],
-              "description": "Scaling factor for scale transformation"
-            },
-            "f_max": {
-              "type": ["number", "string"],
-              "description": "Maximum function value for normalization"
-            },
-            "C": {
-              "type": "number",
-              "description": "Coverage parameter for composition"
-            },
-            "num_functions": {
-              "type": "integer",
-              "description": "Number of functions in composition"
-            },
-            "rotation_matrices": {
-              "type": "array",
-              "items": { "type": "string" },
-              "description": "Paths to rotation matrices for each component"
-            }
-          },
-          "additionalProperties": true
+          "description": "Parameters specific to the function type"
         },
         "function": { "$ref": "#/definitions/nested_function" },
         "functions": {
@@ -117,8 +74,367 @@
           "items": { "$ref": "#/definitions/constraint" }
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        { "$ref": "#/definitions/rule_bias" },
+        { "$ref": "#/definitions/rule_shift" },
+        { "$ref": "#/definitions/rule_rotate" },
+        { "$ref": "#/definitions/rule_offset" },
+        { "$ref": "#/definitions/rule_noise" },
+        { "$ref": "#/definitions/rule_non_continuous" },
+        { "$ref": "#/definitions/rule_composition" },
+        { "$ref": "#/definitions/rule_parameterless_functions" },
+        { "$ref": "#/definitions/rule_high_conditioned_elliptic" },
+        { "$ref": "#/definitions/rule_schwefel_2_6" },
+        { "$ref": "#/definitions/rule_schwefel_2_13" },
+        { "$ref": "#/definitions/rule_weierstrass" }
+      ]
     },
+
+    "rule_bias": {
+      "if": {
+        "properties": { "type": { "const": "bias" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "required": ["value"],
+            "properties": {
+              "value": { "type": "number", "description": "Bias value added to the function output" },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_shift": {
+      "if": {
+        "properties": { "type": { "const": "shift" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "vector": { "type": "string", "minLength": 1, "description": "Shift vector path (legacy key)" },
+              "shift": { "type": "string", "minLength": 1, "description": "Shift vector path (alias)" },
+              "shift_file": { "type": "string", "minLength": 1, "description": "Shift vector path (alias)" },
+              "bounds_mapping": {
+                "type": "string",
+                "enum": ["alternate", "alternate_bounds", "cec2005_f08", "alternate_bounds_opt", "bounds_shift", "cec2005_f05", "composition_bounds", "cec2005_f20"],
+                "description": "Bounds mapping strategy for shift vectors"
+              },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "oneOf": [
+              { "required": ["vector"] },
+              { "required": ["shift"] },
+              { "required": ["shift_file"] }
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_rotate": {
+      "if": {
+        "properties": { "type": { "const": "rotate" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "matrix": { "type": ["string", "array"], "description": "Path to rotation matrix file or inline matrix" },
+              "rotation": { "type": ["string", "array"], "description": "Rotation matrix path (alias)" },
+              "rotation_file": { "type": ["string", "null"], "description": "Rotation matrix path (alias)" },
+              "rotation_matrix": { "type": ["string", "array"], "description": "Rotation matrix path (alias)" },
+              "condition": { "type": "number", "description": "Condition number for the rotation" },
+              "noise": { "type": "number", "description": "Noise factor applied after rotation" },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "oneOf": [
+              { "required": ["matrix"] },
+              { "required": ["rotation"] },
+              { "required": ["rotation_file"] },
+              { "required": ["rotation_matrix"] }
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_offset": {
+      "if": {
+        "properties": { "type": { "const": "offset" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "required": ["value"],
+            "properties": {
+              "value": { "type": "number", "description": "Offset value added to input coordinates" },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_noise": {
+      "if": {
+        "properties": { "type": { "const": "noise" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "required": ["model", "distribution"],
+            "properties": {
+              "model": {
+                "type": "string",
+                "enum": ["multiplicative"],
+                "description": "Noise model type"
+              },
+              "factor": { "type": "number", "description": "Noise scaling factor" },
+              "noise_level": { "type": "number", "description": "Noise scaling factor (alias)" },
+              "level": { "type": "number", "description": "Noise scaling factor (alias)" },
+              "distribution": {
+                "type": "string",
+                "enum": ["absolute_normal", "normal"],
+                "description": "Noise distribution type"
+              },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "oneOf": [
+              { "required": ["factor"] },
+              { "required": ["noise_level"] },
+              { "required": ["level"] }
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_non_continuous": {
+      "if": {
+        "properties": { "type": { "const": "non_continuous" } },
+        "required": ["type"]
+      },
+      "then": {
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_composition": {
+      "if": {
+        "properties": { "type": { "const": "composition" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters", "functions"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "required": ["num_functions", "dominance_suppression", "lambdas", "sigmas", "biases", "C"],
+            "properties": {
+              "num_functions": { "type": "integer", "minimum": 1, "description": "Number of component functions" },
+              "dominance_suppression": { "type": "boolean", "description": "Enable CEC-style winner-takes-most weight suppression" },
+              "shift_file": { "type": "string", "minLength": 1, "description": "Path to shift vectors file for component optima (legacy key)" },
+              "optima_file": { "type": "string", "minLength": 1, "description": "Path to shift vectors file for component optima" },
+              "shift": { "type": "string", "minLength": 1, "description": "Path to shift vectors file for component optima (alias)" },
+              "rotation_file": {
+                "type": ["string", "null"],
+                "description": "Path to rotation matrices file (null for no rotation)"
+              },
+              "rotation": { "type": ["string", "null"], "description": "Path to rotation matrices file (alias)" },
+              "lambdas": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 1,
+                "description": "Per-component input scaling factors"
+              },
+              "sigmas": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 1,
+                "description": "Per-component Gaussian width parameters for weighting"
+              },
+              "biases": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 1,
+                "description": "Per-component bias values added inside weight multiplication"
+              },
+              "C": { "type": "number", "description": "Coverage/normalization constant (typically 2000)" },
+              "zero_last_optimum": { "type": "boolean", "description": "Set the last component's optimum to the origin" },
+              "optimum_pattern": { "type": "string", "description": "Pattern for modifying component optima (e.g., 'alternate_odds')" },
+              "non_continuous": { "type": "boolean", "description": "Apply non-continuous rounding to composition input" },
+              "component_noise": { "type": "boolean", "description": "Indicates one or more components include stochastic noise" },
+              "reference_point": { "type": "number", "description": "Reference point for f_max normalization (default 5.0)" },
+              "global_bias": { "type": "number", "description": "Constant added to the total weighted sum" },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "oneOf": [
+              { "required": ["shift_file"] },
+              { "required": ["optima_file"] },
+              { "required": ["shift"] }
+            ],
+            "additionalProperties": false
+          },
+          "functions": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/nested_function" },
+            "minItems": 1
+          }
+        }
+      }
+    },
+
+    "rule_parameterless_functions": {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "sphere",
+              "schwefel_1_2",
+              "griewank",
+              "ackley",
+              "rastrigin",
+              "rosenbrock",
+              "griewank_of_rosenbrock",
+              "schaffer_f6_expanded"
+            ]
+          }
+        },
+        "required": ["type"]
+      },
+      "then": {
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_high_conditioned_elliptic": {
+      "if": {
+        "properties": { "type": { "const": "high_conditioned_elliptic" } },
+        "required": ["type"]
+      },
+      "then": {
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "number", "description": "Condition number for the elliptic function" },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_schwefel_2_6": {
+      "if": {
+        "properties": { "type": { "const": "schwefel_2_6" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "required": ["matrix_A"],
+            "properties": {
+              "matrix_A": { "type": "string", "minLength": 1, "description": "Path to matrix A data file" },
+              "optimum_pattern": { "type": "string", "description": "Pattern for generating the optimum vector" },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_schwefel_2_13": {
+      "if": {
+        "properties": { "type": { "const": "schwefel_2_13" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "required": ["matrix_A", "matrix_B", "alpha"],
+            "properties": {
+              "matrix_A": { "type": "string", "minLength": 1, "description": "Path to matrix A data file" },
+              "matrix_B": { "type": "string", "minLength": 1, "description": "Path to matrix B data file" },
+              "alpha": { "type": "string", "minLength": 1, "description": "Path to alpha vector file" },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
+    "rule_weierstrass": {
+      "if": {
+        "properties": { "type": { "const": "weierstrass" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["parameters"],
+        "properties": {
+          "parameters": {
+            "type": "object",
+            "required": ["a", "b", "k_max"],
+            "properties": {
+              "a": { "type": "number", "description": "Weierstrass a parameter (typically 0.5)" },
+              "b": { "type": "number", "description": "Weierstrass b parameter (typically 3)" },
+              "k_max": { "type": "integer", "description": "Maximum summation index (typically 20)" },
+              "dimension": { "type": "integer", "minimum": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+
     "dimensions": {
       "type": "object",
       "required": ["supported", "default", "custom_dimensions"],
@@ -142,6 +458,7 @@
       },
       "additionalProperties": false
     },
+
     "search_space": {
       "type": "object",
       "required": ["default_bounds"],
@@ -173,6 +490,7 @@
       },
       "additionalProperties": false
     },
+
     "initialization_range": {
       "type": ["object", "null"],
       "properties": {
@@ -192,6 +510,7 @@
       },
       "additionalProperties": false
     },
+
     "termination_criteria": {
       "type": ["object", "null"],
       "properties": {
@@ -201,6 +520,7 @@
       },
       "additionalProperties": false
     },
+
     "constraint": {
       "type": "object",
       "required": ["type", "expression"],
@@ -210,6 +530,5 @@
       },
       "additionalProperties": false
     }
-  },
-  "additionalProperties": false
+  }
 }

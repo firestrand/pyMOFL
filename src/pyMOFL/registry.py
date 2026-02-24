@@ -17,14 +17,13 @@ Usage:
     f_cls = get("SphereFunction")
     f = f_cls(...)
 
-    # For migration
-    register_function = register
 """
 
-from importlib import import_module
 import pkgutil
+from importlib import import_module
 
 _COMPONENTS = {}
+
 
 def register(name=None):
     """
@@ -37,16 +36,20 @@ def register(name=None):
         class ShiftedFunction(...):
             ...
     """
+
     def _inner(cls):
         _COMPONENTS[name or cls.__name__] = cls
         return cls
+
     return _inner
+
 
 def get(name):
     try:
         return _COMPONENTS[name]
     except KeyError as e:
         raise ValueError(f"Component '{name}' is not registered") from e
+
 
 def scan_package(pkg_name="pyMOFL"):
     """
@@ -56,6 +59,3 @@ def scan_package(pkg_name="pyMOFL"):
     pkg = import_module(pkg_name)
     for mod in pkgutil.walk_packages(pkg.__path__, prefix=f"{pkg_name}."):
         import_module(mod.name)
-
-# Alias for migration
-register_function = register 

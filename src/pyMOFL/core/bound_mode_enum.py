@@ -1,7 +1,9 @@
 """
 BoundModeEnum defines the context in which bounds are applied: initialization or operational.
 """
+
 from enum import Enum, auto
+
 
 class BoundModeEnum(Enum):
     """
@@ -9,5 +11,6 @@ class BoundModeEnum(Enum):
     - INITIALIZATION: Used for random initialization of solutions.
     - OPERATIONAL: Used for enforcing domain limits during optimization.
     """
+
     INITIALIZATION = auto()
-    OPERATIONAL = auto() 
+    OPERATIONAL = auto()

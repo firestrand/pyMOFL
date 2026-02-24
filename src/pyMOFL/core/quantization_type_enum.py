@@ -1,7 +1,9 @@
 """
 QuantizationTypeEnum defines the type of quantization applied to variables: continuous, integer, or stepwise.
 """
+
 from enum import Enum, auto
+
 
 class QuantizationTypeEnum(Enum):
     """
@@ -10,6 +12,7 @@ class QuantizationTypeEnum(Enum):
     - INTEGER: Variables are restricted to integer values within bounds.
     - STEP: Variables are quantized to a fixed step size within bounds.
     """
+
     CONTINUOUS = auto()
     INTEGER = auto()
-    STEP = auto() 
+    STEP = auto()

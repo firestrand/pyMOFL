@@ -2,11 +2,15 @@
 OptimizationFunction base class for all optimization functions in pyMOFL.
 Handles bounds, quantization, and constraint logic.
 """
+
 from abc import ABC, abstractmethod
 from typing import Any
+
 import numpy as np
 from numpy.typing import NDArray
+
 from .bounds import Bounds
+
 
 class OptimizationFunction(ABC):
     """
@@ -15,14 +19,22 @@ class OptimizationFunction(ABC):
 
     Subclasses should use _validate_input(x) and _validate_batch_input(X) to check input shape/type.
     """
+
     initialization_bounds: Bounds
-    operational_bounds: Bounds | None
+    operational_bounds: Bounds
     constraint_penalty: float = 1e8
 
-    def __init__(self, dimension: int, initialization_bounds: Bounds = None, operational_bounds: Bounds = None):
+    def __init__(
+        self,
+        dimension: int,
+        initialization_bounds: Bounds | None = None,
+        operational_bounds: Bounds | None = None,
+    ):
         self.dimension = dimension
-        self.initialization_bounds = initialization_bounds
-        self.operational_bounds = operational_bounds
+        base_low = np.full(dimension, -np.inf, dtype=np.float64)
+        base_high = np.full(dimension, np.inf, dtype=np.float64)
+        self.initialization_bounds = initialization_bounds or Bounds(low=base_low, high=base_high)
+        self.operational_bounds = operational_bounds or Bounds(low=base_low, high=base_high)
 
     def __call__(self, x: NDArray[Any]) -> float:
         """
@@ -36,11 +48,21 @@ class OptimizationFunction(ABC):
         return result
 
     @abstractmethod
-    def evaluate(self, z: NDArray[Any]) -> float:
+    def evaluate(self, x: NDArray[Any]) -> float:
         """
-        Evaluate the function at a point z.
+        Evaluate the function at a point x.
         """
-        pass
+        ...
+
+    def evaluate_batch(self, X: NDArray[Any]) -> NDArray[Any]:
+        """
+        Evaluate the function at multiple points.
+
+        Default implementation loops over rows. Subclasses should override
+        with a vectorized implementation for performance.
+        """
+        X = self._validate_batch_input(X)
+        return np.array([self.evaluate(row) for row in X])
 
     def violations(self, x: NDArray[Any]) -> float:
         """
@@ -67,4 +89,4 @@ class OptimizationFunction(ABC):
         X = np.asarray(X)
         if X.ndim != 2 or X.shape[1] != self.dimension:
             raise ValueError(f"Each input must have dimension {self.dimension}, got {X.shape}")
-        return X 
+        return X
