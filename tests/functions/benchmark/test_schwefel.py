@@ -47,11 +47,11 @@ class TestSchwefel_1_2:
     def test_global_minimum(self):
         """Test the function at its global minimum."""
         for dim in [2, 3, 5]:
-            # Get the global minimum
-            min_point, min_value = Schwefel_1_2.get_global_minimum(dim)
-
             # Create function
             func = Schwefel_1_2(dimension=dim)
+
+            # Get the global minimum
+            min_point, min_value = func.get_global_minimum()
 
             # Verify global minimum point and value
             np.testing.assert_allclose(min_point, np.zeros(dim))

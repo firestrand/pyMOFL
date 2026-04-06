@@ -38,7 +38,8 @@ class TestSchwefel_2_20:
             assert np.isclose(func.evaluate(np.zeros(d)), 0.0, atol=1e-15)
 
     def test_get_global_minimum(self):
-        point, value = Schwefel_2_20.get_global_minimum(3)
+        func = Schwefel_2_20(dimension=3)
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, [0, 0, 0])
         assert value == 0.0
 
@@ -95,7 +96,8 @@ class TestSchwefel_2_21:
             assert np.isclose(func.evaluate(np.zeros(d)), 0.0, atol=1e-15)
 
     def test_get_global_minimum(self):
-        point, value = Schwefel_2_21.get_global_minimum(4)
+        func = Schwefel_2_21(dimension=4)
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, np.zeros(4))
         assert value == 0.0
 
@@ -145,7 +147,8 @@ class TestSchwefel_2_22:
             assert np.isclose(func.evaluate(np.zeros(d)), 0.0, atol=1e-15)
 
     def test_get_global_minimum(self):
-        point, value = Schwefel_2_22.get_global_minimum(3)
+        func = Schwefel_2_22(dimension=3)
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, np.zeros(3))
         assert value == 0.0
 
@@ -207,7 +210,8 @@ class TestSchwefel_2_23:
             assert np.isclose(func.evaluate(np.zeros(d)), 0.0, atol=1e-15)
 
     def test_get_global_minimum(self):
-        point, value = Schwefel_2_23.get_global_minimum(3)
+        func = Schwefel_2_23(dimension=3)
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, np.zeros(3))
         assert value == 0.0
 
@@ -271,7 +275,8 @@ class TestSchwefel_2_25:
             assert np.isclose(func.evaluate(x_opt), 0.0, atol=1e-15)
 
     def test_get_global_minimum(self):
-        point, value = Schwefel_2_25.get_global_minimum(4)
+        func = Schwefel_2_25(dimension=4)
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, np.ones(4))
         assert value == 0.0
 
@@ -340,7 +345,8 @@ class TestSchwefel_2_26:
         assert np.isclose(val, -837.9658, atol=0.01)
 
     def test_get_global_minimum(self):
-        point, value = Schwefel_2_26.get_global_minimum(3)
+        func = Schwefel_2_26(dimension=3)
+        point, value = func.get_global_minimum()
         np.testing.assert_allclose(point, np.full(3, 420.9687), atol=1e-4)
         assert value < -1250  # 3 * -418.98 ≈ -1256.95
 
@@ -385,7 +391,8 @@ class TestSchwefelFunction:
         assert abs(val) < 0.01  # Should be very close to 0
 
     def test_get_global_minimum(self):
-        point, value = SchwefelFunction.get_global_minimum(3)
+        func = SchwefelFunction(dimension=3)
+        point, value = func.get_global_minimum()
         np.testing.assert_allclose(point, np.full(3, 420.9687), atol=1e-4)
         assert value == 0.0  # Nominal value
 

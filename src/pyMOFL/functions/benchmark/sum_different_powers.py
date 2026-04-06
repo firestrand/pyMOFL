@@ -68,18 +68,12 @@ class SumDifferentPowersFunction(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.sum(np.abs(X) ** self._exponents, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Sum of Different Powers function.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
-        return np.zeros(dimension), 0.0
+        return np.zeros(self.dimension), 0.0

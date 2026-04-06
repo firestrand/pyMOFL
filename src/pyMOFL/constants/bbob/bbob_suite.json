@@ -1,0 +1,1064 @@
+{
+  "suite_id": "bbob_noiseless",
+  "name": "BBOB Noiseless Benchmark Suite",
+  "description": "The 24 noiseless functions from the BBOB (Black-Box Optimization Benchmarking) test suite, as defined by Hansen et al. (2009). Unlike CEC suites, BBOB uses seeded random instance generation (x_opt, f_opt, rotations). Construction is handled programmatically by BBOBSuiteFactory; nested 'function' templates below show the correct nesting structure with null for instance-specific parameters.",
+  "version": "2.0",
+  "reference": "Hansen, N., Finck, S., Ros, R., & Auger, A. (2009). Real-parameter black-box optimization benchmarking 2009: Noiseless functions definitions. INRIA Technical Report RR-6829.",
+  "instance_generation": "programmatic",
+  "dimensions": {
+    "supported": [
+      2,
+      3,
+      5,
+      10,
+      20,
+      40
+    ],
+    "default": 10
+  },
+  "search_space": {
+    "default_bounds": {
+      "min": -5,
+      "max": 5
+    }
+  },
+  "functions": [
+    {
+      "id": "bbob_f01_sphere",
+      "name": "Sphere",
+      "category": "separable",
+      "base_function": "sphere",
+      "transforms": [
+        "shift",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "separable",
+        "scalable"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": null
+          },
+          "function": {
+            "type": "sphere",
+            "parameters": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f02_ellipsoidal",
+      "name": "Ellipsoidal (separable)",
+      "category": "separable",
+      "base_function": "elliptic",
+      "transforms": [
+        "shift",
+        "T_osz",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "separable",
+        "scalable",
+        "ill-conditioned"
+      ],
+      "conditioning": "10^6",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "t_osz",
+          "parameters": {},
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": null
+            },
+            "function": {
+              "type": "elliptic",
+              "parameters": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f03_rastrigin",
+      "name": "Rastrigin (separable)",
+      "category": "separable",
+      "base_function": "rastrigin",
+      "transforms": [
+        "shift",
+        "T_osz",
+        "T_asy(0.2)",
+        "Lambda(10)",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "separable",
+        "scalable"
+      ],
+      "conditioning": "10",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "scale",
+          "parameters": {
+            "factor": null
+          },
+          "function": {
+            "type": "t_asy",
+            "parameters": {
+              "beta": 0.2
+            },
+            "function": {
+              "type": "t_osz",
+              "parameters": {},
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": null
+                },
+                "function": {
+                  "type": "rastrigin",
+                  "parameters": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f04_buche_rastrigin",
+      "name": "Büche-Rastrigin",
+      "category": "separable",
+      "base_function": "buche_rastrigin",
+      "transforms": [
+        "shift",
+        "f_pen",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "separable",
+        "scalable",
+        "asymmetric"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "f_pen",
+          "parameters": {},
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": null
+            },
+            "function": {
+              "type": "buche_rastrigin",
+              "parameters": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f05_linear_slope",
+      "name": "Linear Slope",
+      "category": "separable",
+      "base_function": "linear_slope",
+      "transforms": [
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "separable",
+        "scalable"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "linear_slope",
+          "parameters": {}
+        }
+      },
+      "note": "KNOWN ISSUE: COCO implementation uses monolithic internal logic (sign-dependent boundary clipping coupled to slope computation) not decomposable into external transform pipeline."
+    },
+    {
+      "id": "bbob_f06_attractive_sector",
+      "name": "Attractive Sector",
+      "category": "moderate",
+      "base_function": "attractive_sector",
+      "transforms": [
+        "shift",
+        "rotate",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable"
+      ],
+      "conditioning": "10",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "rotate",
+          "parameters": {
+            "matrix": null
+          },
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": null
+            },
+            "function": {
+              "type": "attractive_sector",
+              "parameters": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f07_step_ellipsoidal",
+      "name": "Step Ellipsoidal",
+      "category": "moderate",
+      "base_function": "step_ellipsoid",
+      "transforms": [
+        "shift",
+        "rotate(Q)",
+        "Lambda(10)",
+        "rotate(R)",
+        "f_pen",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable",
+        "plateaus"
+      ],
+      "conditioning": "10",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "f_pen",
+          "parameters": {},
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": null
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": null
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": null
+                  },
+                  "function": {
+                    "type": "step_ellipsoid",
+                    "parameters": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f08_rosenbrock",
+      "name": "Rosenbrock (original)",
+      "category": "moderate",
+      "base_function": "rosenbrock",
+      "transforms": [
+        "shift(xopt)",
+        "scale",
+        "shift(-1)",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable",
+        "narrow-valley"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": null
+          },
+          "function": {
+            "type": "scale",
+            "parameters": {
+              "factor": null
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": null
+              },
+              "function": {
+                "type": "rosenbrock",
+                "parameters": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f09_rosenbrock_rotated",
+      "name": "Rosenbrock (rotated)",
+      "category": "moderate",
+      "base_function": "rosenbrock",
+      "transforms": [
+        "rotate",
+        "shift(-1)",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable",
+        "narrow-valley"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": null
+          },
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "rosenbrock",
+              "parameters": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f10_ellipsoidal_rotated",
+      "name": "Ellipsoidal (rotated)",
+      "category": "ill-conditioned",
+      "base_function": "elliptic",
+      "transforms": [
+        "shift",
+        "rotate",
+        "T_osz",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable",
+        "ill-conditioned"
+      ],
+      "conditioning": "10^6",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "t_osz",
+          "parameters": {},
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": null
+              },
+              "function": {
+                "type": "elliptic",
+                "parameters": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f11_discus",
+      "name": "Discus",
+      "category": "ill-conditioned",
+      "base_function": "discus",
+      "transforms": [
+        "shift",
+        "rotate",
+        "T_osz",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable",
+        "ill-conditioned"
+      ],
+      "conditioning": "10^6",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "t_osz",
+          "parameters": {},
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": null
+              },
+              "function": {
+                "type": "discus",
+                "parameters": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f12_bent_cigar",
+      "name": "Bent Cigar",
+      "category": "ill-conditioned",
+      "base_function": "bent_cigar",
+      "transforms": [
+        "shift",
+        "rotate(R)",
+        "T_asy(0.5)",
+        "rotate(Q)",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable",
+        "ill-conditioned"
+      ],
+      "conditioning": "10^6",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "rotate",
+          "parameters": {
+            "matrix": null
+          },
+          "function": {
+            "type": "t_asy",
+            "parameters": {
+              "beta": 0.5
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "matrix": null
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": null
+                },
+                "function": {
+                  "type": "bent_cigar",
+                  "parameters": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f13_sharp_ridge",
+      "name": "Sharp Ridge",
+      "category": "ill-conditioned",
+      "base_function": "sharp_ridge",
+      "transforms": [
+        "shift",
+        "rotate",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable",
+        "ill-conditioned",
+        "non-differentiable"
+      ],
+      "conditioning": "10",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "rotate",
+          "parameters": {
+            "matrix": null
+          },
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": null
+            },
+            "function": {
+              "type": "sharp_ridge",
+              "parameters": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f14_different_powers",
+      "name": "Different Powers",
+      "category": "ill-conditioned",
+      "base_function": "different_powers",
+      "transforms": [
+        "shift",
+        "rotate",
+        "bias"
+      ],
+      "properties": [
+        "unimodal",
+        "non-separable",
+        "scalable",
+        "ill-conditioned"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "rotate",
+          "parameters": {
+            "matrix": null
+          },
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": null
+            },
+            "function": {
+              "type": "different_powers",
+              "parameters": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f15_rastrigin_rotated",
+      "name": "Rastrigin (rotated)",
+      "category": "multimodal",
+      "base_function": "rastrigin",
+      "transforms": [
+        "shift",
+        "rotate(R)",
+        "T_osz",
+        "T_asy(0.2)",
+        "rotate(Q)",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable"
+      ],
+      "conditioning": "10",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "rotate",
+          "parameters": {
+            "matrix": null
+          },
+          "function": {
+            "type": "t_asy",
+            "parameters": {
+              "beta": 0.2
+            },
+            "function": {
+              "type": "t_osz",
+              "parameters": {},
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": null
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": null
+                  },
+                  "function": {
+                    "type": "rastrigin",
+                    "parameters": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f16_weierstrass",
+      "name": "Weierstrass",
+      "category": "multimodal",
+      "base_function": "weierstrass",
+      "transforms": [
+        "shift",
+        "rotate(R)",
+        "T_osz",
+        "rotate(Q)",
+        "f_pen",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable",
+        "highly-rugged"
+      ],
+      "conditioning": "0.01",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "f_pen",
+          "parameters": {},
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "t_osz",
+              "parameters": {},
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": null
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": null
+                  },
+                  "function": {
+                    "type": "weierstrass",
+                    "parameters": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f17_schaffer_f7",
+      "name": "Schaffer F7",
+      "category": "multimodal",
+      "base_function": "schaffer_f7",
+      "transforms": [
+        "shift",
+        "rotate(R)",
+        "T_asy(0.5)",
+        "Lambda(10)",
+        "rotate(Q)",
+        "f_pen",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable"
+      ],
+      "conditioning": "10",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "f_pen",
+          "parameters": {},
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": null
+              },
+              "function": {
+                "type": "t_asy",
+                "parameters": {
+                  "beta": 0.5
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": null
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": null
+                    },
+                    "function": {
+                      "type": "schaffer_f7",
+                      "parameters": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f18_schaffer_f7_ill_cond",
+      "name": "Schaffer F7 (ill-cond)",
+      "category": "multimodal",
+      "base_function": "schaffer_f7",
+      "transforms": [
+        "shift",
+        "rotate(R)",
+        "T_asy(0.5)",
+        "Lambda(1000)",
+        "rotate(Q)",
+        "f_pen",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable",
+        "ill-conditioned"
+      ],
+      "conditioning": "1000",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "f_pen",
+          "parameters": {},
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": null
+              },
+              "function": {
+                "type": "t_asy",
+                "parameters": {
+                  "beta": 0.5
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": null
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": null
+                    },
+                    "function": {
+                      "type": "schaffer_f7",
+                      "parameters": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f19_griewank_rosenbrock",
+      "name": "Griewank-Rosenbrock",
+      "category": "multimodal",
+      "base_function": "griewank_of_rosenbrock",
+      "transforms": [
+        "rotate",
+        "shift(-1)",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": null
+          },
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "griewank_of_rosenbrock",
+              "parameters": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f20_schwefel",
+      "name": "Schwefel",
+      "category": "weakly-structured",
+      "base_function": "schwefel_sin",
+      "transforms": [
+        "shift",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "scalable",
+        "deceptive"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": null
+          },
+          "function": {
+            "type": "schwefel_sin",
+            "parameters": {}
+          }
+        }
+      },
+      "note": "KNOWN ISSUE: COCO implementation has monolithic internal hat-function conditioning and boundary corrections interleaved with the main computation."
+    },
+    {
+      "id": "bbob_f21_gallagher_101",
+      "name": "Gallagher 101 Peaks",
+      "category": "weakly-structured",
+      "base_function": "gallagher_peaks",
+      "transforms": [
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable",
+        "weakly-structured"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "gallagher_peaks",
+          "parameters": {}
+        }
+      }
+    },
+    {
+      "id": "bbob_f22_gallagher_21",
+      "name": "Gallagher 21 Peaks",
+      "category": "weakly-structured",
+      "base_function": "gallagher_peaks",
+      "transforms": [
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable",
+        "weakly-structured"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "gallagher_peaks",
+          "parameters": {}
+        }
+      }
+    },
+    {
+      "id": "bbob_f23_katsuura",
+      "name": "Katsuura",
+      "category": "weakly-structured",
+      "base_function": "katsuura",
+      "transforms": [
+        "shift",
+        "rotate",
+        "f_pen",
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable",
+        "highly-rugged"
+      ],
+      "conditioning": "100",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "f_pen",
+          "parameters": {},
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": null
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": null
+              },
+              "function": {
+                "type": "katsuura",
+                "parameters": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "bbob_f24_lunacek",
+      "name": "Lunacek bi-Rastrigin",
+      "category": "weakly-structured",
+      "base_function": "lunacek",
+      "transforms": [
+        "bias"
+      ],
+      "properties": [
+        "multimodal",
+        "non-separable",
+        "scalable",
+        "deceptive"
+      ],
+      "conditioning": null,
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": null
+        },
+        "function": {
+          "type": "lunacek",
+          "parameters": {}
+        }
+      },
+      "note": "KNOWN ISSUE: COCO implementation has monolithic internal x_hat/affine/two-basin/penalty logic coupled to optimum generation, not decomposable into external transforms."
+    }
+  ]
+}

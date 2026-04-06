@@ -41,7 +41,8 @@ class TestAckley2Function:
         assert np.isclose(func.evaluate(x_opt), -200.0, atol=1e-12)
 
     def test_get_global_minimum(self):
-        point, value = Ackley2Function.get_global_minimum()
+        func = Ackley2Function()
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, [0.0, 0.0])
         assert value == -200.0
 
@@ -228,7 +229,7 @@ class TestAckley4Function:
     def test_global_min_d2(self):
         """Global min for D=2 is approximately -4.59."""
         func = Ackley4Function(dimension=2)
-        point, value = Ackley4Function.get_global_minimum(2)
+        point, value = func.get_global_minimum()
         actual = func.evaluate(point)
         # The reported minimum should match evaluation
         assert np.isclose(actual, value, atol=1e-6)

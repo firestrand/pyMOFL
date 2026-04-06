@@ -85,18 +85,12 @@ class KatsuuraFunction(OptimizationFunction):
             product *= (1.0 + (i + 1) * inner_sum) ** self._exp
         return self._norm * product - self._norm
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Katsuura function.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
-        return np.zeros(dimension), 0.0
+        return np.zeros(self.dimension), 0.0

@@ -180,8 +180,7 @@ class Schaffer_F6(OptimizationFunction):
         denominator = (1.0 + 0.001 * sum_sq) ** 2
         return 0.5 + numerator / denominator
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """
         Get the global minimum point and value for the Schaffer F6 function.
 
@@ -195,7 +194,7 @@ class Schaffer_F6(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        global_min_point = np.zeros(dimension)
+        global_min_point = np.zeros(self.dimension)
         global_min_value = 0.0
         return global_min_point, global_min_value
 
@@ -352,8 +351,7 @@ class Schaffer_F6_Expanded(OptimizationFunction):
         denominator = (1.0 + 0.001 * sum_sq) ** 2
         return 0.5 + numerator / denominator
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """
         Get the global minimum point and value.
 
@@ -367,7 +365,7 @@ class Schaffer_F6_Expanded(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        global_min_point = np.zeros(dimension)
+        global_min_point = np.zeros(self.dimension)
         global_min_value = 0.0
         return global_min_point, global_min_value
 
@@ -427,11 +425,8 @@ class Schaffer1Function(OptimizationFunction):
         r2 = X[:, 0] ** 2 + X[:, 1] ** 2
         return 0.5 + (np.sin(np.sqrt(r2)) ** 2 - 0.5) / (1 + 0.001 * r2) ** 2
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("Schaffer 1 requires dimension=2")
         return np.array([0.0, 0.0]), 0.0
 
 
@@ -491,11 +486,8 @@ class Schaffer2Function(OptimizationFunction):
         r2 = X[:, 0] ** 2 + X[:, 1] ** 2
         return 0.5 + (np.sin(X[:, 0] ** 2 - X[:, 1] ** 2) ** 2 - 0.5) / (1 + 0.001 * r2) ** 2
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("Schaffer 2 requires dimension=2")
         return np.array([0.0, 0.0]), 0.0
 
 
@@ -561,12 +553,9 @@ class Schaffer4Function(OptimizationFunction):
             / (1 + 0.001 * r2) ** 2
         )
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
-        """Get global minimum (analytical — at |x²-y²| = π/2, min r²)."""
-        if dimension != 2:
-            raise ValueError("Schaffer 4 requires dimension=2")
-        # Optimum at (±sqrt(π/2), 0) or (0, ±sqrt(π/2))
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get global minimum (analytical -- at |x^2-y^2| = pi/2, min r^2)."""
+        # Optimum at (+-sqrt(pi/2), 0) or (0, +-sqrt(pi/2))
         return np.array([np.sqrt(np.pi / 2), 0.0]), 0.29258
 
 
@@ -629,18 +618,72 @@ class SchaffersF7Function(OptimizationFunction):
         terms = np.sqrt(s) * (1.0 + np.sin(50.0 * s**0.2) ** 2)
         return (np.sum(terms, axis=1) / (self.dimension - 1)) ** 2
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Schaffers F7 function.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
-        return np.zeros(dimension), 0.0
+        return np.zeros(self.dimension), 0.0
+
+
+@register("SchaffersF7CEC")
+@register("schaffers_f7_cec")
+@register("schaffer_f7")
+class SchaffersF7CECFunction(OptimizationFunction):
+    """
+    Schaffers F7 function (CEC variant).
+
+    Uses (0.5 + sin²(...)) instead of (1 + sin²(...)). This matches the
+    CEC 2013/2017/2020+ C reference implementations.
+
+    sᵢ = √(xᵢ² + xᵢ₊₁²),  i = 1..D-1
+    f(x) = (1/(D-1) Σᵢ₌₁ᴰ⁻¹ √sᵢ · (0.5 + sin²(50·sᵢ^0.2)))²
+
+    Properties: Continuous, Differentiable, Non-Separable, Scalable, Multimodal
+    Domain: [-100, 100]^D
+    Global minimum: f(0, ..., 0) = 0.25 * (D-1)²/(D-1)² = see note
+    Requires dimension >= 2.
+    """
+
+    def __init__(
+        self,
+        dimension: int,
+        initialization_bounds: Bounds | None = None,
+        operational_bounds: Bounds | None = None,
+        **kwargs,
+    ):
+        if dimension < 2:
+            raise ValueError("Schaffers F7 CEC requires dimension >= 2")
+        default_bounds = Bounds(
+            low=np.full(dimension, -100.0),
+            high=np.full(dimension, 100.0),
+            mode=BoundModeEnum.OPERATIONAL,
+            qtype=QuantizationTypeEnum.CONTINUOUS,
+        )
+        super().__init__(
+            dimension=dimension,
+            initialization_bounds=initialization_bounds or default_bounds,
+            operational_bounds=operational_bounds or default_bounds,
+            **kwargs,
+        )
+
+    def evaluate(self, x: np.ndarray) -> float:
+        """Compute Schaffers F7 CEC: (1/(D-1) Σ √sᵢ(0.5+sin²(50sᵢ^0.2)))²."""
+        x = self._validate_input(x)
+        s = np.sqrt(x[:-1] ** 2 + x[1:] ** 2)
+        terms = np.sqrt(s) * (0.5 + np.sin(50.0 * s**0.2) ** 2)
+        return float((np.sum(terms) / (self.dimension - 1)) ** 2)
+
+    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+        """Compute Schaffers F7 CEC for a batch of points."""
+        X = self._validate_batch_input(X)
+        s = np.sqrt(X[:, :-1] ** 2 + X[:, 1:] ** 2)
+        terms = np.sqrt(s) * (0.5 + np.sin(50.0 * s**0.2) ** 2)
+        return (np.sum(terms, axis=1) / (self.dimension - 1)) ** 2
+
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get the global minimum of the Schaffers F7 CEC function."""
+        return np.zeros(self.dimension), 0.0

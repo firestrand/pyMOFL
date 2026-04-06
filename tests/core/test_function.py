@@ -22,3 +22,13 @@ def test_call_within_bounds():
     bounds = Bounds(low=np.array([0.0]), high=np.array([1.0]))
     f = DummyFunction(bounds, 1)
     assert f(np.array([0.5])) == 0.5
+
+
+def test_get_global_minimum_raises_not_implemented():
+    """Base class get_global_minimum raises NotImplementedError by default."""
+    bounds = Bounds(low=np.array([0.0]), high=np.array([1.0]))
+    f = DummyFunction(bounds, 1)
+    import pytest
+
+    with pytest.raises(NotImplementedError, match="DummyFunction does not implement"):
+        f.get_global_minimum()

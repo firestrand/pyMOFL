@@ -114,14 +114,12 @@ class GearTrainFunction(OptimizationFunction):
         result = np.abs(ratio - self._R_TARGET)
         return result
 
-    @staticmethod
-    def get_global_minimum() -> tuple:
-        """
-        Get the global minimum of the function.
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get the global minimum of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
         global_min_point = np.array([16, 19, 43, 49])

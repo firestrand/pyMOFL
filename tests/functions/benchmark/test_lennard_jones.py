@@ -2,6 +2,8 @@
 Tests for the Lennard-Jones cluster function.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -205,7 +207,7 @@ class TestLennardJonesFunction:
 
     def _load_coordinates(self, xyz_file):
         """Helper to load coordinates from an XYZ file."""
-        with open(xyz_file) as f:
+        with Path(xyz_file).open() as f:
             lines = f.readlines()
 
         coords = []

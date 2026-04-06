@@ -56,7 +56,7 @@ class TestPermFunction:
         assert func.evaluate(x_opt) == pytest.approx(0.0, abs=1e-10)
 
         # Check that the global minimum function returns the correct values
-        global_min_point, global_min_value = PermFunction.get_global_minimum()
+        global_min_point, global_min_value = func.get_global_minimum()
         np.testing.assert_allclose(global_min_point, np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         assert global_min_value == 0.0
 
@@ -139,10 +139,6 @@ class TestPermFunction:
 
         with pytest.raises(ValueError):
             func.evaluate_batch(np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]))
-
-        # Test get_global_minimum with incorrect dimension
-        with pytest.raises(ValueError):
-            PermFunction.get_global_minimum(dimension=3)
 
     def test_non_negativity(self):
         """Test that the function value is always non-negative."""

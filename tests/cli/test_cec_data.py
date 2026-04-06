@@ -33,7 +33,7 @@ class TestSuiteCLI:
         assert "--strict" in result.output
 
     def test_validate_default_suite(self):
-        result = runner.invoke(app, ["suite", "validate"])
+        result = runner.invoke(app, ["suite", "validate", "--suite-id", "cec2005_suite"])
         assert result.exit_code == 0
         assert "All referenced files exist." in result.output
 

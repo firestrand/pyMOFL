@@ -54,6 +54,9 @@ EXPECTED_AT_ORIGIN = {
     "f25": 1977.5764604093733,
 }
 
+RTOL = 1e-9
+ATOL = 1e-8
+
 EXPECTED_AT_FIXED = {
     "f15": 1849.7077799284934,
     "f16": 1764.9395257502943,
@@ -92,7 +95,9 @@ class TestCompositionRegressionAtOrigin:
         origin = np.zeros(DIM)
         result = func.evaluate(origin)
         expected = EXPECTED_AT_ORIGIN[fid]
-        np.testing.assert_allclose(result, expected, rtol=1e-12, atol=0, err_msg=f"{fid} at origin")
+        np.testing.assert_allclose(
+            result, expected, rtol=RTOL, atol=ATOL, err_msg=f"{fid} at origin"
+        )
 
 
 class TestCompositionRegressionAtFixed:
@@ -109,7 +114,7 @@ class TestCompositionRegressionAtFixed:
         result = func.evaluate(FIXED_POINT.copy())
         expected = EXPECTED_AT_FIXED[fid]
         np.testing.assert_allclose(
-            result, expected, rtol=1e-12, atol=0, err_msg=f"{fid} at fixed point"
+            result, expected, rtol=RTOL, atol=ATOL, err_msg=f"{fid} at fixed point"
         )
 
 

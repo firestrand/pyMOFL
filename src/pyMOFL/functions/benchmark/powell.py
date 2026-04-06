@@ -88,11 +88,8 @@ class PowellSingularFunction(OptimizationFunction):
 
         return term1 + term2 + term3 + term4
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 4) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 4:
-            raise ValueError("Powell Singular requires dimension=4")
         return np.array([0.0, 0.0, 0.0, 0.0]), 0.0
 
 
@@ -164,11 +161,8 @@ class PowellSingular2Function(OptimizationFunction):
 
         return term1 + term2 + term3 + term4
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 4) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 4:
-            raise ValueError("Powell Singular 2 requires dimension=4")
         return np.array([0.0, 0.0, 0.0, 0.0]), 0.0
 
 
@@ -235,7 +229,6 @@ class PowellSumFunction(OptimizationFunction):
 
         return results
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        return np.zeros(dimension), 0.0
+        return np.zeros(self.dimension), 0.0

@@ -6,12 +6,16 @@ import pytest
 from pyMOFL.factories.data_loader import DataLoader
 from pyMOFL.factories.transform_builder import TransformBuilder
 from pyMOFL.functions.transformations import (
+    AsymmetricTransform,
     BiasTransform,
+    BoundaryPenaltyTransform,
     IndexedScaleTransform,
     NoiseTransform,
     NonContinuousTransform,
     NormalizeTransform,
     OffsetTransform,
+    OscillationTransform,
+    PenaltyTransform,
     RotateTransform,
     ScalarTransform,
     ScaleTransform,
@@ -91,6 +95,78 @@ class TestVectorTransforms:
         t = builder.build("non_continuous", {}, dimension=5)
         assert isinstance(t, NonContinuousTransform)
 
+    def test_oscillation(self, builder):
+        t = builder.build("oscillation", {}, dimension=5)
+        assert isinstance(t, OscillationTransform)
+        assert isinstance(t, VectorTransform)
+
+    def test_oscillation_t_osz_alias(self, builder):
+        t = builder.build("t_osz", {}, dimension=5)
+        assert isinstance(t, OscillationTransform)
+
+    def test_asymmetric(self, builder):
+        t = builder.build("asymmetric", {"beta": 0.5}, dimension=5)
+        assert isinstance(t, AsymmetricTransform)
+        assert isinstance(t, VectorTransform)
+        assert t.beta == 0.5
+        assert t.dimension == 5
+
+    def test_asymmetric_t_asy_alias(self, builder):
+        t = builder.build("t_asy", {"beta": 0.3}, dimension=10)
+        assert isinstance(t, AsymmetricTransform)
+        assert t.beta == 0.3
+
+    def test_asymmetric_default_beta(self, builder):
+        t = builder.build("asymmetric", {}, dimension=5)
+        assert isinstance(t, AsymmetricTransform)
+        assert t.beta == 0.2
+
+    def test_oscillation_produces_correct_output(self, builder):
+        """Verify that the built OscillationTransform produces correct values."""
+        t = builder.build("oscillation", {}, dimension=3)
+        x = np.array([1.0, -1.0, 0.0])
+        result = t(x)
+        np.testing.assert_allclose(result, [1.0, -1.0, 0.0], rtol=1e-14)
+
+    def test_asymmetric_produces_correct_output(self, builder):
+        """Verify that the built AsymmetricTransform produces correct values."""
+        t = builder.build("asymmetric", {"beta": 0.5}, dimension=5)
+        x = np.array([0.0, 0.0, 0.0, 0.0, 4.0])
+        result = t(x)
+        # last element: ratio=1, 4^(1+0.5*1*2) = 4^2 = 16
+        np.testing.assert_allclose(result[4], 16.0, rtol=1e-14)
+
+
+class TestPenaltyTransforms:
+    """Test building penalty transforms."""
+
+    def test_boundary_penalty(self, builder):
+        t = builder.build("boundary_penalty", {}, dimension=5)
+        assert isinstance(t, BoundaryPenaltyTransform)
+        assert isinstance(t, PenaltyTransform)
+        assert t.bound == 5.0
+
+    def test_boundary_penalty_custom_bound(self, builder):
+        t = builder.build("boundary_penalty", {"bound": 3.0}, dimension=5)
+        assert isinstance(t, BoundaryPenaltyTransform)
+        assert t.bound == 3.0
+
+    def test_f_pen_alias(self, builder):
+        t = builder.build("f_pen", {}, dimension=5)
+        assert isinstance(t, BoundaryPenaltyTransform)
+
+    def test_boundary_penalty_produces_correct_output(self, builder):
+        """Verify that the built BoundaryPenaltyTransform produces correct values."""
+        t = builder.build("boundary_penalty", {"bound": 5.0}, dimension=3)
+        x = np.array([6.0, 0.0, 0.0])
+        np.testing.assert_allclose(t(x), 1.0)
+
+    def test_boundary_penalty_not_vector_or_scalar(self, builder):
+        """BoundaryPenalty is a PenaltyTransform, not VectorTransform or ScalarTransform."""
+        t = builder.build("boundary_penalty", {}, dimension=5)
+        assert not isinstance(t, VectorTransform)
+        assert not isinstance(t, ScalarTransform)
+
 
 class TestScalarTransforms:
     """Test building scalar (output) transforms."""
@@ -123,12 +199,13 @@ class TestBuildMany:
             ("bias", {"value": -100.0}),
             ("rotate", {"matrix": "identity"}),
         ]
-        input_t, output_t = builder.build_many(transforms, dimension=2)
+        input_t, output_t, penalty_t = builder.build_many(transforms, dimension=2)
 
         assert len(input_t) == 2
         assert all(isinstance(t, VectorTransform) for t in input_t)
         assert len(output_t) == 1
         assert all(isinstance(t, ScalarTransform) for t in output_t)
+        assert len(penalty_t) == 0
 
     def test_preserves_order(self, builder):
         """Transforms maintain the input order within each category."""
@@ -138,17 +215,33 @@ class TestBuildMany:
             ("bias", {"value": -100.0}),
             ("noise", {"level": 0.4}),
         ]
-        input_t, output_t = builder.build_many(transforms, dimension=2)
+        input_t, output_t, penalty_t = builder.build_many(transforms, dimension=2)
 
         assert isinstance(input_t[0], ShiftTransform)
         assert isinstance(input_t[1], RotateTransform)
         assert isinstance(output_t[0], BiasTransform)
         assert isinstance(output_t[1], NoiseTransform)
+        assert len(penalty_t) == 0
+
+    def test_separates_penalty_transforms(self, builder):
+        """Penalty transforms are separated into their own group."""
+        transforms = [
+            ("shift", {"vector": [1.0, 2.0]}),
+            ("boundary_penalty", {"bound": 5.0}),
+            ("bias", {"value": -100.0}),
+        ]
+        input_t, output_t, penalty_t = builder.build_many(transforms, dimension=2)
+
+        assert len(input_t) == 1
+        assert len(output_t) == 1
+        assert len(penalty_t) == 1
+        assert all(isinstance(t, PenaltyTransform) for t in penalty_t)
 
     def test_empty_list(self, builder):
-        input_t, output_t = builder.build_many([], dimension=2)
+        input_t, output_t, penalty_t = builder.build_many([], dimension=2)
         assert input_t == []
         assert output_t == []
+        assert penalty_t == []
 
 
 class TestUnknownType:

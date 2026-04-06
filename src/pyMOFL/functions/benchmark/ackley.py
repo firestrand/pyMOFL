@@ -131,8 +131,7 @@ class AckleyFunction(OptimizationFunction):
         term2 = -np.exp(s2 * self._inv_d)
         return term1 + term2 + self._const
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """
         Get the global minimum of the function.
 
@@ -142,7 +141,7 @@ class AckleyFunction(OptimizationFunction):
         Returns:
             tuple: A tuple containing the global minimum point and the function value at that point.
         """
-        global_min_point = np.zeros(dimension)
+        global_min_point = np.zeros(self.dimension)
         global_min_value = 0.0
         return global_min_point, global_min_value
 
@@ -197,10 +196,8 @@ class Ackley2Function(OptimizationFunction):
         X = self._validate_batch_input(X)
         return -200.0 * np.exp(-0.02 * np.sqrt(X[:, 0] ** 2 + X[:, 1] ** 2))
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
-        if dimension != 2:
-            raise ValueError("Ackley 2 requires dimension=2")
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get global minimum."""
         return np.zeros(2), -200.0
 
 
@@ -262,10 +259,8 @@ class Ackley3Function(OptimizationFunction):
         term2 = 5.0 * np.exp(np.cos(3.0 * X[:, 0]) + np.sin(3.0 * X[:, 1]))
         return term1 + term2
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
-        if dimension != 2:
-            raise ValueError("Ackley 3 requires dimension=2")
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get global minimum."""
         return Ackley3Function._GLOBAL_MIN_X.copy(), Ackley3Function._GLOBAL_MIN_VALUE
 
 
@@ -328,16 +323,15 @@ class Ackley4Function(OptimizationFunction):
         )
         return terms.sum(axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get approximate global minimum.
 
         For D=2, the global minimum is well-characterized.
         For higher dimensions, the minimum is problem-specific and
         the returned point is an approximation.
         """
-        if dimension == 2:
+        if self.dimension == 2:
             return np.array([-1.51, -0.755]), -4.590100665150724
         # For D>2, return zeros as a placeholder — the true minimum
         # depends on the dimension and has no closed-form solution.
-        return np.zeros(dimension), float("nan")
+        return np.zeros(self.dimension), float("nan")

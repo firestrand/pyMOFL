@@ -1,0 +1,849 @@
+{
+  "suite_id": "cec2021",
+  "name": "CEC 2021 Bound-Constrained Single Objective Benchmark",
+  "description": "CEC 2021 10-function suite using the generic hybrid/composition config schema.",
+  "version": "1.0",
+  "functions": [
+    {
+      "id": "cec21_f01_bent_cigar",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 100
+        },
+        "function": {
+          "type": "bent_cigar",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "transpose": true,
+              "matrix": "f01/M_D{dim}.txt"
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f01/shift_data.txt"
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f02_rotated_schwefel",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1100
+        },
+        "function": {
+          "type": "schwefel_sin",
+          "parameters": {
+            "boundary_handling": true
+          },
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 420.9687462275036
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f02/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 10.0,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f02/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f03_lunacek",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 700
+        },
+        "function": {
+          "type": "lunacek_rotated_cosine",
+          "parameters": {
+            "cosine_rotation": "f03/M_D{dim}.txt",
+            "shift_signs": "f03/shift_data.txt"
+          },
+          "function": {
+            "type": "scale",
+            "parameters": {
+              "factor": 0.1,
+              "multiply": true
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f03/shift_data.txt"
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f04_griewank_rosenbrock",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1900
+        },
+        "function": {
+          "type": "griewank_of_rosenbrock",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 1.0
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f04/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.05,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f04/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f05_hybrid_1",
+      "category": "Hybrid Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1700
+        },
+        "function": {
+          "type": "hybrid",
+          "parameters": {
+            "shuffle": "f05/shuffle_D{dim}.txt",
+            "percentages": [
+              0.3,
+              0.3,
+              0.4
+            ]
+          },
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "transpose": true,
+              "matrix": "f05/M_D{dim}.txt"
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": 1.0,
+                "multiply": true
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f05/shift_data.txt"
+                }
+              }
+            }
+          },
+          "functions": [
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 10.0,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "scale",
+              "parameters": {
+                "factor": 0.0512,
+                "multiply": true
+              },
+              "function": {
+                "type": "rastrigin"
+              }
+            },
+            {
+              "type": "high_conditioned_elliptic"
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f06_hybrid_6",
+      "category": "Hybrid Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1600
+        },
+        "function": {
+          "type": "hybrid",
+          "parameters": {
+            "shuffle": "f06/shuffle_D{dim}.txt",
+            "percentages": [
+              0.2,
+              0.2,
+              0.3,
+              0.3
+            ]
+          },
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "transpose": true,
+              "matrix": "f06/M_D{dim}.txt"
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": 1.0,
+                "multiply": true
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f06/shift_data.txt"
+                }
+              }
+            }
+          },
+          "functions": [
+            {
+              "type": "schaffer_f6_expanded"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.05,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "hgbat"
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.02048,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "rosenbrock"
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 10.0,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f07_hybrid_5",
+      "category": "Hybrid Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 2100
+        },
+        "function": {
+          "type": "hybrid",
+          "parameters": {
+            "shuffle": "f07/shuffle_D{dim}.txt",
+            "percentages": [
+              0.1,
+              0.2,
+              0.2,
+              0.2,
+              0.3
+            ]
+          },
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "transpose": true,
+              "matrix": "f07/M_D{dim}.txt"
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": 1.0,
+                "multiply": true
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f07/shift_data.txt"
+                }
+              }
+            }
+          },
+          "functions": [
+            {
+              "type": "schaffer_f6_expanded"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.05,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "hgbat"
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.02048,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "rosenbrock"
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 10.0,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "high_conditioned_elliptic"
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f08_composition_2",
+      "category": "Hybrid Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 2200
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f08/shift_data.txt",
+            "rotation_file": "f08/M_D{dim}.txt",
+            "num_functions": 3,
+            "lambdas": [
+              0.0512,
+              6.0,
+              10.0
+            ],
+            "sigmas": [
+              10,
+              20,
+              30
+            ],
+            "biases": [
+              0,
+              100,
+              200
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 100
+              },
+              "function": {
+                "type": "griewank"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f09_composition_4",
+      "category": "Hybrid Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 2400
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f09/shift_data.txt",
+            "rotation_file": "f09/M_D{dim}.txt",
+            "num_functions": 4,
+            "lambdas": [
+              1.0,
+              1.0,
+              6.0,
+              0.0512
+            ],
+            "sigmas": [
+              10,
+              20,
+              30,
+              40
+            ],
+            "biases": [
+              0,
+              100,
+              200,
+              300
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 100
+              },
+              "function": {
+                "type": "ackley"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 10000000000.0
+              },
+              "function": {
+                "type": "high_conditioned_elliptic"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 100
+              },
+              "function": {
+                "type": "griewank"
+              }
+            },
+            {
+              "type": "rastrigin"
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec21_f10_composition_5",
+      "category": "Hybrid Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 2500
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f10/shift_data.txt",
+            "rotation_file": "f10/M_D{dim}.txt",
+            "num_functions": 5,
+            "lambdas": [
+              0.0512,
+              0.05,
+              1.0,
+              1.0,
+              0.02048
+            ],
+            "sigmas": [
+              10,
+              20,
+              30,
+              40,
+              50
+            ],
+            "biases": [
+              0,
+              100,
+              200,
+              300,
+              400
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 1000.0
+              },
+              "function": {
+                "type": "rastrigin"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 1000.0
+              },
+              "function": {
+                "type": "offset",
+                "parameters": {
+                  "value": -1.0
+                },
+                "function": {
+                  "type": "happycat"
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 100
+              },
+              "function": {
+                "type": "ackley"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 10000000000.0
+              },
+              "function": {
+                "type": "discus"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "rosenbrock"
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          20
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 20,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    }
+  ]
+}

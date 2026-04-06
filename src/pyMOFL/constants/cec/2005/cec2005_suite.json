@@ -191,8 +191,8 @@
         "function": {
           "type": "schwefel_2_6",
           "parameters": {
-            "matrix_A": "f05/matrix_data_A_D50.txt",
-            "optimum_pattern": "cec2005_f05"
+            "A": "f05/matrix_data_A_D50.txt",
+            "B": "f05/vector_B_D{dim}.txt"
           },
           "function": {
             "type": "shift",
@@ -518,8 +518,8 @@
         "function": {
           "type": "schwefel_2_13",
           "parameters": {
-            "matrix_A": "f12/matrix_data_A_D50.txt",
-            "matrix_B": "f12/matrix_data_B_D50.txt",
+            "a": "f12/matrix_data_A_D50.txt",
+            "b": "f12/matrix_data_B_D50.txt",
             "alpha": "f12/vector_alpha_D50.txt"
           }
         }

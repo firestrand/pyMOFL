@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import copy
 import json
 import re
@@ -53,25 +54,51 @@ def load_suite_function_config(
     return inject_dimension(function_cfg, dimension)
 
 
-def find_suite_function_config(suite: Mapping[str, Any], function_id: str) -> dict[str, Any]:
-    """Return deep-copied nested function config for a suite function id."""
+def find_suite_function_config(suite: Mapping[str, Any], function_id: str | int) -> dict[str, Any]:
+    """Return deep-copied nested function config for a suite function id.
+
+    Supports string IDs (CEC-style ``"cec05_f01_..."``) and integer/numeric
+    IDs (BBOB-style ``1``).  A bare numeric query like ``"1"`` or ``1`` will
+    match entries whose id is the integer ``1``, the string ``"1"``, or any
+    string containing the code ``f01``.
+    """
     functions = suite.get("functions", [])
     if not isinstance(functions, list):
         raise TypeError("Suite config must contain a 'functions' list")
 
-    target_code = _extract_function_code(function_id)
+    # Normalise query to string
+    query = str(function_id)
+    target_code = _extract_function_code(query)
+
+    # If the query is a bare integer string (e.g. "1", "10"), also derive
+    # a zero-padded function code for matching against integer entry ids.
+    bare_numeric_code: str | None = None
+    with contextlib.suppress(ValueError):
+        bare_numeric_code = f"f{int(query):02d}"
 
     for function_entry in functions:
         if not isinstance(function_entry, dict):
             continue
         function_entry_id = function_entry.get("id")
-        if not isinstance(function_entry_id, str):
+        if function_entry_id is None:
             continue
 
-        candidate_code = _extract_function_code(function_entry_id)
-        matches = function_entry_id == function_id
+        # Convert entry id to string for uniform matching
+        entry_id_str = str(function_entry_id)
+
+        candidate_code = _extract_function_code(entry_id_str)
+
+        # Direct equality (string or stringified integer)
+        matches = entry_id_str == query
+
+        # Code-based match (e.g. query "f01" matches "cec05_f01_sphere")
         if target_code is not None and candidate_code == target_code:
             matches = True
+
+        # Bare numeric query match (e.g. query "1" matches entry id 1)
+        if bare_numeric_code is not None and candidate_code == bare_numeric_code:
+            matches = True
+
         if not matches:
             continue
 
@@ -95,6 +122,32 @@ def inject_dimension(config: dict[str, Any], dimension: int) -> dict[str, Any]:
             parameters = {}
             node["parameters"] = parameters
         parameters.setdefault("dimension", dimension)
+
+        walk(node.get("function"))
+        for item in node.get("functions", []) if isinstance(node.get("functions"), list) else []:
+            walk(item)
+
+    copied = copy.deepcopy(config)
+    walk(copied)
+    return copied
+
+
+def force_inject_dimension(config: dict[str, Any], dimension: int) -> dict[str, Any]:
+    """Like inject_dimension but forces dimension override at every level.
+
+    Used by _build_hybrid to ensure component functions get their partition
+    dimension, even if an outer inject_dimension already set a different value.
+    """
+
+    def walk(node: Any) -> None:
+        if not isinstance(node, dict):
+            return
+
+        parameters = node.get("parameters")
+        if not isinstance(parameters, dict):
+            parameters = {}
+            node["parameters"] = parameters
+        parameters["dimension"] = dimension
 
         walk(node.get("function"))
         for item in node.get("functions", []) if isinstance(node.get("functions"), list) else []:

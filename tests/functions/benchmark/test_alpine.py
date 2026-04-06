@@ -50,15 +50,11 @@ class TestAlpine1Function:
 
     def test_global_minimum(self):
         """Test global minimum is at origin with value 0."""
-        min_point, min_value = Alpine1Function.get_global_minimum(2)
+        func = Alpine1Function()
+        min_point, min_value = func.get_global_minimum()
         expected_point = np.array([0.0, 0.0])
         np.testing.assert_array_almost_equal(min_point, expected_point)
         assert min_value == 0.0
-
-    def test_global_minimum_dimension_validation(self):
-        """Test global minimum raises error for wrong dimension."""
-        with pytest.raises(ValueError, match="Alpine 1 requires dimension=2"):
-            Alpine1Function.get_global_minimum(3)
 
     def test_evaluate_at_global_minimum(self):
         """Test function evaluates to 0 at global minimum."""
@@ -168,7 +164,8 @@ class TestAlpine2Function:
         """Test global minimum for various dimensions."""
 
         for dim in [2, 5, 10]:
-            min_point, min_value = Alpine2Function.get_global_minimum(dim)
+            func = Alpine2Function(dimension=dim)
+            min_point, min_value = func.get_global_minimum()
 
             # Global minimum should be around [7.917, 7.917, ...]
             expected_point = np.full(dim, 7.917)
@@ -183,7 +180,7 @@ class TestAlpine2Function:
         """Test function evaluates correctly at global minimum."""
         for dim in [2, 5, 10]:
             func = Alpine2Function(dimension=dim)
-            min_point, min_value = Alpine2Function.get_global_minimum(dim)
+            min_point, min_value = func.get_global_minimum()
             result = func.evaluate(min_point)
             assert abs(result - min_value) < 1e-10
 
@@ -323,12 +320,11 @@ class TestAlpineFamilyIntegration:
         """Test global minimum methods are consistent."""
         for func_class in [Alpine1Function, Alpine2Function]:
             if func_class == Alpine1Function:
-                min_point, min_value = func_class.get_global_minimum(2)
                 func = func_class()
             else:
-                min_point, min_value = func_class.get_global_minimum(3)
                 func = func_class(dimension=3)
 
+            min_point, min_value = func.get_global_minimum()
             evaluated_value = func.evaluate(min_point)
             assert abs(evaluated_value - min_value) < 1e-10, (
                 f"Global minimum inconsistent for {func_class.__name__}"

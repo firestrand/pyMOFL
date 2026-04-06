@@ -42,7 +42,7 @@ def load_cec_validation_data(
 
     # Load the validation data
     try:
-        with open(file_path) as f:
+        with file_path.open() as f:
             data = json.load(f)
     except FileNotFoundError:
         raise FileNotFoundError(
@@ -77,7 +77,7 @@ def load_cec_validation_file(year: int, function_number: int) -> dict:
     """Load the raw CEC validation JSON for a function."""
     base_dir = Path(__file__).parent.parent
     file_path = base_dir / f"validation_data/cec/{year}/f{function_number:02d}.json"
-    with open(file_path) as f:
+    with file_path.open() as f:
         return json.load(f)
 
 

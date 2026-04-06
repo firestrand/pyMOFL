@@ -110,8 +110,7 @@ class RosenbrockFunction(OptimizationFunction):
         term2 = (X[:, :-1] - 1) ** 2
         return np.sum(term1 + term2, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """
         Get the global minimum of the function.
 
@@ -125,7 +124,7 @@ class RosenbrockFunction(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        global_min_point = np.ones(dimension)
+        global_min_point = np.ones(self.dimension)
         global_min_value = 0.0
         return global_min_point, global_min_value
 
@@ -271,8 +270,7 @@ class GriewankOfRosenbrock(OptimizationFunction):
         assert self.operational_bounds is not None
         return np.stack([self.operational_bounds.low, self.operational_bounds.high], axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """
         Get the global minimum of the function.
 
@@ -286,6 +284,6 @@ class GriewankOfRosenbrock(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        global_min_point = np.ones(dimension)
+        global_min_point = np.ones(self.dimension)
         global_min_value = 0.0
         return global_min_point, global_min_value

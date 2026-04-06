@@ -76,9 +76,6 @@ class EasomFunction(OptimizationFunction):
         x1, x2 = X[:, 0], X[:, 1]
         return -np.cos(x1) * np.cos(x2) * np.exp(-((x1 - np.pi) ** 2) - (x2 - np.pi) ** 2)
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("Easom requires dimension=2")
         return np.array([np.pi, np.pi]), -1.0

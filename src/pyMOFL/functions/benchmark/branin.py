@@ -109,13 +109,9 @@ class BraninFunction(OptimizationFunction):
 
         return term1 + term2 + term3
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("Branin requires dimension=2")
-
-        # Return first global minimum: (-π, 12.275) with computed value
+        # Return first global minimum: (-pi, 12.275) with computed value
         min_point = np.array([-np.pi, 12.275])
 
         # Compute the actual value at this point for precision
@@ -222,12 +218,8 @@ class Branin2Function(OptimizationFunction):
 
         return term1 + term2 + term3
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("Branin 2 requires dimension=2")
-
         # For Branin 2, due to the added cos(x2) term, the minimum location
         # will be different from standard Branin. Using approximation.
         min_point = np.array([-np.pi, 12.275])

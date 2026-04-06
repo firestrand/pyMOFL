@@ -71,9 +71,6 @@ class McCormickFunction(OptimizationFunction):
         x1, x2 = X[:, 0], X[:, 1]
         return np.sin(x1 + x2) + (x1 - x2) ** 2 - 1.5 * x1 + 2.5 * x2 + 1
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("McCormick requires dimension=2")
         return np.array([-0.54719, -1.54719]), -1.9133

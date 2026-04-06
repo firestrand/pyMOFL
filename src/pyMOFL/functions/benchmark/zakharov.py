@@ -69,18 +69,12 @@ class ZakharovFunction(OptimizationFunction):
         weighted = np.sum(self._weights * X, axis=1)
         return sum_sq + weighted**2 + weighted**4
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Zakharov function.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
-        return np.zeros(dimension), 0.0
+        return np.zeros(self.dimension), 0.0

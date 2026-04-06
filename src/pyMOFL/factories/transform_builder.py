@@ -12,18 +12,33 @@ from pyMOFL.core.bounds_optimum_transform import (
 )
 from pyMOFL.factories.data_loader import DataLoader
 from pyMOFL.functions.transformations import (
+    AsymmetricTransform,
     BiasTransform,
+    BlockDiagonalRotateTransform,
+    BoundaryPenaltyTransform,
+    CauchyNoiseTransform,
+    ConditioningTransform,
+    DiscretizeTransform,
+    FusedBufferAliasAsymmetricTransform,
+    GaussianNoiseTransform,
     IndexedRotateTransform,
     IndexedScaleTransform,
     IndexedShiftTransform,
+    LogSinTransform,
     NoiseTransform,
     NonContinuousTransform,
     NormalizeTransform,
     OffsetTransform,
+    OscillationTransform,
+    PenaltyTransform,
+    PermutationTransform,
+    PowerTransform,
     RotateTransform,
     ScalarTransform,
     ScaleTransform,
     ShiftTransform,
+    StepHalfTransform,
+    UniformNoiseTransform,
     VectorTransform,
 )
 
@@ -51,7 +66,7 @@ class TransformBuilder:
 
     def build(
         self, transform_type: str, params: dict[str, Any], dimension: int
-    ) -> VectorTransform | ScalarTransform:
+    ) -> VectorTransform | ScalarTransform | PenaltyTransform:
         """Build a single transform from its type string and parameters."""
         transform_type = self._normalize_type(transform_type)
         params = dict(params or {})
@@ -73,10 +88,47 @@ class TransformBuilder:
             return self._build_indexed_scale(params)
         if transform_type == "non_continuous":
             return NonContinuousTransform()
+        if transform_type in {"oscillation", "t_osz"}:
+            boundary_only = bool(params.get("boundary_only", False))
+            return OscillationTransform(boundary_only=boundary_only)
+        if transform_type in {"asymmetric", "t_asy"}:
+            beta = float(params.get("beta", 0.2))
+            return AsymmetricTransform(beta=beta, dimension=dimension)
+        if transform_type in {"log_sin", "t_log_sin"}:
+            mu = params.get("mu", (1.0, 1.0))
+            omega = params.get("omega", (1.0, 1.0, 1.0, 1.0))
+            return LogSinTransform(mu=mu, omega=omega)
+        if transform_type == "discretize":
+            xopt = params.get("xopt")
+            return DiscretizeTransform(dimension=dimension, xopt=xopt)
+        if transform_type == "permutation":
+            perm = params.get("permutation")
+            if perm is None:
+                raise ValueError("permutation transform requires 'permutation' param")
+            return PermutationTransform(np.asarray(perm, dtype=int))
+        if transform_type in {"conditioning", "lambda_scale"}:
+            alpha = float(params.get("alpha", params.get("base", 10.0)))
+            return ConditioningTransform(alpha=alpha, dimension=dimension)
+        if transform_type in {"step_half", "step_round"}:
+            return StepHalfTransform()
+        if transform_type == "block_diagonal_rotate":
+            blocks = params.get("blocks")
+            if blocks is None:
+                raise ValueError("block_diagonal_rotate requires 'blocks' param")
+            return BlockDiagonalRotateTransform(blocks=blocks)
+        if transform_type == "fused_asy":
+            return self._build_fused_asy(params, dimension)
+
+        # Penalty transforms (vector → scalar, additive)
+        if transform_type in {"boundary_penalty", "f_pen"}:
+            bound = float(params.get("bound", 5.0))
+            return BoundaryPenaltyTransform(bound=bound)
 
         # Scalar transforms
         if transform_type == "bias":
             return BiasTransform(float(params.get("value", params.get("bias", 0.0))))
+        if transform_type == "power":
+            return PowerTransform(float(params.get("exponent", params.get("lambda", 1.0))))
         if transform_type == "noise":
             noise_level = float(
                 params.get("noise_level", params.get("level", params.get("factor", 0.4)))
@@ -88,22 +140,42 @@ class TransformBuilder:
                 f_max=params.get("f_max", "computed"),
                 reference_point=float(params.get("reference_point", 5.0)),
             )
+        if transform_type == "gaussian_noise":
+            return GaussianNoiseTransform(
+                beta=float(params.get("beta", 1.0)),
+                seed=params.get("seed"),
+            )
+        if transform_type == "uniform_noise":
+            return UniformNoiseTransform(
+                alpha=float(params.get("alpha", 0.01)),
+                beta=float(params.get("beta", 0.01)),
+                seed=params.get("seed"),
+            )
+        if transform_type == "cauchy_noise":
+            return CauchyNoiseTransform(
+                alpha=float(params.get("alpha", 0.01)),
+                p=float(params.get("p", 0.05)),
+                seed=params.get("seed"),
+            )
 
         raise ValueError(f"Unknown transform type: {transform_type}")
 
     def build_many(
         self, transforms: list[tuple[str, dict[str, Any]]], dimension: int
-    ) -> tuple[list[VectorTransform], list[ScalarTransform]]:
-        """Build multiple transforms, separating into input/output groups."""
+    ) -> tuple[list[VectorTransform], list[ScalarTransform], list[PenaltyTransform]]:
+        """Build multiple transforms, separating into input/output/penalty groups."""
         input_transforms: list[VectorTransform] = []
         output_transforms: list[ScalarTransform] = []
+        penalty_transforms: list[PenaltyTransform] = []
         for ttype, tparams in transforms:
             t = self.build(ttype, tparams, dimension)
-            if isinstance(t, VectorTransform):
+            if isinstance(t, PenaltyTransform):
+                penalty_transforms.append(t)
+            elif isinstance(t, VectorTransform):
                 input_transforms.append(t)
             else:
                 output_transforms.append(t)
-        return input_transforms, output_transforms
+        return input_transforms, output_transforms, penalty_transforms
 
     # --- Private builders -------------------------------------------------
 
@@ -141,12 +213,6 @@ class TransformBuilder:
                 vec = AlternateShiftOptimumPattern().construct_optimum(
                     dimension, vec, lower_bound=cfg["lower_bound"]
                 )
-            elif pattern_key == "bounds_shift":
-                lower_bound = float(params.get("lower_bound", params.get("bounds_min", -100.0)))
-                upper_bound = float(params.get("upper_bound", params.get("bounds_max", 100.0)))
-                vec = BoundsOptimumTransform.create_from_config(
-                    {"pattern": "bounds_shift"}
-                ).get_optimum(dimension, vec, lower_bound=lower_bound, upper_bound=upper_bound)
             elif pattern_key == "composition_bounds":
                 lower_bound = float(params.get("lower_bound", params.get("bounds_min", -5.0)))
                 upper_bound = float(params.get("upper_bound", params.get("bounds_max", 5.0)))
@@ -194,6 +260,7 @@ class TransformBuilder:
         matrix_source = self._first(
             params, "matrix", "rotation", "rotation_file", "rotation_matrix"
         )
+        transpose = bool(params.get("transpose", False))
 
         # Indexed rotation support via parameters.
         if "component_index" in params or "matrix_dimension" in params:
@@ -214,13 +281,28 @@ class TransformBuilder:
                 matrix_dimension=params.get("matrix_dimension"),
             )
 
+        block_index = params.get("block_index")
+
         if isinstance(matrix_source, str):
             if matrix_source == "identity":
                 mat = np.eye(dimension)
+            elif block_index is not None:
+                # Load raw stacked matrix (bypass load_matrix which truncates to dim×dim)
+                path = self._data_loader.resolve_path(matrix_source, dimension)
+                mat = np.loadtxt(path, dtype=np.float64)
             else:
                 mat = self._data_loader.load_matrix(matrix_source, dimension)
         else:
             mat = np.asarray(matrix_source, dtype=np.float64)
+
+        # Extract block from stacked rotation matrices (e.g., CEC 2013)
+        if block_index is not None:
+            block_index = int(block_index)
+            start_row = block_index * dimension
+            mat = mat[start_row : start_row + dimension, :]
+
+        if transpose:
+            mat = mat.T
         return RotateTransform(mat)
 
     def _build_scale(
@@ -232,7 +314,28 @@ class TransformBuilder:
                 component_index=params.get("component_index"),
                 default_factor=params.get("default_factor", 1.0),
             )
-        return ScaleTransform(float(params.get("factor", params.get("lambda", 1.0))))
+
+        # Support diagonal scaling via vector 'factor' or 'lambda'
+        src = self._first(params, "factor", "lambda", "scale_vector")
+        if isinstance(src, (list, np.ndarray)):
+            factor = np.asarray(src, dtype=np.float64)
+        elif isinstance(src, str):
+            factor = self._data_loader.load_vector(src, dimension)
+        elif src is not None:
+            factor = float(src)
+        else:
+            factor = 1.0
+
+        # "multiply" mode inverts the factor so ScaleTransform (which divides)
+        # effectively multiplies by the original value.
+        # This supports CEC 2014's z = z * sh_rate convention.
+        if params.get("multiply", False):
+            if isinstance(factor, np.ndarray):
+                factor = 1.0 / factor
+            else:
+                factor = 1.0 / factor
+
+        return ScaleTransform(factor)
 
     def _build_indexed_shift(self, params: dict[str, Any], dimension: int) -> IndexedShiftTransform:
         shifts = params.get("shifts")
@@ -270,3 +373,13 @@ class TransformBuilder:
             component_index=params.get("component_index"),
             default_factor=params.get("default_factor", 1.0),
         )
+
+    def _build_fused_asy(
+        self, params: dict[str, Any], dimension: int
+    ) -> FusedBufferAliasAsymmetricTransform:
+        """Build a fused inner+asy transform replicating CEC 2013 buffer aliasing."""
+        beta = float(params.get("beta", 0.5))
+        inner_type = str(params.get("inner_type", "oscillation"))
+        inner_params = dict(params.get("inner_params", {}))
+        inner = self.build(inner_type, inner_params, dimension)
+        return FusedBufferAliasAsymmetricTransform(inner=inner, beta=beta, dimension=dimension)

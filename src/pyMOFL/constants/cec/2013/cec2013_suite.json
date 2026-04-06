@@ -1,0 +1,2207 @@
+{
+  "suite_id": "cec2013",
+  "name": "CEC 2013 Single Objective Real-Parameter Optimization",
+  "description": "CEC 2013 benchmark suite (F1-F28) with BBOB-style transforms (oscillation, asymmetric, conditioning, double rotation).",
+  "version": "2.0",
+  "functions": [
+    {
+      "id": "cec13_f01_sphere",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -1400
+        },
+        "function": {
+          "type": "sphere",
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": "f01/shift_data.txt"
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f02_elliptic",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -1300
+        },
+        "function": {
+          "type": "high_conditioned_elliptic",
+          "function": {
+            "type": "oscillation",
+            "parameters": {
+              "boundary_only": true
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "matrix": "f02/M_D{dim}.txt",
+                "block_index": 0,
+                "transpose": true
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f02/shift_data.txt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f03_bent_cigar",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -1200
+        },
+        "function": {
+          "type": "bent_cigar",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": "f03/M_D{dim}.txt",
+              "block_index": 1,
+              "transpose": true
+            },
+            "function": {
+              "type": "asymmetric",
+              "parameters": {
+                "beta": 0.5
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": "f03/M_D{dim}.txt",
+                  "block_index": 0,
+                  "transpose": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f03/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f04_discus",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -1100
+        },
+        "function": {
+          "type": "discus",
+          "function": {
+            "type": "oscillation",
+            "parameters": {
+              "boundary_only": true
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "matrix": "f04/M_D{dim}.txt",
+                "block_index": 0,
+                "transpose": true
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f04/shift_data.txt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f05_different_powers",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -1000
+        },
+        "function": {
+          "type": "different_powers",
+          "parameters": {
+            "integer_exponents": true
+          },
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": "f05/shift_data.txt"
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f06_rosenbrock",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -900
+        },
+        "function": {
+          "type": "rosenbrock",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 1.0
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "matrix": "f06/M_D{dim}.txt",
+                "block_index": 0,
+                "transpose": true
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.02048,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f06/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f07_schaffer_f7",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -800
+        },
+        "function": {
+          "type": "schaffer_f7",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": "f07/M_D{dim}.txt",
+              "block_index": 1,
+              "transpose": true
+            },
+            "function": {
+              "type": "conditioning",
+              "parameters": {
+                "alpha": 10
+              },
+              "function": {
+                "type": "fused_asy",
+                "parameters": {
+                  "beta": 0.5,
+                  "inner_type": "rotate",
+                  "inner_params": {
+                    "matrix": "f07/M_D{dim}.txt",
+                    "block_index": 0,
+                    "transpose": true
+                  }
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f07/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f08_ackley",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -700
+        },
+        "function": {
+          "type": "ackley",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": "f08/M_D{dim}.txt",
+              "block_index": 1,
+              "transpose": true
+            },
+            "function": {
+              "type": "conditioning",
+              "parameters": {
+                "alpha": 10
+              },
+              "function": {
+                "type": "fused_asy",
+                "parameters": {
+                  "beta": 0.5,
+                  "inner_type": "rotate",
+                  "inner_params": {
+                    "matrix": "f08/M_D{dim}.txt",
+                    "block_index": 0,
+                    "transpose": true
+                  }
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f08/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE: Float64 precision amplification at D10/D30. The asymmetric transform raises rotated values to ~8th power, amplifying ULP differences between BLAS and C loop matrix multiplication to macroscopic errors. Unfixable — inherent to float64 non-associativity."
+    },
+    {
+      "id": "cec13_f09_weierstrass",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -600
+        },
+        "function": {
+          "type": "weierstrass",
+          "parameters": {
+            "a": 0.5,
+            "b": 3.0,
+            "k_max": 20
+          },
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": "f09/M_D{dim}.txt",
+              "block_index": 1,
+              "transpose": true
+            },
+            "function": {
+              "type": "conditioning",
+              "parameters": {
+                "alpha": 10
+              },
+              "function": {
+                "type": "fused_asy",
+                "parameters": {
+                  "beta": 0.5,
+                  "inner_type": "rotate",
+                  "inner_params": {
+                    "matrix": "f09/M_D{dim}.txt",
+                    "block_index": 0,
+                    "transpose": true
+                  }
+                },
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": 0.005,
+                    "multiply": true
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f09/shift_data.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f10_griewank",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -500
+        },
+        "function": {
+          "type": "griewank",
+          "function": {
+            "type": "conditioning",
+            "parameters": {
+              "alpha": 100
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "matrix": "f10/M_D{dim}.txt",
+                "block_index": 0,
+                "transpose": true
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 6.0,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f10/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f11_rastrigin",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -400
+        },
+        "function": {
+          "type": "rastrigin",
+          "function": {
+            "type": "conditioning",
+            "parameters": {
+              "alpha": 10
+            },
+            "function": {
+              "type": "fused_asy",
+              "parameters": {
+                "beta": 0.2,
+                "inner_type": "oscillation",
+                "inner_params": {
+                  "boundary_only": true
+                }
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.0512,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f11/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f12_rastrigin_rotated",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -300
+        },
+        "function": {
+          "type": "rastrigin",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": "f12/M_D{dim}.txt",
+              "block_index": 0,
+              "transpose": true
+            },
+            "function": {
+              "type": "conditioning",
+              "parameters": {
+                "alpha": 10
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": "f12/M_D{dim}.txt",
+                  "block_index": 1,
+                  "transpose": true
+                },
+                "function": {
+                  "type": "fused_asy",
+                  "parameters": {
+                    "beta": 0.2,
+                    "inner_type": "oscillation",
+                    "inner_params": {
+                      "boundary_only": true
+                    }
+                  },
+                  "function": {
+                    "type": "rotate",
+                    "parameters": {
+                      "matrix": "f12/M_D{dim}.txt",
+                      "block_index": 0,
+                      "transpose": true
+                    },
+                    "function": {
+                      "type": "scale",
+                      "parameters": {
+                        "factor": 0.0512,
+                        "multiply": true
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f12/shift_data.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f13_step_rastrigin",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -200
+        },
+        "function": {
+          "type": "rastrigin",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": "f13/M_D{dim}.txt",
+              "block_index": 0,
+              "transpose": true
+            },
+            "function": {
+              "type": "conditioning",
+              "parameters": {
+                "alpha": 10
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": "f13/M_D{dim}.txt",
+                  "block_index": 1,
+                  "transpose": true
+                },
+                "function": {
+                  "type": "fused_asy",
+                  "parameters": {
+                    "beta": 0.2,
+                    "inner_type": "oscillation",
+                    "inner_params": {
+                      "boundary_only": true
+                    }
+                  },
+                  "function": {
+                    "type": "step_half",
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f13/M_D{dim}.txt",
+                        "block_index": 0,
+                        "transpose": true
+                      },
+                      "function": {
+                        "type": "scale",
+                        "parameters": {
+                          "factor": 0.0512,
+                          "multiply": true
+                        },
+                        "function": {
+                          "type": "shift",
+                          "parameters": {
+                            "vector": "f13/shift_data.txt"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f14_schwefel",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -100
+        },
+        "function": {
+          "type": "schwefel_sin",
+          "parameters": {
+            "boundary_handling": true
+          },
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 420.9687462275036
+            },
+            "function": {
+              "type": "conditioning",
+              "parameters": {
+                "alpha": 10
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 10.0,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f14/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f15_schwefel_rotated",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 100
+        },
+        "function": {
+          "type": "schwefel_sin",
+          "parameters": {
+            "boundary_handling": true
+          },
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 420.9687462275036
+            },
+            "function": {
+              "type": "conditioning",
+              "parameters": {
+                "alpha": 10
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": "f15/M_D{dim}.txt",
+                  "block_index": 0,
+                  "transpose": true
+                },
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": 10.0,
+                    "multiply": true
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f15/shift_data.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f16_katsuura",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 200
+        },
+        "function": {
+          "type": "katsuura",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": "f16/M_D{dim}.txt",
+              "block_index": 1,
+              "transpose": true
+            },
+            "function": {
+              "type": "conditioning",
+              "parameters": {
+                "alpha": 100
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": "f16/M_D{dim}.txt",
+                  "block_index": 0,
+                  "transpose": true
+                },
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": 0.05,
+                    "multiply": true
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f16/shift_data.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f17_lunacek",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 300
+        },
+        "function": {
+          "type": "lunacek_rotated_cosine",
+          "parameters": {
+            "shift_signs": "f17/shift_data.txt",
+            "cosine_conditioning": true
+          },
+          "function": {
+            "type": "scale",
+            "parameters": {
+              "factor": 0.1,
+              "multiply": true
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f17/shift_data.txt"
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f18_lunacek_rotated",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 400
+        },
+        "function": {
+          "type": "lunacek_rotated_cosine",
+          "parameters": {
+            "shift_signs": "f18/shift_data.txt",
+            "cosine_rotation_double": "f18/M_D{dim}.txt"
+          },
+          "function": {
+            "type": "scale",
+            "parameters": {
+              "factor": 0.1,
+              "multiply": true
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f18/shift_data.txt"
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f19_griewank_rosenbrock",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 500
+        },
+        "function": {
+          "type": "griewank_of_rosenbrock",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 1.0
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": 0.05,
+                "multiply": true
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f19/shift_data.txt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f20_expanded_scaffer_f6",
+      "category": "Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 600
+        },
+        "function": {
+          "type": "schaffer_f6_expanded",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "matrix": "f20/M_D{dim}.txt",
+              "block_index": 1,
+              "transpose": true
+            },
+            "function": {
+              "type": "asymmetric",
+              "parameters": {
+                "beta": 0.5
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "matrix": "f20/M_D{dim}.txt",
+                  "block_index": 0,
+                  "transpose": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f20/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec13_f21_cf01",
+      "category": "Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 700
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f21/shift_data.txt",
+            "rotation_file": "f21/M_D{dim}.txt",
+            "num_functions": 5,
+            "lambdas": [
+              0.02048,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              20,
+              30,
+              40,
+              50
+            ],
+            "biases": [
+              0,
+              100,
+              200,
+              300,
+              400
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true,
+            "r_flags": [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          },
+          "functions": [
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 10000.0
+              },
+              "function": {
+                "type": "offset",
+                "parameters": {
+                  "value": 1.0
+                },
+                "function": {
+                  "type": "rosenbrock"
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 10000000000.0
+              },
+              "function": {
+                "type": "different_powers"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 1e+30
+              },
+              "function": {
+                "type": "bent_cigar"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 10000000000.0
+              },
+              "function": {
+                "type": "discus"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 100000.0
+              },
+              "function": {
+                "type": "sphere"
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE (C reference bug): Global y[]/z[] buffer aliasing in asyfunc retains stale values for negative elements. Combined with hardcoded schwefel internals, this makes exact C reproduction impossible without monolithic reimplementation."
+    },
+    {
+      "id": "cec13_f22_cf02",
+      "category": "Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 800
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f22/shift_data.txt",
+            "rotation_file": "f22/M_D{dim}.txt",
+            "num_functions": 3,
+            "lambdas": [
+              10.0,
+              10.0,
+              10.0
+            ],
+            "sigmas": [
+              20,
+              20,
+              20
+            ],
+            "biases": [
+              0,
+              100,
+              200
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true,
+            "r_flags": [
+              0,
+              0,
+              0
+            ]
+          },
+          "functions": [
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "conditioning",
+                "parameters": {
+                  "alpha": 10
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "conditioning",
+                "parameters": {
+                  "alpha": 10
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "conditioning",
+                "parameters": {
+                  "alpha": 10
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE (C reference bug): Global y[]/z[] buffer aliasing in asyfunc — see F21 note."
+    },
+    {
+      "id": "cec13_f23_cf03",
+      "category": "Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 900
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f23/shift_data.txt",
+            "rotation_file": "f23/M_D{dim}.txt",
+            "num_functions": 3,
+            "lambdas": [
+              10.0,
+              10.0,
+              10.0
+            ],
+            "sigmas": [
+              20,
+              20,
+              20
+            ],
+            "biases": [
+              0,
+              100,
+              200
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "conditioning",
+                "parameters": {
+                  "alpha": 10
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "conditioning",
+                "parameters": {
+                  "alpha": 10
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "conditioning",
+                "parameters": {
+                  "alpha": 10
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE (C reference bug): Global y[]/z[] buffer aliasing in asyfunc — see F21 note."
+    },
+    {
+      "id": "cec13_f24_cf04",
+      "category": "Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1000
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f24/shift_data.txt",
+            "rotation_file": "f24/M_D{dim}.txt",
+            "num_functions": 3,
+            "lambdas": [
+              10.0,
+              0.0512,
+              0.005
+            ],
+            "sigmas": [
+              20,
+              20,
+              20
+            ],
+            "biases": [
+              0,
+              100,
+              200
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 4000.0
+              },
+              "function": {
+                "type": "offset",
+                "parameters": {
+                  "value": 420.9687462275036
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 1000.0
+              },
+              "function": {
+                "type": "rastrigin"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 400.0
+              },
+              "function": {
+                "type": "weierstrass",
+                "parameters": {
+                  "a": 0.5,
+                  "b": 3.0,
+                  "k_max": 20
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE (C reference bug): Global y[]/z[] buffer aliasing in asyfunc — see F21 note."
+    },
+    {
+      "id": "cec13_f25_cf05",
+      "category": "Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1100
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f25/shift_data.txt",
+            "rotation_file": "f25/M_D{dim}.txt",
+            "num_functions": 3,
+            "lambdas": [
+              10.0,
+              0.0512,
+              0.005
+            ],
+            "sigmas": [
+              10,
+              30,
+              50
+            ],
+            "biases": [
+              0,
+              100,
+              200
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 4000.0
+              },
+              "function": {
+                "type": "offset",
+                "parameters": {
+                  "value": 420.9687462275036
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 1000.0
+              },
+              "function": {
+                "type": "rastrigin"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 400.0
+              },
+              "function": {
+                "type": "weierstrass",
+                "parameters": {
+                  "a": 0.5,
+                  "b": 3.0,
+                  "k_max": 20
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE (C reference bug): Global y[]/z[] buffer aliasing in asyfunc — see F21 note."
+    },
+    {
+      "id": "cec13_f26_cf06",
+      "category": "Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1200
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f26/shift_data.txt",
+            "rotation_file": "f26/M_D{dim}.txt",
+            "num_functions": 5,
+            "lambdas": [
+              10.0,
+              0.0512,
+              1.0,
+              0.005,
+              6.0
+            ],
+            "sigmas": [
+              10,
+              10,
+              10,
+              10,
+              10
+            ],
+            "biases": [
+              0,
+              100,
+              200,
+              300,
+              400
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 4000.0
+              },
+              "function": {
+                "type": "offset",
+                "parameters": {
+                  "value": 420.9687462275036
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 1000.0
+              },
+              "function": {
+                "type": "rastrigin"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 10000000000.0
+              },
+              "function": {
+                "type": "high_conditioned_elliptic"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 400.0
+              },
+              "function": {
+                "type": "weierstrass",
+                "parameters": {
+                  "a": 0.5,
+                  "b": 3.0,
+                  "k_max": 20
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 1000,
+                "f_max": 100.0
+              },
+              "function": {
+                "type": "griewank"
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE (C reference bug): Global y[]/z[] buffer aliasing in asyfunc — see F21 note."
+    },
+    {
+      "id": "cec13_f27_cf07",
+      "category": "Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1300
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f27/shift_data.txt",
+            "rotation_file": "f27/M_D{dim}.txt",
+            "num_functions": 5,
+            "lambdas": [
+              6.0,
+              0.0512,
+              10.0,
+              0.005,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              10,
+              10,
+              20,
+              20
+            ],
+            "biases": [
+              0,
+              100,
+              200,
+              300,
+              400
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true,
+            "r_flags": [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          },
+          "functions": [
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 100.0
+              },
+              "function": {
+                "type": "griewank"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 1000.0
+              },
+              "function": {
+                "type": "rastrigin"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 4000.0
+              },
+              "function": {
+                "type": "offset",
+                "parameters": {
+                  "value": 420.9687462275036
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 400.0
+              },
+              "function": {
+                "type": "weierstrass",
+                "parameters": {
+                  "a": 0.5,
+                  "b": 3.0,
+                  "k_max": 20
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 100000.0
+              },
+              "function": {
+                "type": "sphere"
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE (C reference bug): Global y[]/z[] buffer aliasing in asyfunc — see F21 note."
+    },
+    {
+      "id": "cec13_f28_cf08",
+      "category": "Composition",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1400
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f28/shift_data.txt",
+            "rotation_file": "f28/M_D{dim}.txt",
+            "num_functions": 5,
+            "lambdas": [
+              0.05,
+              1.0,
+              10.0,
+              1.0,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              20,
+              30,
+              40,
+              50
+            ],
+            "biases": [
+              0,
+              100,
+              200,
+              300,
+              400
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true,
+            "r_flags": [
+              1,
+              1,
+              1,
+              1,
+              0
+            ]
+          },
+          "functions": [
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 4000.0
+              },
+              "function": {
+                "type": "offset",
+                "parameters": {
+                  "value": 1.0
+                },
+                "function": {
+                  "type": "griewank_of_rosenbrock"
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 4000000.0
+              },
+              "function": {
+                "type": "schaffer_f7"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 4000.0
+              },
+              "function": {
+                "type": "offset",
+                "parameters": {
+                  "value": 420.9687462275036
+                },
+                "function": {
+                  "type": "schwefel_sin",
+                  "parameters": {
+                    "boundary_handling": true
+                  }
+                }
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 20000000.0
+              },
+              "function": {
+                "type": "schaffer_f6_expanded"
+              }
+            },
+            {
+              "type": "normalize",
+              "parameters": {
+                "C": 10000,
+                "f_max": 100000.0
+              },
+              "function": {
+                "type": "sphere"
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10,
+          30,
+          50
+        ],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      },
+      "note": "KNOWN ISSUE (C reference bug): Global y[]/z[] buffer aliasing in asyfunc — see F21 note."
+    }
+  ]
+}

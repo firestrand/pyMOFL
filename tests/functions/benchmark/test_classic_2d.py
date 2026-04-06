@@ -40,7 +40,8 @@ class TestHimmelblauFunction:
 
     def test_global_minimum(self):
         """Test global minimum - Himmelblau has 4 global minima all with value 0."""
-        min_point, min_value = HimmelblauFunction.get_global_minimum(2)
+        func = HimmelblauFunction()
+        min_point, min_value = func.get_global_minimum()
         assert min_value == 0.0
 
         # Should return one of the four known global minima
@@ -114,7 +115,8 @@ class TestMatyasFunction:
 
     def test_global_minimum(self):
         """Test global minimum at origin."""
-        min_point, min_value = MatyasFunction.get_global_minimum(2)
+        func = MatyasFunction()
+        min_point, min_value = func.get_global_minimum()
         np.testing.assert_array_almost_equal(min_point, [0.0, 0.0])
         assert min_value == 0.0
 
@@ -163,7 +165,8 @@ class TestEasomFunction:
 
     def test_global_minimum(self):
         """Test global minimum at (π, π)."""
-        min_point, min_value = EasomFunction.get_global_minimum(2)
+        func = EasomFunction()
+        min_point, min_value = func.get_global_minimum()
         np.testing.assert_array_almost_equal(min_point, [np.pi, np.pi])
         assert min_value == -1.0
 
@@ -211,7 +214,8 @@ class TestMcCormickFunction:
 
     def test_global_minimum(self):
         """Test global minimum."""
-        min_point, min_value = McCormickFunction.get_global_minimum(2)
+        func = McCormickFunction()
+        min_point, min_value = func.get_global_minimum()
         expected_point = np.array([-0.54719, -1.54719])
         expected_value = -1.9133
 
@@ -221,7 +225,7 @@ class TestMcCormickFunction:
     def test_evaluate_at_global_minimum(self):
         """Test function evaluates correctly at global minimum."""
         func = McCormickFunction()
-        min_point, min_value = McCormickFunction.get_global_minimum(2)
+        min_point, min_value = func.get_global_minimum()
         result = func.evaluate(min_point)
         assert abs(result - min_value) < 1e-3
 
@@ -257,7 +261,8 @@ class TestGoldsteinPriceFunction:
 
     def test_global_minimum(self):
         """Test global minimum."""
-        min_point, min_value = GoldsteinPriceFunction.get_global_minimum(2)
+        func = GoldsteinPriceFunction()
+        min_point, min_value = func.get_global_minimum()
         expected_point = np.array([0.0, -1.0])
         expected_value = 3.0
 
@@ -384,8 +389,8 @@ class TestClassic2DFunctionIntegration:
     )
     def test_global_minimum_consistency(self, func_class):
         """Test global minimum methods are consistent."""
-        min_point, min_value = func_class.get_global_minimum(2)
         func = func_class()
+        min_point, min_value = func.get_global_minimum()
         evaluated_value = func.evaluate(min_point)
 
         # Allow some tolerance for numerical precision

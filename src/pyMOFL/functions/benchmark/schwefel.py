@@ -95,8 +95,7 @@ class Schwefel_1_2(OptimizationFunction):
         cumsum = np.cumsum(X, axis=1)
         return np.sum(cumsum**2, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """
         Get the global minimum point and value for the Schwefel 1.2 function.
 
@@ -110,7 +109,7 @@ class Schwefel_1_2(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        global_min_point = np.zeros(dimension)
+        global_min_point = np.zeros(self.dimension)
         global_min_value = 0.0
         return global_min_point, global_min_value
 
@@ -157,10 +156,6 @@ class Schwefel_2_6(OptimizationFunction):
         initialization_bounds: Bounds | None = None,
         operational_bounds: Bounds | None = None,
         optimum_point: np.ndarray | None = None,
-        # F5 special parameters for B computation
-        shift: np.ndarray | None = None,
-        optimum_on_bounds: bool = False,
-        compute_B: bool = False,
         **kwargs,
     ):
         # Default bounds: [-100, 100] for each dimension
@@ -186,24 +181,9 @@ class Schwefel_2_6(OptimizationFunction):
         )
         self.A = np.array(A)
 
-        # Compute B if needed (F5 pattern)
-        if B is not None:
-            self.B = np.array(B)
-        elif compute_B and shift is not None:
-            if optimum_on_bounds:
-                # F5: Use BoundsShiftOptimumPattern
-                from pyMOFL.core.bounds_optimum_transform import BoundsShiftOptimumPattern
-
-                pattern = BoundsShiftOptimumPattern()
-                optimum = pattern.construct_optimum(dimension, shift)
-                self.B = np.dot(self.A, optimum)
-            else:
-                # Standard: B = A @ shift
-                self.B = np.dot(self.A, shift)
-        else:
-            raise ValueError(
-                "Schwefel_2_6 requires either B parameter or (compute_B=True and shift)"
-            )
+        if B is None:
+            raise ValueError("Schwefel_2_6 requires B parameter")
+        self.B = np.array(B)
 
         self.optimum_point = np.array(optimum_point) if optimum_point is not None else None
 
@@ -227,13 +207,12 @@ class Schwefel_2_6(OptimizationFunction):
         diff = np.abs(Ax - self.B[np.newaxis, :])
         return np.max(diff, axis=1)
 
-    def get_global_minimum(self):
-        """
-        Get the global minimum point and value for the Schwefel 2.6 function.
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get the global minimum point and value for the Schwefel 2.6 function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (optimum_point, 0.0) if optimum_point is set, else raises NotImplementedError.
 
         Raises
@@ -411,35 +390,19 @@ class Schwefel_2_13(OptimizationFunction):
 
         return results
 
-    @staticmethod
-    def get_global_minimum(
-        dimension: int, a: np.ndarray, b: np.ndarray, alpha: np.ndarray
-    ) -> tuple:
-        """
-        Get the global minimum of the function for given parameters.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension of the function.
-        a : np.ndarray
-            D×D coefficient matrix for sine terms.
-        b : np.ndarray
-            D×D coefficient matrix for cosine terms.
-        alpha : np.ndarray
-            Global optimum point.
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get the global minimum of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
 
         Notes
         -----
-        The global minimum is at alpha, with value 0.0 for the given a, b, alpha.
-        For reproducibility, the same a, b, alpha must be used as in the function instance.
+        The global minimum is at alpha, with value 0.0.
         """
-        return alpha, 0.0
+        return self.alpha.copy(), 0.0
 
 
 class SchwefelFunction(OptimizationFunction):
@@ -491,9 +454,8 @@ class SchwefelFunction(OptimizationFunction):
         X = self._validate_batch_input(X)
         return self._offset - np.sum(X * np.sin(np.sqrt(np.abs(X))), axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.full(dimension, 420.9687), 0.0
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.full(self.dimension, 420.9687), 0.0
 
 
 class Schwefel_2_4(OptimizationFunction):
@@ -544,9 +506,8 @@ class Schwefel_2_4(OptimizationFunction):
         x_rest = X[:, 1:]  # shape (N, D-1)
         return np.sum((x1 - x_rest**2) ** 2 + (x_rest - 1) ** 2, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.ones(dimension), 0.0
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.ones(self.dimension), 0.0
 
 
 class Schwefel_2_20(OptimizationFunction):
@@ -594,9 +555,8 @@ class Schwefel_2_20(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.sum(np.abs(X), axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.zeros(dimension), 0.0
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.zeros(self.dimension), 0.0
 
 
 class Schwefel_2_21(OptimizationFunction):
@@ -644,9 +604,8 @@ class Schwefel_2_21(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.max(np.abs(X), axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.zeros(dimension), 0.0
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.zeros(self.dimension), 0.0
 
 
 class Schwefel_2_22(OptimizationFunction):
@@ -697,9 +656,8 @@ class Schwefel_2_22(OptimizationFunction):
         A = np.abs(X)
         return np.sum(A, axis=1) + np.prod(A, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.zeros(dimension), 0.0
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.zeros(self.dimension), 0.0
 
 
 class Schwefel_2_23(OptimizationFunction):
@@ -748,9 +706,8 @@ class Schwefel_2_23(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.sum(X**10, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.zeros(dimension), 0.0
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.zeros(self.dimension), 0.0
 
 
 class Schwefel_2_25(OptimizationFunction):
@@ -799,9 +756,8 @@ class Schwefel_2_25(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.sum((X[:, :-1] ** 2 - X[:, 1:]) ** 2 + (X[:, :-1] - 1) ** 2, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.ones(dimension), 0.0
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.ones(self.dimension), 0.0
 
 
 class Schwefel_2_26(OptimizationFunction):
@@ -851,9 +807,8 @@ class Schwefel_2_26(OptimizationFunction):
         X = self._validate_batch_input(X)
         return -np.sum(X * np.sin(np.sqrt(np.abs(X))), axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.full(dimension, 420.9687), -418.9829 * dimension
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.full(self.dimension, 420.9687), -418.9829 * self.dimension
 
 
 class Schwefel_2_36(OptimizationFunction):
@@ -902,6 +857,5 @@ class Schwefel_2_36(OptimizationFunction):
         X = self._validate_batch_input(X)
         return -np.sum(X * np.sin(np.sqrt(np.abs(X))), axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
-        return np.full(dimension, 420.9687), -418.9829 * dimension
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        return np.full(self.dimension, 420.9687), -418.9829 * self.dimension

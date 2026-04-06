@@ -47,7 +47,7 @@ class TestSchwefel_2_13:
         b = rng.integers(-100, 101, (dim, dim))
         alpha = rng.uniform(-np.pi, np.pi, dim)
         func = Schwefel_2_13(dimension=dim, a=a, b=b, alpha=alpha)
-        min_point, min_value = Schwefel_2_13.get_global_minimum(dim, a, b, alpha)
+        min_point, min_value = func.get_global_minimum()
         np.testing.assert_allclose(min_point, alpha)
         assert min_value == 0.0
         np.testing.assert_allclose(func.evaluate(min_point), min_value, atol=1e-10)

@@ -36,7 +36,8 @@ class TestSchwefel_2_36:
         assert np.isclose(val, -418.9829 * 2, atol=0.1)
 
     def test_get_global_minimum(self):
-        point, value = Schwefel_2_36.get_global_minimum(3)
+        func = Schwefel_2_36(dimension=3)
+        point, value = func.get_global_minimum()
         np.testing.assert_allclose(point, np.full(3, 420.9687), atol=0.001)
         assert np.isclose(value, -418.9829 * 3, atol=0.1)
 

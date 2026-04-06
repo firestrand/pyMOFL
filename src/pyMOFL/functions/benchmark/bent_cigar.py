@@ -22,6 +22,7 @@ from pyMOFL.registry import register
 
 @register("BentCigar")
 @register("bent_cigar")
+@register("cigar")
 class BentCigarFunction(OptimizationFunction):
     """
     Bent Cigar function.
@@ -63,8 +64,7 @@ class BentCigarFunction(OptimizationFunction):
         X = self._validate_batch_input(X)
         return X[:, 0] ** 2 + 1e6 * np.sum(X[:, 1:] ** 2, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Bent Cigar function.
 
         Parameters
@@ -77,7 +77,7 @@ class BentCigarFunction(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        return np.zeros(dimension), 0.0
+        return np.zeros(self.dimension), 0.0
 
 
 @register("Discus")
@@ -126,8 +126,7 @@ class DiscusFunction(OptimizationFunction):
         X = self._validate_batch_input(X)
         return 1e6 * X[:, 0] ** 2 + np.sum(X[:, 1:] ** 2, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Discus function.
 
         Parameters
@@ -140,4 +139,4 @@ class DiscusFunction(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        return np.zeros(dimension), 0.0
+        return np.zeros(self.dimension), 0.0

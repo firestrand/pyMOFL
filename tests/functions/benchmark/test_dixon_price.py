@@ -39,20 +39,22 @@ class TestDixonPriceFunction:
         """Test function evaluates to 0 at the global minimum."""
         for dim in [2, 5, 10]:
             func = DixonPriceFunction(dimension=dim)
-            min_point, _min_value = DixonPriceFunction.get_global_minimum(dim)
+            min_point, _min_value = func.get_global_minimum()
             result = func.evaluate(min_point)
             assert abs(result) < 1e-8, f"Expected ~0 at optimum for dim={dim}, got {result}"
 
     def test_get_global_minimum(self):
-        """Test static get_global_minimum method returns correct point and value."""
+        """Test get_global_minimum method returns correct point and value."""
         for dim in [2, 5, 10]:
-            min_point, min_value = DixonPriceFunction.get_global_minimum(dim)
+            func = DixonPriceFunction(dimension=dim)
+            min_point, min_value = func.get_global_minimum()
             assert min_value == 0.0
             assert len(min_point) == dim
 
         # D=2: x_1 = 2^(-(2^1 - 2)/2^1) = 2^0 = 1
         #       x_2 = 2^(-(2^2 - 2)/2^2) = 2^(-2/4) = 2^(-0.5)
-        min_point_2, _ = DixonPriceFunction.get_global_minimum(2)
+        func_2 = DixonPriceFunction(dimension=2)
+        min_point_2, _ = func_2.get_global_minimum()
         assert abs(min_point_2[0] - 1.0) < 1e-10
         assert abs(min_point_2[1] - 2.0 ** (-0.5)) < 1e-10
 
@@ -60,7 +62,7 @@ class TestDixonPriceFunction:
         """Test that evaluating at the returned global minimum gives the returned value."""
         for dim in [2, 3, 5]:
             func = DixonPriceFunction(dimension=dim)
-            min_point, min_value = DixonPriceFunction.get_global_minimum(dim)
+            min_point, min_value = func.get_global_minimum()
             evaluated = func.evaluate(min_point)
             assert abs(evaluated - min_value) < 1e-8
 
@@ -166,7 +168,7 @@ class TestDixonPriceFunction:
         """Test function works across multiple dimensions."""
         for dim in [2, 10, 50]:
             func = DixonPriceFunction(dimension=dim)
-            min_point, _ = DixonPriceFunction.get_global_minimum(dim)
+            min_point, _ = func.get_global_minimum()
             result = func.evaluate(min_point)
             assert abs(result) < 1e-6
 

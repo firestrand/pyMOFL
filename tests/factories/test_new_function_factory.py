@@ -134,6 +134,237 @@ class TestFunctionRegistry:
         with pytest.raises(ValueError, match="Unknown base function"):
             registry.create_base_function("unknown", dimension=10)
 
+    def test_creates_base_function_case_insensitive(self):
+        """Registry lookup should be case-insensitive."""
+        registry = FunctionRegistry()
+        for name in ("Sphere", "SPHERE", "sPHERE", "Ackley"):
+            func = registry.create_base_function(name, dimension=5)
+            assert isinstance(func, OptimizationFunction)
+            assert func.dimension == 5
+
+    def test_has_phase1_bbob_base_functions(self):
+        """Phase 1 BBOB types are registered in the factory."""
+        registry = FunctionRegistry()
+        for key in [
+            "linear_slope",
+            "attractive_sector",
+            "sharp_ridge",
+            "schwefel_sin",
+            "gallagher_peaks",
+        ]:
+            assert key in registry.base_functions, f"{key!r} missing from base_functions"
+
+    def test_creates_phase1_bbob_functions(self):
+        """Each Phase 1 BBOB type can be instantiated via create_base_function."""
+        from pyMOFL.functions.benchmark.attractive_sector import AttractiveSectorFunction
+        from pyMOFL.functions.benchmark.gallagher_peaks import GallagherPeaksFunction
+        from pyMOFL.functions.benchmark.linear_slope import LinearSlopeFunction
+        from pyMOFL.functions.benchmark.schwefel_sin import SchwefelSinFunction
+        from pyMOFL.functions.benchmark.sharp_ridge import SharpRidgeFunction
+
+        registry = FunctionRegistry()
+        cases = {
+            "linear_slope": LinearSlopeFunction,
+            "attractive_sector": AttractiveSectorFunction,
+            "sharp_ridge": SharpRidgeFunction,
+            "schwefel_sin": SchwefelSinFunction,
+            "gallagher_peaks": GallagherPeaksFunction,
+        }
+        for key, expected_cls in cases.items():
+            func = registry.create_base_function(key, dimension=5)
+            assert isinstance(func, expected_cls), f"{key!r} created wrong type"
+
+    def test_has_phase3_bbob_base_functions(self):
+        """Phase 3 BBOB types are registered in the factory."""
+        registry = FunctionRegistry()
+        for key in [
+            "discus",
+            "bent_cigar",
+            "different_powers",
+            "schaffer_f7",
+            "katsuura",
+            "lunacek",
+            "buche_rastrigin",
+            "step_ellipsoid",
+        ]:
+            assert key in registry.base_functions, f"{key!r} missing from base_functions"
+
+    def test_creates_phase3_bbob_functions(self):
+        """Each Phase 3 BBOB type can be instantiated via create_base_function."""
+        from pyMOFL.functions.benchmark.bent_cigar import BentCigarFunction, DiscusFunction
+        from pyMOFL.functions.benchmark.buche_rastrigin import BucheRastriginFunction
+        from pyMOFL.functions.benchmark.different_powers import DifferentPowersFunction
+        from pyMOFL.functions.benchmark.katsuura import KatsuuraFunction
+        from pyMOFL.functions.benchmark.lunacek import LunacekBiRastriginFunction
+        from pyMOFL.functions.benchmark.schaffer import SchaffersF7Function
+        from pyMOFL.functions.benchmark.step_ellipsoid import StepEllipsoidFunction
+
+        registry = FunctionRegistry()
+        cases = {
+            "discus": DiscusFunction,
+            "bent_cigar": BentCigarFunction,
+            "different_powers": DifferentPowersFunction,
+            "schaffer_f7": SchaffersF7Function,
+            "katsuura": KatsuuraFunction,
+            "lunacek": LunacekBiRastriginFunction,
+            "buche_rastrigin": BucheRastriginFunction,
+            "step_ellipsoid": StepEllipsoidFunction,
+        }
+        for key, expected_cls in cases.items():
+            func = registry.create_base_function(key, dimension=5)
+            assert isinstance(func, expected_cls), f"{key!r} created wrong type"
+
+    def test_has_phase4_classical_scalable_base_functions(self):
+        """Phase 4 scalable classical types are registered in the factory."""
+        registry = FunctionRegistry()
+        for key in [
+            "styblinski_tang",
+            "salomon",
+            "michalewicz",
+            "langermann",
+            "brown",
+            "chung_reynolds",
+            "qing",
+            "quartic",
+        ]:
+            assert key in registry.base_functions, f"{key!r} missing from base_functions"
+
+    def test_creates_phase4_classical_scalable_functions(self):
+        """Each Phase 4 scalable classical type can be instantiated."""
+        from pyMOFL.functions.benchmark.brown import BrownFunction
+        from pyMOFL.functions.benchmark.chung_reynolds import ChungReynoldsFunction
+        from pyMOFL.functions.benchmark.langermann import LangermannFunction
+        from pyMOFL.functions.benchmark.michalewicz import MichalewiczFunction
+        from pyMOFL.functions.benchmark.qing import QingFunction
+        from pyMOFL.functions.benchmark.quartic import QuarticFunction
+        from pyMOFL.functions.benchmark.salomon import SalomonFunction
+        from pyMOFL.functions.benchmark.styblinski_tang import StyblinskiTangFunction
+
+        registry = FunctionRegistry()
+        cases = {
+            "styblinski_tang": StyblinskiTangFunction,
+            "salomon": SalomonFunction,
+            "michalewicz": MichalewiczFunction,
+            "langermann": LangermannFunction,
+            "brown": BrownFunction,
+            "chung_reynolds": ChungReynoldsFunction,
+            "qing": QingFunction,
+            "quartic": QuarticFunction,
+        }
+        for key, expected_cls in cases.items():
+            func = registry.create_base_function(key, dimension=5)
+            assert isinstance(func, expected_cls), f"{key!r} created wrong type"
+
+    def test_has_phase4_classical_fixed_base_functions(self):
+        """Phase 4 fixed-dimension classical types are registered in the factory."""
+        registry = FunctionRegistry()
+        for key in [
+            "beale",
+            "booth",
+            "bohachevsky1",
+            "bohachevsky2",
+            "bohachevsky3",
+            "bukin6",
+            "six_hump_camel",
+            "three_hump_camel",
+            "cross_in_tray",
+            "drop_wave",
+            "eggholder",
+            "holder_table",
+            "hartmann3",
+            "hartmann6",
+            "colville",
+        ]:
+            assert key in registry.base_functions, f"{key!r} missing from base_functions"
+
+    def test_creates_phase4_classical_fixed_functions(self):
+        """Each Phase 4 fixed-dimension classical type can be instantiated."""
+        from pyMOFL.functions.benchmark.beale import BealeFunction
+        from pyMOFL.functions.benchmark.bohachevsky import (
+            Bohachevsky1Function,
+            Bohachevsky2Function,
+            Bohachevsky3Function,
+        )
+        from pyMOFL.functions.benchmark.booth import BoothFunction
+        from pyMOFL.functions.benchmark.bukin import Bukin6Function
+        from pyMOFL.functions.benchmark.camel import SixHumpCamelFunction, ThreeHumpCamelFunction
+        from pyMOFL.functions.benchmark.colville import ColvilleFunction
+        from pyMOFL.functions.benchmark.cross_in_tray import CrossInTrayFunction
+        from pyMOFL.functions.benchmark.drop_wave import DropWaveFunction
+        from pyMOFL.functions.benchmark.eggholder import EggholderFunction
+        from pyMOFL.functions.benchmark.hartmann import Hartmann3Function, Hartmann6Function
+        from pyMOFL.functions.benchmark.holder_table import HolderTableFunction
+
+        registry = FunctionRegistry()
+        cases = {
+            "beale": (BealeFunction, {}),
+            "booth": (BoothFunction, {}),
+            "bohachevsky1": (Bohachevsky1Function, {}),
+            "bohachevsky2": (Bohachevsky2Function, {}),
+            "bohachevsky3": (Bohachevsky3Function, {}),
+            "bukin6": (Bukin6Function, {}),
+            "six_hump_camel": (SixHumpCamelFunction, {}),
+            "three_hump_camel": (ThreeHumpCamelFunction, {}),
+            "cross_in_tray": (CrossInTrayFunction, {}),
+            "drop_wave": (DropWaveFunction, {}),
+            "eggholder": (EggholderFunction, {}),
+            "holder_table": (HolderTableFunction, {}),
+            "hartmann3": (Hartmann3Function, {"dimension": 3}),
+            "hartmann6": (Hartmann6Function, {"dimension": 6}),
+            "colville": (ColvilleFunction, {"dimension": 4}),
+        }
+        for key, (expected_cls, extra_params) in cases.items():
+            params = extra_params or {}
+            func = registry.create_base_function(key, **params)
+            assert isinstance(func, expected_cls), f"{key!r} created wrong type"
+
+    def test_has_phase6_selected_classical_functions(self):
+        """Phase 6 on-demand additions should be available via the registry."""
+        registry = FunctionRegistry()
+        for key in [
+            "adjiman",
+            "box_betts",
+            "deb01",
+            "deb03",
+            "exponential",
+            "keane",
+            "kowalik",
+            "miele_cantrell",
+            "parsopoulos",
+            "rana",
+        ]:
+            assert key in registry.base_functions, f"{key!r} missing from base_functions"
+
+    def test_creates_phase6_selected_classical_functions(self):
+        """Selected Phase 6 functions should instantiate via create_base_function."""
+        from pyMOFL.functions.benchmark.adjiman import AdjimanFunction
+        from pyMOFL.functions.benchmark.box_betts import BoxBettsFunction
+        from pyMOFL.functions.benchmark.deb01 import Deb01Function
+        from pyMOFL.functions.benchmark.deb03 import Deb03Function
+        from pyMOFL.functions.benchmark.exponential_function import ExponentialFunction
+        from pyMOFL.functions.benchmark.keane import KeaneFunction
+        from pyMOFL.functions.benchmark.kowalik import KowalikFunction
+        from pyMOFL.functions.benchmark.miele_cantrell import MieleCantrellFunction
+        from pyMOFL.functions.benchmark.parsopoulos import ParsopoulosFunction
+        from pyMOFL.functions.benchmark.rana import RanaFunction
+
+        registry = FunctionRegistry()
+        cases = {
+            "adjiman": (AdjimanFunction, {"dimension": 2}),
+            "box_betts": (BoxBettsFunction, {"dimension": 3}),
+            "deb01": (Deb01Function, {"dimension": 5}),
+            "deb03": (Deb03Function, {"dimension": 5}),
+            "exponential": (ExponentialFunction, {"dimension": 5}),
+            "keane": (KeaneFunction, {"dimension": 5}),
+            "kowalik": (KowalikFunction, {"dimension": 4}),
+            "miele_cantrell": (MieleCantrellFunction, {"dimension": 4}),
+            "parsopoulos": (ParsopoulosFunction, {"dimension": 2}),
+            "rana": (RanaFunction, {"dimension": 5}),
+        }
+        for key, (expected_cls, params) in cases.items():
+            func = registry.create_base_function(key, **params)
+            assert isinstance(func, expected_cls), f"{key!r} created wrong type"
+
 
 class TestFunctionFactory:
     """Test the simplified factory - no wrappers, just composition."""
@@ -288,3 +519,26 @@ class TestFunctionFactory:
         from pyMOFL.functions.transformations import ScaleTransform as _SCT
 
         assert isinstance(func.input_transforms[0], _SCT)
+
+    def test_creates_phase1_function_via_config(self, factory):
+        """Phase 1 BBOB types route through the config-driven factory."""
+        from pyMOFL.functions.benchmark.attractive_sector import AttractiveSectorFunction
+        from pyMOFL.functions.benchmark.gallagher_peaks import GallagherPeaksFunction
+        from pyMOFL.functions.benchmark.linear_slope import LinearSlopeFunction
+        from pyMOFL.functions.benchmark.schwefel_sin import SchwefelSinFunction
+        from pyMOFL.functions.benchmark.sharp_ridge import SharpRidgeFunction
+
+        cases = [
+            ("linear_slope", LinearSlopeFunction),
+            ("attractive_sector", AttractiveSectorFunction),
+            ("sharp_ridge", SharpRidgeFunction),
+            ("schwefel_sin", SchwefelSinFunction),
+            ("gallagher_peaks", GallagherPeaksFunction),
+        ]
+        for type_name, expected_cls in cases:
+            config = {"type": type_name, "parameters": {"dimension": 5}}
+            func = factory.create_function(config)
+            assert isinstance(func, ComposedFunction)
+            assert isinstance(func.base_function, expected_cls), (
+                f"Config type {type_name!r} routed to wrong base"
+            )

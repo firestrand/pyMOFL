@@ -90,21 +90,15 @@ class SphereFunction(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.sum(X**2, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """
         Get the global minimum point and value for the Sphere function.
 
-        Parameters
-        ----------
-        dimension : int
-            The dimensionality of the function.
-
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
-        global_min_point = np.zeros(dimension)
+        global_min_point = np.zeros(self.dimension)
         global_min_value = 0.0
         return global_min_point, global_min_value

@@ -64,6 +64,8 @@ class ConfigParser:
                 return None, {}, []
 
             t = node.get("type")
+            if isinstance(t, str):
+                t = t.lower()
             params = dict(node.get("parameters", {}))
 
             # Track dimension from any level
@@ -79,9 +81,9 @@ class ConfigParser:
                     return walk(inner)
                 return None, {}, []
 
-            # Composition nodes are returned as-is
-            if t == "composition":
-                return "composition", node, []
+            # Composition/hybrid nodes are returned as-is
+            if t in {"composition", "min", "lower_envelope", "hybrid"}:
+                return t, node, []
 
             # Base function found
             if t in self._known_base_types:
@@ -114,10 +116,11 @@ class ConfigParser:
 
         base_type, base_params, transforms = walk(config)
 
-        # For compositions, wrap in ParsedConfig with the outer transforms
-        if base_type == "composition":
+        # For compositions/hybrids, wrap in ParsedConfig with any outer transforms
+        is_comp = base_type in {"composition", "min", "lower_envelope", "hybrid"}
+        if is_comp:
             return ParsedConfig(
-                base_type="composition",
+                base_type=base_type,
                 base_params={},
                 transforms=transforms,
                 is_composition=True,

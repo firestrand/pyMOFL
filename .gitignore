@@ -171,7 +171,11 @@ cython_debug/
 .pypirc
 # JetBrains IDE
 .idea
-.DS_Store
+# VS Code
+.vscode/
+# Serena MCP
+.serena/
+**/.DS_Store
 
 # Ignore LLM utility files
 utility_scripts/

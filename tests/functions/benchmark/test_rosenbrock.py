@@ -46,11 +46,11 @@ class TestRosenbrockFunction:
     def test_global_minimum(self):
         """Test the function at its global minimum."""
         for dim in [2, 3, 5]:
-            # Get the global minimum
-            min_point, min_value = RosenbrockFunction.get_global_minimum(dim)
-
             # Create function
             func = RosenbrockFunction(dimension=dim)
+
+            # Get the global minimum
+            min_point, min_value = func.get_global_minimum()
 
             # Verify global minimum point and value
             np.testing.assert_allclose(min_point, np.ones(dim))

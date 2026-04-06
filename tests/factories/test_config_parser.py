@@ -247,6 +247,45 @@ class TestDimensionExtraction:
         assert ConfigParser.extract_dimension(config) == 20
 
 
+class TestCaseInsensitivity:
+    """Test that type names are case-insensitive in configs."""
+
+    def test_base_type_uppercase(self, parser):
+        """PascalCase/uppercase base type names should be recognized."""
+        config = {"type": "Sphere", "parameters": {"dimension": 5}}
+        result = parser.parse(config)
+        assert result.base_type == "sphere"
+
+    def test_base_type_mixed_case(self, parser):
+        config = {"type": "ACKLEY", "parameters": {"dimension": 5}}
+        result = parser.parse(config)
+        assert result.base_type == "ackley"
+
+    def test_transform_type_uppercase(self, parser):
+        """Transform type names should also be case-insensitive."""
+        config = {
+            "type": "Bias",
+            "parameters": {"value": -100},
+            "function": {"type": "sphere", "parameters": {"dimension": 5}},
+        }
+        result = parser.parse(config)
+        assert result.base_type == "sphere"
+        assert len(result.transforms) == 1
+        # The transform type should be stored lowercase
+        assert result.transforms[0][0] == "bias"
+
+    def test_composition_type_uppercase(self, parser):
+        config = {
+            "type": "Composition",
+            "parameters": {"num_functions": 1},
+            "functions": [
+                {"type": "weight", "function": {"type": "sphere", "parameters": {"dimension": 2}}}
+            ],
+        }
+        result = parser.parse(config)
+        assert result.is_composition is True
+
+
 class TestEdgeCases:
     """Test edge cases."""
 

@@ -140,25 +140,14 @@ class PermFunction(OptimizationFunction):
         assert self.operational_bounds is not None
         return np.stack([self.operational_bounds.low, self.operational_bounds.high], axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 5) -> tuple:
-        """
-        Get the global minimum of the function.
-
-        Parameters
-        ----------
-        dimension : int, optional
-            The dimension of the function. Should be 5 for the standard Perm function.
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get the global minimum of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
-        if dimension != 5:
-            raise ValueError(
-                "Perm function is only defined for 5 dimensions in this implementation"
-            )
         global_min_point = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
         global_min_value = 0.0
         return global_min_point, global_min_value

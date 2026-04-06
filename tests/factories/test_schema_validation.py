@@ -14,7 +14,7 @@ SUITE_PATH = Path("src/pyMOFL/constants/cec/2005/cec2005_suite.json")
 
 @pytest.fixture(scope="module")
 def schema():
-    with open(SCHEMA_PATH) as f:
+    with SCHEMA_PATH.open() as f:
         return json.load(f)
 
 
@@ -71,8 +71,8 @@ class TestTypoDetection:
             ("weierstrass", {"a": 0.5, "b": 3, "kmax": 20}, "typo in 'k_max'"),
             (
                 "schwefel_2_13",
-                {"matrixA": "a.txt", "matrix_B": "b.txt", "alpha": "a.txt"},
-                "typo in 'matrix_A'",
+                {"ma": "a.txt", "b": "b.txt", "alpha": "a.txt"},
+                "typo in 'a'",
             ),
         ],
     )
@@ -261,7 +261,10 @@ class TestValidConfigs:
         suite = _minimal_suite(
             {
                 "type": "schwefel_2_6",
-                "parameters": {"matrix_A": "f05/matrix.txt", "optimum_pattern": "cec2005_f05"},
+                "parameters": {
+                    "A": "f05/matrix_data_A_D50.txt",
+                    "B": "f05/vector_B_D10.txt",
+                },
             }
         )
         validate(instance=suite, schema=schema)
@@ -270,7 +273,7 @@ class TestValidConfigs:
         suite = _minimal_suite(
             {
                 "type": "schwefel_2_13",
-                "parameters": {"matrix_A": "a.txt", "matrix_B": "b.txt", "alpha": "alpha.txt"},
+                "parameters": {"a": "a.txt", "b": "b.txt", "alpha": "alpha.txt"},
             }
         )
         validate(instance=suite, schema=schema)

@@ -38,6 +38,9 @@ class WeightedComposition(OptimizationFunction):
         If None, defaults to zeros.
     global_bias : float
         Constant added to the total weighted sum.
+    inverse_distance_weight : bool
+        If True, multiplies Gaussian weight by 1/d (CEC 2014 style).
+        If False, uses pure Gaussian weight (CEC 2005 style).
     dominance_suppression : bool
         If True, applies CEC-style winner-takes-most suppression
         to the Gaussian weights before normalization.
@@ -60,6 +63,7 @@ class WeightedComposition(OptimizationFunction):
         sigmas: list[float],
         biases: list[float] | None = None,
         global_bias: float = 0.0,
+        inverse_distance_weight: bool = False,
         dominance_suppression: bool = False,
         non_continuous: bool = False,
         initialization_bounds: Bounds | None = None,
@@ -84,17 +88,36 @@ class WeightedComposition(OptimizationFunction):
         self.sigmas = [float(s) for s in sigmas]
         self.biases = [float(b) for b in biases] if biases is not None else [0.0] * ncomp
         self.global_bias = float(global_bias)
+        self.inverse_distance_weight = bool(inverse_distance_weight)
         self.dominance_suppression = bool(dominance_suppression)
         self.non_continuous = bool(non_continuous)
 
     def _compute_weights(self, x: np.ndarray) -> np.ndarray:
-        """Compute Gaussian weights from raw distances to component optima."""
+        """Compute Gaussian weights from raw distances to component optima.
+
+        Two weight modes:
+        - CEC 2005 style (inverse_distance_weight=False):
+          w[i] = exp(-d²/(2*D*σ²))
+        - CEC 2014 style (inverse_distance_weight=True):
+          w[i] = (1/d) * exp(-d²/(2*D*δ²)), or INF when d=0
+        """
         n = len(self.components)
         d2 = np.array(
             [np.sum((x - self.optima[i]) ** 2) for i in range(n)],
             dtype=np.float64,
         )
-        w = np.exp(-(d2 / (2.0 * self.dimension * (np.array(self.sigmas) ** 2))))
+        sigmas2 = np.array(self.sigmas, dtype=np.float64) ** 2
+        w = np.exp(-(d2 / (2.0 * self.dimension * sigmas2)))
+
+        if self.inverse_distance_weight:
+            # CEC 2014: w[i] = sqrt(1/d²) * exp(...)  = (1/d) * exp(...)
+            # At d=0, weight becomes INF (handled below)
+            zero_mask = d2 == 0.0
+            if np.any(zero_mask):
+                w[:] = 0.0
+                w[zero_mask] = 1e99  # INF proxy
+            else:
+                w *= np.sqrt(1.0 / d2)
 
         if self.dominance_suppression:
             maxw = np.max(w)

@@ -76,8 +76,7 @@ class HappyCatFunction(OptimizationFunction):
         sum_x = np.sum(X, axis=1)
         return np.abs(r2 - self.dimension) ** 0.25 + (0.5 * r2 + sum_x) / self.dimension + 0.5
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the HappyCat function.
 
         Parameters
@@ -90,7 +89,7 @@ class HappyCatFunction(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        return np.full(dimension, -1.0), 0.0
+        return np.full(self.dimension, -1.0), 0.0
 
 
 @register("HGBat")
@@ -143,8 +142,7 @@ class HGBatFunction(OptimizationFunction):
         sum_x = np.sum(X, axis=1)
         return np.abs(r2**2 - sum_x**2) ** 0.5 + (0.5 * r2 + sum_x) / self.dimension + 0.5
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the HGBat function.
 
         Parameters
@@ -157,4 +155,4 @@ class HGBatFunction(OptimizationFunction):
         tuple
             (global_min_point, global_min_value)
         """
-        return np.full(dimension, -1.0), 0.0
+        return np.full(self.dimension, -1.0), 0.0

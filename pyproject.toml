@@ -4,22 +4,21 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyMOFL"
-version = "0.1.0"
+version = "0.3.0"
 description = "Python Modular Optimization Function Library"
 readme = "README.md"
 authors = [
-    {name = "pyMOFL Team", email = "example@example.com"}
+    {name = "Travis Silvers", email = "firestrand@users.noreply.github.com"}
 ]
+keywords = ["optimization", "benchmark", "metaheuristic", "CEC", "BBOB", "mathematical-optimization"]
 license = {text = "MIT"}
 requires-python = ">=3.12"
 dependencies = [
     "numpy>=1.26.0",
     "matplotlib>=3.8.0",
-    "typer>=0.15",
-    "rich>=13.0",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -38,14 +37,19 @@ dev = [
     "ty>=0.0.1a7",
     "jsonschema>=4.0",
 ]
-cli = []
+cli = [
+    "typer>=0.15",
+    "rich>=13.0",
+]
 
 [project.scripts]
 pymofl = "pyMOFL.cli:app"
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/pyMOFL"
-"Bug Tracker" = "https://github.com/yourusername/pyMOFL/issues"
+"Homepage" = "https://github.com/firestrand/pyMOFL"
+"Source" = "https://github.com/firestrand/pyMOFL"
+"Documentation" = "https://github.com/firestrand/pyMOFL#readme"
+"Bug Tracker" = "https://github.com/firestrand/pyMOFL/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyMOFL"]
@@ -63,7 +67,7 @@ line-length = 100
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "I", "N", "NPY", "UP", "B", "C4", "SIM", "RUF"]
+select = ["E", "W", "F", "I", "N", "NPY", "UP", "B", "C4", "SIM", "PTH", "ASYNC", "RUF"]
 ignore = [
     "E501",   # line too long (handled by formatter)
     "E741",   # ambiguous variable name (l, O, I in math code)
@@ -82,6 +86,12 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["pyMOFL"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ty.environment]
+python-version = "3.12"
 
 [tool.ruff.format]
 quote-style = "double"

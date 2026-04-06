@@ -82,10 +82,7 @@ class HimmelblauFunction(OptimizationFunction):
         term2 = (x1 + x2**2 - 7) ** 2
         return term1 + term2
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum - returns first of four global minima."""
-        if dimension != 2:
-            raise ValueError("Himmelblau requires dimension=2")
         # Returns first global minimum - function has 4 equal global minima
         return np.array([3.0, 2.0]), 0.0

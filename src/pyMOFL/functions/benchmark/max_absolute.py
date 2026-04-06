@@ -14,8 +14,10 @@ from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.function import OptimizationFunction
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.registry import register
 
 
+@register("yao_liu_04")
 class MaxAbsolute(OptimizationFunction):
     def __init__(
         self,

@@ -95,10 +95,7 @@ class GoldsteinPriceFunction(OptimizationFunction):
 
         return term1 * term2
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("Goldstein-Price requires dimension=2")
         # Known global minimum location
         return np.array([0.0, -1.0]), 3.0

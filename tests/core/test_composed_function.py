@@ -10,6 +10,7 @@ from pyMOFL.functions.benchmark.ackley import AckleyFunction
 from pyMOFL.functions.benchmark.sphere import SphereFunction
 from pyMOFL.functions.transformations import (
     BiasTransform,
+    BoundaryPenaltyTransform,
     RotateTransform,
     ScaleTransform,
     ShiftTransform,
@@ -144,3 +145,102 @@ class TestComposedFunction:
     def test_unknown_transformation_raises_error(self):
         """Test that unknown transformation type raises error."""
         pytest.skip("Unknown transformation test not applicable in pure functional model")
+
+
+class TestComposedFunctionWithPenalty:
+    """Test ComposedFunction with penalty_transforms (vector→scalar additive penalty)."""
+
+    def test_penalty_added_to_result(self):
+        """Penalty is added to the base function result."""
+        base = SphereFunction(dimension=2)
+        penalty = BoundaryPenaltyTransform(bound=5.0)
+        composed = ComposedFunction(
+            base_function=base,
+            penalty_transforms=[penalty],
+        )
+        # x = [6, 0]: sphere([6, 0]) = 36, penalty = (6-5)^2 = 1 → total = 37
+        result = composed.evaluate(np.array([6.0, 0.0]))
+        np.testing.assert_allclose(result, 37.0)
+
+    def test_no_penalty_when_within_bounds(self):
+        """Penalty is zero inside the boundary — result equals base function."""
+        base = SphereFunction(dimension=2)
+        penalty = BoundaryPenaltyTransform(bound=5.0)
+        composed = ComposedFunction(
+            base_function=base,
+            penalty_transforms=[penalty],
+        )
+        x = np.array([1.0, 2.0])
+        expected = 1.0 + 4.0  # sphere only, no penalty
+        np.testing.assert_allclose(composed.evaluate(x), expected)
+
+    def test_penalty_uses_raw_x_not_transformed(self):
+        """Penalty is computed on the original x, not the transformed x."""
+        base = SphereFunction(dimension=2)
+        # Shift moves x into [0,0] for the base, but penalty sees raw x
+        shift = ShiftTransform(np.array([10.0, 10.0]))
+        penalty = BoundaryPenaltyTransform(bound=5.0)
+        composed = ComposedFunction(
+            base_function=base,
+            input_transforms=[shift],
+            penalty_transforms=[penalty],
+        )
+        # x = [10, 10]: shift → [0, 0], sphere = 0
+        # penalty on raw [10, 10] = (10-5)^2 + (10-5)^2 = 50
+        result = composed.evaluate(np.array([10.0, 10.0]))
+        np.testing.assert_allclose(result, 50.0)
+
+    def test_penalty_combines_with_output_transforms(self):
+        """Penalty adds to the result after scalar output transforms."""
+        base = SphereFunction(dimension=2)
+        bias = BiasTransform(100.0)
+        penalty = BoundaryPenaltyTransform(bound=5.0)
+        composed = ComposedFunction(
+            base_function=base,
+            output_transforms=[bias],
+            penalty_transforms=[penalty],
+        )
+        # x = [6, 0]: sphere = 36, bias → 136, penalty = 1 → total = 137
+        result = composed.evaluate(np.array([6.0, 0.0]))
+        np.testing.assert_allclose(result, 137.0)
+
+    def test_penalty_batch_evaluation(self):
+        """Batch evaluation adds penalties correctly."""
+        base = SphereFunction(dimension=2)
+        penalty = BoundaryPenaltyTransform(bound=5.0)
+        composed = ComposedFunction(
+            base_function=base,
+            penalty_transforms=[penalty],
+        )
+        X = np.array(
+            [
+                [1.0, 1.0],  # sphere=2, penalty=0 → 2
+                [6.0, 0.0],  # sphere=36, penalty=1 → 37
+                [10.0, 10.0],  # sphere=200, penalty=50 → 250
+            ]
+        )
+        results = composed.evaluate_batch(X)
+        np.testing.assert_allclose(results, [2.0, 37.0, 250.0])
+
+    def test_multiple_penalty_transforms(self):
+        """Multiple penalty transforms all contribute additively."""
+        base = SphereFunction(dimension=2)
+        penalty1 = BoundaryPenaltyTransform(bound=5.0)
+        penalty2 = BoundaryPenaltyTransform(bound=3.0)
+        composed = ComposedFunction(
+            base_function=base,
+            penalty_transforms=[penalty1, penalty2],
+        )
+        # x = [6, 0]: sphere=36, pen1=(6-5)^2=1, pen2=(6-3)^2=9 → 46
+        result = composed.evaluate(np.array([6.0, 0.0]))
+        np.testing.assert_allclose(result, 46.0)
+
+    def test_empty_penalty_list_no_effect(self):
+        """Empty penalty_transforms list has no effect (backward compat)."""
+        base = SphereFunction(dimension=2)
+        composed = ComposedFunction(
+            base_function=base,
+            penalty_transforms=[],
+        )
+        x = np.array([6.0, 0.0])
+        np.testing.assert_allclose(composed.evaluate(x), 36.0)

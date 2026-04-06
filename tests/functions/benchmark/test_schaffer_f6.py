@@ -154,8 +154,9 @@ class TestSchafferF6Function:
     def test_get_global_minimum(self):
         """Test the get_global_minimum method."""
         for dim in [2, 3, 5]:
-            # Get the global minimum
-            point, value = Schaffer_F6.get_global_minimum(dim)
+            # Create function and get the global minimum
+            func = Schaffer_F6(dimension=dim)
+            point, value = func.get_global_minimum()
 
             # Check the point shape and value
             assert point.shape == (dim,)
@@ -163,7 +164,6 @@ class TestSchafferF6Function:
             assert value == 0.0
 
             # Verify that evaluating at the global minimum gives the expected value
-            func = Schaffer_F6(dimension=dim)
             assert np.isclose(func.evaluate(point), value)
 
             # Check with bias using decorator

@@ -74,9 +74,10 @@ class TestLunacekBiRastriginFunction:
             )
 
     def test_get_global_minimum(self):
-        """Test get_global_minimum static method returns correct point and value."""
+        """Test get_global_minimum method returns correct point and value."""
         for dim in [2, 5, 10, 30]:
-            min_point, min_value = LunacekBiRastriginFunction.get_global_minimum(dim)
+            func = LunacekBiRastriginFunction(dimension=dim)
+            min_point, min_value = func.get_global_minimum()
             np.testing.assert_array_equal(min_point, np.full(dim, 2.5))
             assert min_value == 0.0
 
@@ -84,7 +85,7 @@ class TestLunacekBiRastriginFunction:
         """Test that evaluate at get_global_minimum point matches declared value."""
         for dim in [2, 5, 10]:
             func = LunacekBiRastriginFunction(dimension=dim)
-            min_point, min_value = LunacekBiRastriginFunction.get_global_minimum(dim)
+            min_point, min_value = func.get_global_minimum()
             result = func.evaluate(min_point)
             assert result == pytest.approx(min_value, abs=1e-10)
 

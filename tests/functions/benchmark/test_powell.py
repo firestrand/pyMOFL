@@ -54,15 +54,11 @@ class TestPowellSingularFunction:
 
     def test_global_minimum(self):
         """Test global minimum is at origin with value 0."""
-        min_point, min_value = PowellSingularFunction.get_global_minimum(4)
+        func = PowellSingularFunction()
+        min_point, min_value = func.get_global_minimum()
         expected_point = np.array([0.0, 0.0, 0.0, 0.0])
         np.testing.assert_array_almost_equal(min_point, expected_point)
         assert min_value == 0.0
-
-    def test_global_minimum_dimension_validation(self):
-        """Test global minimum raises error for wrong dimension."""
-        with pytest.raises(ValueError, match="Powell Singular requires dimension=4"):
-            PowellSingularFunction.get_global_minimum(3)
 
     def test_evaluate_at_global_minimum(self):
         """Test function evaluates to 0 at global minimum."""
@@ -143,7 +139,8 @@ class TestPowellSingular2Function:
 
     def test_global_minimum(self):
         """Test global minimum."""
-        min_point, min_value = PowellSingular2Function.get_global_minimum(4)
+        func = PowellSingular2Function()
+        min_point, min_value = func.get_global_minimum()
         expected_point = np.array([0.0, 0.0, 0.0, 0.0])
         np.testing.assert_array_almost_equal(min_point, expected_point)
         assert min_value == 0.0
@@ -195,7 +192,8 @@ class TestPowellSumFunction:
     def test_global_minimum_various_dimensions(self):
         """Test global minimum for various dimensions."""
         for dim in [2, 5, 10]:
-            min_point, min_value = PowellSumFunction.get_global_minimum(dim)
+            func = PowellSumFunction(dimension=dim)
+            min_point, min_value = func.get_global_minimum()
             expected_point = np.zeros(dim)
             np.testing.assert_array_almost_equal(min_point, expected_point)
             assert min_value == 0.0

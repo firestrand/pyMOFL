@@ -1,0 +1,2501 @@
+{
+  "suite_id": "gnbg_suite",
+  "name": "GNBG-II Generated Suite",
+  "description": "Generated GNBG-II instances for comparison.",
+  "version": "1.0-generated",
+  "functions": [
+    {
+      "id": "gnbg_f01",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.6838593757021816
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f01/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    0.0,
+                    0.0
+                  ],
+                  "omega": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f01/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f01/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f02",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.9460266641429922
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f02/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    0.0,
+                    0.0
+                  ],
+                  "omega": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f02/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f02/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f03",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.6282702875305262
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f03/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    0.0,
+                    0.0
+                  ],
+                  "omega": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f03/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f03/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f04",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.5171746271104016
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f04/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    0.0,
+                    0.0
+                  ],
+                  "omega": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f04/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f04/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f05",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.826083094084392
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f05/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    0.0,
+                    0.0
+                  ],
+                  "omega": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f05/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f05/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f06",
+      "category": "Unimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.5506706511856279
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f06/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    0.0,
+                    0.0
+                  ],
+                  "omega": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f06/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f06/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f07",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.6112999094706068
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f07/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    2.856019539832319,
+                    2.0120066276808624
+                  ],
+                  "omega": [
+                    4.467722132027619,
+                    4.378836948363822,
+                    2.8920040630497463,
+                    3.597084436248529
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f07/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f07/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f08",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.525790568883471
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f08/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    2.764995095014953,
+                    2.3357383128030333
+                  ],
+                  "omega": [
+                    1.7949190490558307,
+                    1.6933080564567402,
+                    4.989116464360555,
+                    4.902138083725664
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f08/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f08/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f09",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.7154648618453532
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f09/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    1.415466958239703,
+                    1.0569658318227675
+                  ],
+                  "omega": [
+                    4.882005015159095,
+                    4.869530185464557,
+                    2.414147634280965,
+                    4.341422756071058
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f09/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f09/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f10",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.6129913107022481
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f10/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    2.439733707603934,
+                    1.1636281951548617
+                  ],
+                  "omega": [
+                    2.339691920757494,
+                    3.292937678083288,
+                    3.0184888810531056,
+                    2.916905502778429
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f10/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f10/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f11",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.8463650973120889
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f11/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    1.4741981130167048,
+                    1.5573500083146197
+                  ],
+                  "omega": [
+                    1.8309650766848642,
+                    4.519440281675262,
+                    3.77992156371916,
+                    3.0294143023660167
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f11/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f11/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f12",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.5363622034096998
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f12/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    1.7104670618134992,
+                    2.192925895395735
+                  ],
+                  "omega": [
+                    1.5943644001259054,
+                    1.5908192564814696,
+                    3.306263531568509,
+                    1.2957313705916653
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f12/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f12/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f13",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.6230738639120723
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f13/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    2.7210613339830596,
+                    1.9792429586848619
+                  ],
+                  "omega": [
+                    2.090651954606344,
+                    4.0605561459672455,
+                    1.2701292784499905,
+                    1.3760674212353528
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f13/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f13/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f14",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.7698292434717016
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f14/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    2.3994783348854387,
+                    2.080658697380716
+                  ],
+                  "omega": [
+                    4.540982591914573,
+                    3.2019896996060875,
+                    3.8312273614413175,
+                    3.6589258190529876
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f14/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f14/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f15",
+      "category": "Single-Component Multimodal",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 0.0
+        },
+        "function": {
+          "type": "power",
+          "parameters": {
+            "exponent": 0.9351914171148381
+          },
+          "function": {
+            "type": "sphere",
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": "f15/vector_cond_c1_D{dim}.txt"
+              },
+              "function": {
+                "type": "log_sin",
+                "parameters": {
+                  "mu": [
+                    2.799681242368374,
+                    2.894548764654129
+                  ],
+                  "omega": [
+                    3.2184474972295734,
+                    2.612280422290271,
+                    4.269923149426859,
+                    1.2424509446862704
+                  ]
+                },
+                "function": {
+                  "type": "rotate",
+                  "parameters": {
+                    "matrix": "f15/matrix_rotation_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "shift",
+                    "parameters": {
+                      "vector": "f15/vector_shift_c1_D{dim}.txt"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f16",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.9508195531157126
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f16/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.3733140991937756,
+                        1.275690404788014
+                      ],
+                      "omega": [
+                        4.533463790549321,
+                        3.6375312592225533,
+                        2.228922052720626,
+                        3.370824599807006
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f16/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f16/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 57.080224100172
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.9048947917984681
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f16/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.8615486149044864,
+                        2.313474716758482
+                      ],
+                      "omega": [
+                        2.5556409876295207,
+                        4.751494888863412,
+                        3.869812889988942,
+                        4.540781446443866
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f16/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f16/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 32.941043022099514
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.9576188678028077
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f16/vector_cond_c3_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.3403081898843767,
+                        2.6471127704923947
+                      ],
+                      "omega": [
+                        2.591624911459698,
+                        4.728831416102013,
+                        4.944617449094054,
+                        3.7355558423781585
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f16/matrix_rotation_c3_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f16/vector_shift_c3_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 83.17776162598422
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.7168746578723204
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f16/vector_cond_c4_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.706951976928363,
+                        2.409018676390092
+                      ],
+                      "omega": [
+                        3.0031194844711986,
+                        4.756130014233094,
+                        1.1607169096774874,
+                        1.350398965566228
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f16/matrix_rotation_c4_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f16/vector_shift_c4_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 19.385794536087705
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.7043652969508492
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f16/vector_cond_c5_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.365597837709086,
+                        1.6117802086209645
+                      ],
+                      "omega": [
+                        4.275135539855791,
+                        4.1416038935828325,
+                        4.461244030402491,
+                        2.361049673925395
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f16/matrix_rotation_c5_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f16/vector_shift_c5_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f17",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.9787580087769034
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f17/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.084111321147856,
+                        1.8005550164785333
+                      ],
+                      "omega": [
+                        1.9106630247368068,
+                        1.2701589229479668,
+                        1.5746401821645168,
+                        2.5250964135601115
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f17/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f17/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 41.009105563780956
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5551760736928519
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f17/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.209216382909669,
+                        2.3977893949241915
+                      ],
+                      "omega": [
+                        2.35292584702727,
+                        3.5553476221722184,
+                        3.6250453124482815,
+                        4.804252677242399
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f17/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f17/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 32.29919411007671
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5334725912795077
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f17/vector_cond_c3_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.736810932826516,
+                        1.3492567204577213
+                      ],
+                      "omega": [
+                        1.2001313407285794,
+                        3.23328771508081,
+                        2.560199978067506,
+                        4.908405740003388
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f17/matrix_rotation_c3_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f17/vector_shift_c3_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f18",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5951516754273163
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f18/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.4313926781543702,
+                        2.014673935904052
+                      ],
+                      "omega": [
+                        2.6456989306359766,
+                        1.5593326396832055,
+                        2.9584944335780268,
+                        4.902827305887849
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f18/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f18/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 76.39614364044783
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.9570692137262122
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f18/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.1452369066119887,
+                        1.4744987873600672
+                      ],
+                      "omega": [
+                        1.9993433213852523,
+                        4.112681796611003,
+                        1.8679057608682301,
+                        2.382454808933832
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f18/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f18/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f19",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5524268015288165
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f19/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.033447406468226,
+                        2.25792046658232
+                      ],
+                      "omega": [
+                        4.812478114655718,
+                        2.032913324843493,
+                        1.4357890467884866,
+                        1.68754059597173
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f19/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f19/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 52.72261577208186
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.9133809093363294
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f19/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.3826244904244667,
+                        2.01269898350227
+                      ],
+                      "omega": [
+                        3.0106573068439206,
+                        4.269070891089928,
+                        1.1862396464158955,
+                        1.5656709240570241
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f19/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f19/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 87.18155940299683
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5448368042063414
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f19/vector_cond_c3_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.164024280683565,
+                        2.096536778745235
+                      ],
+                      "omega": [
+                        4.550085951957058,
+                        4.891665994647074,
+                        4.6012904833923916,
+                        3.813162511477843
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f19/matrix_rotation_c3_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f19/vector_shift_c3_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f20",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.511739114468014
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f20/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.9517417428544475,
+                        1.9458314539093136
+                      ],
+                      "omega": [
+                        2.9149552736000843,
+                        3.8643587065552936,
+                        4.291311384704063,
+                        1.53154915674686
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f20/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f20/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 25.75585108289137
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.6437866732201392
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f20/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.6730985844049902,
+                        1.6705740209582087
+                      ],
+                      "omega": [
+                        2.896454686531445,
+                        4.0002103226218395,
+                        1.57963242135164,
+                        3.6601965839700092
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f20/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f20/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f21",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.6269570008880119
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f21/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.570827657697781,
+                        1.1179092805497575
+                      ],
+                      "omega": [
+                        3.670415431986329,
+                        4.1237996175970615,
+                        2.300180158394914,
+                        4.2854363575682255
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f21/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f21/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 98.3483173315132
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5478486584515103
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f21/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.3059081423085512,
+                        2.2912820083137158
+                      ],
+                      "omega": [
+                        4.333898403744216,
+                        4.392647723004714,
+                        3.3480153978205975,
+                        3.507574640075295
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f21/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f21/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 28.033066788435775
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.7259150200732538
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f21/vector_cond_c3_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.4727246831830552,
+                        1.6145665330041352
+                      ],
+                      "omega": [
+                        1.228269591667285,
+                        3.322272171893705,
+                        2.0240723146387127,
+                        4.060887903515104
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f21/matrix_rotation_c3_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f21/vector_shift_c3_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f22",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5024180811779149
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f22/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.4321021317558318,
+                        1.6737764570086835
+                      ],
+                      "omega": [
+                        4.068273250851644,
+                        2.3677923128545575,
+                        4.554353991923811,
+                        3.0932220884495454
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f22/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f22/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 40.245177879260844
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.8739787066303071
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f22/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.9154956032481705,
+                        1.4304683282220398
+                      ],
+                      "omega": [
+                        4.969894578038849,
+                        1.5587571117996908,
+                        3.977255267104987,
+                        1.5899313479562203
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f22/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f22/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f23",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.666087121650077
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f23/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.154491048943651,
+                        2.377619088808866
+                      ],
+                      "omega": [
+                        4.206759748770458,
+                        1.5180374603465716,
+                        3.8267172448005677,
+                        3.9384568427826427
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f23/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f23/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 13.292721885384653
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5779657193432888
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f23/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.1318504374721643,
+                        1.9721810159567927
+                      ],
+                      "omega": [
+                        2.3902719900767786,
+                        4.429078833511115,
+                        2.8376055295356952,
+                        4.1204708680096145
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f23/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f23/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    },
+    {
+      "id": "gnbg_f24",
+      "category": "Multi-Component Multimodal",
+      "function": {
+        "type": "min",
+        "functions": [
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 0.0
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.7605116001025112
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f24/vector_cond_c1_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        1.4694882920555448,
+                        1.6922478973706365
+                      ],
+                      "omega": [
+                        2.417192726986498,
+                        2.7590119380565854,
+                        1.7410101293031333,
+                        3.312194042149143
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f24/matrix_rotation_c1_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f24/vector_shift_c1_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 56.47810582930955
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.5642755268082398
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f24/vector_cond_c2_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.3531414068821115,
+                        1.935176434975288
+                      ],
+                      "omega": [
+                        2.5259459934656454,
+                        2.1844380695548695,
+                        4.668227162574438,
+                        3.4712693819750355
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f24/matrix_rotation_c2_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f24/vector_shift_c2_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 23.52815795093217
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.8117820164394531
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f24/vector_cond_c3_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.703399719399843,
+                        2.630662221911452
+                      ],
+                      "omega": [
+                        1.5257681215660739,
+                        3.3173833386903397,
+                        1.6120417796182913,
+                        2.795346667465904
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f24/matrix_rotation_c3_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f24/vector_shift_c3_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "bias",
+            "parameters": {
+              "value": 60.61149363858632
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 0.9427583351783073
+              },
+              "function": {
+                "type": "sphere",
+                "function": {
+                  "type": "scale",
+                  "parameters": {
+                    "factor": "f24/vector_cond_c4_D{dim}.txt"
+                  },
+                  "function": {
+                    "type": "log_sin",
+                    "parameters": {
+                      "mu": [
+                        2.3204456672835816,
+                        2.108180127946029
+                      ],
+                      "omega": [
+                        1.0386846455130536,
+                        1.6158983181529805,
+                        4.104150065691032,
+                        3.6002708133088124
+                      ]
+                    },
+                    "function": {
+                      "type": "rotate",
+                      "parameters": {
+                        "matrix": "f24/matrix_rotation_c4_D{dim}.txt"
+                      },
+                      "function": {
+                        "type": "shift",
+                        "parameters": {
+                          "vector": "f24/vector_shift_c4_D{dim}.txt"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          30,
+          50,
+          100
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -5.0,
+          "max": 5.0
+        }
+      }
+    }
+  ]
+}

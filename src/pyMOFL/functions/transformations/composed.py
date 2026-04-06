@@ -8,7 +8,7 @@ import numpy as np
 
 from pyMOFL.core.function import OptimizationFunction
 
-from .base import ScalarTransform, VectorTransform
+from .base import PenaltyTransform, ScalarTransform, VectorTransform
 
 
 class ComposedFunction(OptimizationFunction):
@@ -29,6 +29,7 @@ class ComposedFunction(OptimizationFunction):
         base_function: OptimizationFunction,
         input_transforms: list[VectorTransform] | None = None,
         output_transforms: list[ScalarTransform] | None = None,
+        penalty_transforms: list[PenaltyTransform] | None = None,
     ):
         """
         Initialize composed function.
@@ -37,6 +38,9 @@ class ComposedFunction(OptimizationFunction):
             base_function: The optimization function to evaluate
             input_transforms: List of vector transforms to apply to input (in order)
             output_transforms: List of scalar transforms to apply to output (in order)
+            penalty_transforms: List of penalty transforms (vector→scalar) whose
+                results are added to the output. Penalties are computed on the
+                raw input vector before input_transforms are applied.
         """
         super().__init__(
             dimension=base_function.dimension,
@@ -47,6 +51,7 @@ class ComposedFunction(OptimizationFunction):
         self.base_function = base_function
         self.input_transforms = input_transforms or []
         self.output_transforms = output_transforms or []
+        self.penalty_transforms = penalty_transforms or []
 
         # Set component function for any normalize transforms that need it
         for transform in self.output_transforms:
@@ -75,7 +80,8 @@ class ComposedFunction(OptimizationFunction):
         """
         Evaluate the composed function.
 
-        Applies input transforms, evaluates base function, applies output transforms.
+        Applies input transforms, evaluates base function, applies output transforms,
+        then adds penalty transforms computed on the raw (pre-transform) input.
 
         Args:
             x: Input vector
@@ -84,6 +90,7 @@ class ComposedFunction(OptimizationFunction):
             Final scalar result
         """
         x = self._validate_input(x)
+        raw_x = x  # Preserve for penalty computation
 
         # Apply input transformations in order
         for transform in self.input_transforms:
@@ -95,6 +102,10 @@ class ComposedFunction(OptimizationFunction):
         # Apply output transformations in order
         for transform in self.output_transforms:
             result = transform(result)
+
+        # Add penalty transforms (computed on raw input)
+        for penalty in self.penalty_transforms:
+            result += penalty(raw_x)
 
         return float(result)
 
@@ -109,6 +120,7 @@ class ComposedFunction(OptimizationFunction):
             Batch of results
         """
         X = self._validate_batch_input(X)
+        raw_X = X  # Preserve for penalty computation
 
         # Apply input transformations in order
         for transform in self.input_transforms:
@@ -120,5 +132,9 @@ class ComposedFunction(OptimizationFunction):
         # Apply output transformations in order
         for transform in self.output_transforms:
             results = transform.transform_batch(results)
+
+        # Add penalty transforms (computed on raw input)
+        for penalty in self.penalty_transforms:
+            results = results + penalty.compute_batch(raw_X)
 
         return results

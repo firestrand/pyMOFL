@@ -41,8 +41,8 @@ class TestWeierstrassFunction:
     def test_global_minimum(self):
         """Test the function at its global minimum."""
         for dim in [2, 3, 5]:
-            min_point, min_value = WeierstrassFunction.get_global_minimum(dim)
             func = WeierstrassFunction(dimension=dim)
+            min_point, min_value = func.get_global_minimum()
             np.testing.assert_allclose(min_point, np.zeros(dim))
             assert min_value == 0.0
             np.testing.assert_allclose(func.evaluate(min_point), min_value, atol=1e-10)

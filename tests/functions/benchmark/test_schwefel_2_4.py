@@ -28,7 +28,8 @@ class TestSchwefel_2_4:
             assert np.isclose(func.evaluate(x_opt), 0.0, atol=1e-15)
 
     def test_get_global_minimum(self):
-        point, value = Schwefel_2_4.get_global_minimum(4)
+        func = Schwefel_2_4(dimension=4)
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, np.ones(4))
         assert value == 0.0
 

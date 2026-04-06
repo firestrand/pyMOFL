@@ -29,6 +29,27 @@ class VectorTransform(ABC):
         return np.array([self(x) for x in X])
 
 
+class PenaltyTransform(ABC):
+    """
+    Base class for vector-to-scalar penalty transformations.
+
+    These take an input vector and return a scalar penalty value
+    to be added to the function output. Used for boundary penalties
+    in BBOB-style benchmarks where the penalty depends on the raw input
+    vector, not the scalar function output.
+    """
+
+    @abstractmethod
+    def __call__(self, x: np.ndarray) -> float:
+        """Compute penalty for a single vector."""
+        pass
+
+    def compute_batch(self, X: np.ndarray) -> np.ndarray:
+        """Compute penalties for a batch of vectors."""
+        # Default implementation - can be overridden for efficiency
+        return np.array([self(x) for x in X])
+
+
 class ScalarTransform(ABC):
     """
     Base class for scalar-to-scalar transformations.

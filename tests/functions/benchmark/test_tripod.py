@@ -44,7 +44,7 @@ class TestTripodFunction:
         func = TripodFunction()
 
         # Get global minimum
-        min_point, min_value = TripodFunction.get_global_minimum()
+        min_point, min_value = func.get_global_minimum()
 
         # Verify global minimum point and value
         np.testing.assert_allclose(min_point, np.array([0, -50]))
@@ -131,10 +131,6 @@ class TestTripodFunction:
 
         with pytest.raises(ValueError):
             func.evaluate_batch(np.array([[1, 2, 3], [4, 5, 6]]))
-
-        # Test global_minimum with wrong dimension
-        with pytest.raises(ValueError):
-            TripodFunction.get_global_minimum(dimension=3)
 
     def test_non_negativity(self):
         """Test that function values are non-negative for points in the domain."""

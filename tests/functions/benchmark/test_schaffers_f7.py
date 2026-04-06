@@ -47,9 +47,10 @@ class TestSchaffersF7Function:
             assert abs(result) < 1e-12, f"Expected 0.0 at origin for dim={dim}, got {result}"
 
     def test_get_global_minimum(self):
-        """Test get_global_minimum static method returns correct values."""
+        """Test get_global_minimum instance method returns correct values."""
         for dim in [2, 5, 10, 30]:
-            min_point, min_value = SchaffersF7Function.get_global_minimum(dim)
+            func = SchaffersF7Function(dimension=dim)
+            min_point, min_value = func.get_global_minimum()
             np.testing.assert_array_equal(min_point, np.zeros(dim))
             assert min_value == 0.0
 
@@ -57,7 +58,7 @@ class TestSchaffersF7Function:
         """Test that evaluating at the returned global minimum gives the stated value."""
         for dim in [2, 5, 10]:
             func = SchaffersF7Function(dimension=dim)
-            min_point, min_value = SchaffersF7Function.get_global_minimum(dim)
+            min_point, min_value = func.get_global_minimum()
             result = func.evaluate(min_point)
             assert abs(result - min_value) < 1e-12
 

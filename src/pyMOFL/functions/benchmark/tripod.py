@@ -121,23 +121,14 @@ class TripodFunction(OptimizationFunction):
         assert self.operational_bounds is not None
         return np.stack([self.operational_bounds.low, self.operational_bounds.high], axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
-        """
-        Get the global minimum of the function.
-
-        Parameters
-        ----------
-        dimension : int, optional
-            The dimension of the function. Defaults to 2, as Tripod is always 2D.
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get the global minimum of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
-        if dimension != 2:
-            raise ValueError("Tripod function is only defined for 2 dimensions")
         global_min_point = np.array([0.0, -50.0])
         global_min_value = 0.0
         return global_min_point, global_min_value

@@ -37,20 +37,16 @@ class TestMcCormickFunction:
     def test_global_minimum(self):
         """Test function value at global minimum."""
         func = McCormickFunction()
-        min_point, min_value = McCormickFunction.get_global_minimum()
+        min_point, min_value = func.get_global_minimum()
         result = func.evaluate(min_point)
         assert result == pytest.approx(min_value, abs=1e-3)
 
     def test_get_global_minimum(self):
         """Test get_global_minimum returns correct point and value."""
-        min_point, min_value = McCormickFunction.get_global_minimum()
+        func = McCormickFunction()
+        min_point, min_value = func.get_global_minimum()
         np.testing.assert_array_almost_equal(min_point, np.array([-0.54719, -1.54719]), decimal=4)
         assert min_value == pytest.approx(-1.9133, abs=1e-3)
-
-    def test_get_global_minimum_wrong_dimension(self):
-        """Test get_global_minimum rejects non-2D."""
-        with pytest.raises(ValueError):
-            McCormickFunction.get_global_minimum(dimension=3)
 
     def test_value_at_origin(self):
         """Test function value at origin — hand-computed."""

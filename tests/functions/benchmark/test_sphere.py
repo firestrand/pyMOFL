@@ -63,8 +63,10 @@ class TestSphereFunction:
     def test_global_minimum(self):
         """Test the global minimum function."""
         for dim in [2, 5, 10]:
+            func = SphereFunction(dimension=dim)
+
             # Get the global minimum
-            point, value = SphereFunction.get_global_minimum(dim)
+            point, value = func.get_global_minimum()
 
             # Check the point shape and value
             assert point.shape == (dim,)
@@ -72,7 +74,6 @@ class TestSphereFunction:
             assert value == 0.0
 
             # Verify that evaluating at the global minimum gives the expected value
-            func = SphereFunction(dimension=dim)
             assert np.isclose(func.evaluate(point), value)
 
             # Check with bias

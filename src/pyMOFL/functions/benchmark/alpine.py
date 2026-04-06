@@ -87,12 +87,9 @@ class Alpine1Function(OptimizationFunction):
 
         return results
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("Alpine 1 requires dimension=2")
-        return np.array([0.0, 0.0]), 0.0
+        return np.zeros(self.dimension), 0.0
 
 
 @register("Alpine_2")
@@ -167,15 +164,14 @@ class Alpine2Function(OptimizationFunction):
 
         return results
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
         # Global minimum approximately at x_i ≈ 7.917 for all i
-        min_point = np.full(dimension, 7.917)
+        min_point = np.full(self.dimension, 7.917)
 
         # Global minimum value approximately 2.808^n
         # More precisely: (√7.917 * sin(7.917))^n ≈ 2.808^n
         component_value = np.sqrt(7.917) * np.sin(7.917)
-        min_value = component_value**dimension
+        min_value = component_value**self.dimension
 
         return min_point, float(min_value)

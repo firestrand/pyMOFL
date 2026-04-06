@@ -44,9 +44,10 @@ class TestSumDifferentPowersFunction:
             assert abs(result) < 1e-10, f"Expected 0 at origin for dim={dim}, got {result}"
 
     def test_get_global_minimum(self):
-        """Test static get_global_minimum method returns correct point and value."""
+        """Test get_global_minimum method returns correct point and value."""
         for dim in [2, 5, 10]:
-            min_point, min_value = SumDifferentPowersFunction.get_global_minimum(dim)
+            func = SumDifferentPowersFunction(dimension=dim)
+            min_point, min_value = func.get_global_minimum()
             np.testing.assert_array_equal(min_point, np.zeros(dim))
             assert min_value == 0.0
 
@@ -54,7 +55,7 @@ class TestSumDifferentPowersFunction:
         """Test that evaluating at the returned global minimum gives the returned value."""
         for dim in [2, 5, 10]:
             func = SumDifferentPowersFunction(dimension=dim)
-            min_point, min_value = SumDifferentPowersFunction.get_global_minimum(dim)
+            min_point, min_value = func.get_global_minimum()
             evaluated = func.evaluate(min_point)
             assert abs(evaluated - min_value) < 1e-10
 

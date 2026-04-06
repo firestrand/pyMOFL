@@ -147,19 +147,12 @@ class LennardJonesFunction(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.array([self.evaluate(x) for x in X])
 
-    @staticmethod
-    def get_global_minimum(n_atoms: int = 6) -> tuple:
-        """
-        Get the global minimum of the Lennard-Jones function for a given number of atoms.
-
-        Parameters
-        ----------
-        n_atoms : int, optional
-            Number of atoms in the cluster. Defaults to 6.
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get the global minimum of the Lennard-Jones function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
             global_min_point is a zero vector of length 3*n_atoms (placeholder, not unique).
             global_min_value is the reference minimum energy from the LJ_GLOBAL_MINIMA table.
@@ -170,7 +163,8 @@ class LennardJonesFunction(OptimizationFunction):
         This method returns a zero vector as a placeholder for the coordinates, and the reference minimum
         energy from the literature for the given n_atoms.
         """
-        dimension = 3 * n_atoms
-        global_min_point = np.zeros(dimension)
-        global_min_value = LennardJonesFunction.LJ_GLOBAL_MINIMA.get(n_atoms, None)
-        return global_min_point, global_min_value
+        global_min_point = np.zeros(self.dimension)
+        global_min_value = LennardJonesFunction.LJ_GLOBAL_MINIMA.get(self.n_atoms)
+        if global_min_value is None:
+            global_min_value = float(self.evaluate(global_min_point))
+        return global_min_point, float(global_min_value)

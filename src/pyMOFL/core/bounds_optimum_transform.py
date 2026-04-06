@@ -11,19 +11,11 @@ from typing import Any
 import numpy as np
 
 _OPTIMUM_ALIAS: dict[str, str] = {
-    "bounds_shift": "bounds_shift",
-    "cec2005_f05": "bounds_shift",
     "alternate_bounds": "alternate_bounds",
     "alternate": "alternate_bounds",
-    "alternate_shift": "alternate_bounds",
-    "alternate_bounds_opt": "alternate_bounds",
-    "cec2005_f08": "alternate_bounds",
     "composition_bounds": "composition_bounds",
-    "cec2005_f20": "composition_bounds",
     "alternate_odds": "alternate_odds",
-    "f20_alternate_odds": "alternate_odds",
     "non_continuous": "non_continuous",
-    "cec2005_f23": "non_continuous",
 }
 
 
@@ -43,62 +35,6 @@ class OptimumPattern(ABC):
     ) -> np.ndarray:
         """Construct the optimum point based on the pattern."""
         pass
-
-
-class BoundsShiftOptimumPattern(OptimumPattern):
-    """
-    Bounds-shift optimum pattern.
-
-    Creates optimum points using a combination of bounds and shift vector values.
-    The pattern divides dimensions into three sections: lower bounds, shift values,
-    and upper bounds.
-
-    Pattern by dimension:
-    - D=2: [upper, upper]
-    - D=10: [lower]*3 + shift[3:6] + [upper]*4
-    - D=30: [lower]*8 + shift[8:21] + [upper]*9
-    - D=50: [lower]*13 + shift[13:36] + [upper]*14
-    - Other D: approximation using thirds
-    """
-
-    def construct_optimum(
-        self,
-        dimension: int,
-        shift_vector: np.ndarray,
-        lower_bound: float = -100.0,
-        upper_bound: float = 100.0,
-    ) -> np.ndarray:
-        """Construct optimum using bounds-shift pattern."""
-        optimum = np.zeros(dimension)
-
-        if dimension == 2:
-            optimum[:] = upper_bound
-        elif dimension == 10:
-            optimum[:3] = lower_bound
-            optimum[3:6] = shift_vector[3:6]
-            optimum[6:] = upper_bound
-        elif dimension == 30:
-            optimum[:8] = lower_bound
-            optimum[8:21] = shift_vector[8:21]
-            optimum[21:] = upper_bound
-        elif dimension == 50:
-            optimum[:13] = lower_bound
-            optimum[13:36] = shift_vector[13:36]
-            optimum[36:] = upper_bound
-        else:
-            # General pattern for other dimensions
-            third = dimension // 3
-            optimum[:third] = lower_bound
-            if 2 * third <= len(shift_vector):
-                optimum[third : 2 * third] = shift_vector[third : 2 * third]
-            else:
-                # If shift vector is shorter, use what we have
-                available = min(third, len(shift_vector) - third)
-                optimum[third : third + available] = shift_vector[third : third + available]
-                optimum[third + available : 2 * third] = upper_bound
-            optimum[2 * third :] = upper_bound
-
-        return optimum
 
 
 class AlternateShiftOptimumPattern(OptimumPattern):
@@ -228,17 +164,14 @@ class BoundsOptimumTransform:
         """Create transform from configuration.
 
         Supported pattern names:
-        - ``"bounds_shift"`` (alias: ``"cec2005_f05"``)
-        - ``"alternate_bounds"`` (alias: ``"alternate_shift"``, ``"alternate_bounds_opt"``, ``"cec2005_f08"``)
-        - ``"composition_bounds"`` (alias: ``"cec2005_f20"``)
-        - ``"alternate_odds"`` (alias: ``"f20_alternate_odds"``)
-        - ``"non_continuous"`` (alias: ``"cec2005_f23"``)
+        - ``"alternate_bounds"``
+        - ``"composition_bounds"``
+        - ``"alternate_odds"``
+        - ``"non_continuous"``
         """
-        pattern_type = normalize_optimum_pattern(config.get("pattern", "bounds_shift"))
+        pattern_type = normalize_optimum_pattern(config.get("pattern", "alternate_bounds"))
 
-        if pattern_type == "bounds_shift":
-            pattern = BoundsShiftOptimumPattern()
-        elif pattern_type == "alternate_bounds":
+        if pattern_type == "alternate_bounds":
             pattern = AlternateShiftOptimumPattern()
         elif pattern_type == "composition_bounds":
             pattern = CompositionBoundsOptimumPattern()

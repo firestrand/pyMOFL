@@ -87,17 +87,15 @@ class RastriginFunction(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.sum(X**2 - 10 * np.cos(2 * np.pi * X) + 10, axis=1)
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """
         Get the global minimum of the function.
 
-        Args:
-            dimension (int): The dimension of the function.
-
-        Returns:
-            tuple: A tuple containing the global minimum point and the function value at that point.
+        Returns
+        -------
+        tuple[np.ndarray, float]
+            (global_min_point, global_min_value)
         """
-        global_min_point = np.zeros(dimension)
+        global_min_point = np.zeros(self.dimension)
         global_min_value = 0.0
         return global_min_point, global_min_value

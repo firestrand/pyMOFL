@@ -42,6 +42,7 @@ class DifferentPowersFunction(OptimizationFunction):
         operational_bounds: Bounds | None = None,
         **kwargs,
     ):
+        integer_exponents = kwargs.pop("integer_exponents", False)
         default_bounds = Bounds(
             low=np.full(dimension, -100.0),
             high=np.full(dimension, 100.0),
@@ -57,6 +58,12 @@ class DifferentPowersFunction(OptimizationFunction):
         # Pre-compute exponents: 2 + 4*(i-1)/(D-1) for i=1..D (1-based)
         if dimension == 1:
             self._exponents = np.array([2.0])
+        elif integer_exponents:
+            # CEC 2013 C code uses integer division: 2 + 4*i/(D-1)
+            self._exponents = np.array(
+                [2 + (4 * i) // (dimension - 1) for i in range(dimension)],
+                dtype=np.float64,
+            )
         else:
             self._exponents = 2.0 + 4.0 * np.arange(dimension) / (dimension - 1)
 
@@ -70,18 +77,12 @@ class DifferentPowersFunction(OptimizationFunction):
         X = self._validate_batch_input(X)
         return np.sqrt(np.sum(np.abs(X) ** self._exponents, axis=1))
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Different Powers function.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
-        return np.zeros(dimension), 0.0
+        return np.zeros(self.dimension), 0.0

@@ -50,7 +50,8 @@ class TestBraninFunction:
 
     def test_global_minimum(self):
         """Test global minimum - Branin has 3 global minima."""
-        min_point, min_value = BraninFunction.get_global_minimum(2)
+        func = BraninFunction()
+        min_point, min_value = func.get_global_minimum()
         expected_value = 0.397887
 
         # Should return one of the three global minima
@@ -69,11 +70,6 @@ class TestBraninFunction:
 
         assert is_close_to_known, f"Returned minimum {min_point} not close to any known minimum"
         assert abs(min_value - expected_value) < 1e-5
-
-    def test_global_minimum_dimension_validation(self):
-        """Test global minimum raises error for wrong dimension."""
-        with pytest.raises(ValueError, match="Branin requires dimension=2"):
-            BraninFunction.get_global_minimum(3)
 
     def test_evaluate_at_global_minima(self):
         """Test function evaluates to ~0.397887 at global minima."""
@@ -191,7 +187,8 @@ class TestBranin2Function:
 
     def test_global_minimum(self):
         """Test global minimum."""
-        min_point, min_value = Branin2Function.get_global_minimum(2)
+        func = Branin2Function()
+        min_point, min_value = func.get_global_minimum()
 
         # Branin 2 should have global minimum around similar locations as Branin
         # but with different value
@@ -202,7 +199,7 @@ class TestBranin2Function:
     def test_evaluate_at_global_minimum(self):
         """Test function evaluates correctly at global minimum."""
         func = Branin2Function()
-        min_point, min_value = Branin2Function.get_global_minimum(2)
+        min_point, min_value = func.get_global_minimum()
 
         result = func.evaluate(min_point)
         assert abs(result - min_value) < 1e-10
@@ -292,10 +289,9 @@ class TestBraninFamilyIntegration:
     def test_global_minimum_consistency(self):
         """Test global minimum methods are consistent."""
         for func_class in [BraninFunction, Branin2Function]:
-            min_point, min_value = func_class.get_global_minimum(2)
-
-            # Create instance and verify
             func = func_class()
+            min_point, min_value = func.get_global_minimum()
+
             evaluated_value = func.evaluate(min_point)
 
             assert abs(evaluated_value - min_value) < 1e-6, (

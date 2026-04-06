@@ -70,21 +70,15 @@ class DixonPriceFunction(OptimizationFunction):
         term2 = np.sum(self._indices * (2 * X[:, 1:] ** 2 - X[:, :-1]) ** 2, axis=1)
         return term1 + term2
 
-    @staticmethod
-    def get_global_minimum(dimension: int) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Dixon-Price function.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension of the function.
 
         Returns
         -------
-        tuple
+        tuple[np.ndarray, float]
             (global_min_point, global_min_value)
         """
         # x_i = 2^(-(2^i - 2) / 2^i) for i = 1..D (1-based)
-        i = np.arange(1, dimension + 1, dtype=float)
+        i = np.arange(1, self.dimension + 1, dtype=float)
         x_opt = 2.0 ** (-(2.0**i - 2.0) / 2.0**i)
         return x_opt, 0.0

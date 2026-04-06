@@ -39,6 +39,7 @@ class HybridFunction(OptimizationFunction):
         weights: list[float] | None = None,
         initialization_bounds: Bounds | None = None,
         operational_bounds: Bounds | None = None,
+        normalize_weights: bool = True,
     ):
         """
         Initialize the hybrid function.
@@ -52,6 +53,8 @@ class HybridFunction(OptimizationFunction):
                                                    If None, constructs bounds from component bounds.
             operational_bounds (Bounds, optional): Bounds for operation.
                                                    If None, constructs bounds from component bounds.
+            normalize_weights (bool): If True, normalize weights to sum to 1.
+                                     If False, use weights as-is (e.g. for plain summation).
         """
         # Check if the number of components matches the number of partitions
         if len(components) != len(partitions):
@@ -112,13 +115,16 @@ class HybridFunction(OptimizationFunction):
 
         # Set weights
         if weights is None:
-            self.weights = np.ones(len(components)) / len(components)
+            if normalize_weights:
+                self.weights = np.ones(len(components)) / len(components)
+            else:
+                self.weights = np.ones(len(components))
         else:
             self.weights = np.asarray(weights)
             if len(self.weights) != len(components):
                 raise ValueError("The number of weights must match the number of components")
             # Normalize weights
-            if np.sum(self.weights) > 0:
+            if normalize_weights and np.sum(self.weights) > 0:
                 self.weights = self.weights / np.sum(self.weights)
 
     def evaluate(self, x: np.ndarray) -> float:

@@ -128,7 +128,7 @@
               "shift_file": { "type": "string", "minLength": 1, "description": "Shift vector path (alias)" },
               "bounds_mapping": {
                 "type": "string",
-                "enum": ["alternate", "alternate_bounds", "cec2005_f08", "alternate_bounds_opt", "bounds_shift", "cec2005_f05", "composition_bounds", "cec2005_f20"],
+                "enum": ["alternate", "alternate_bounds", "composition_bounds"],
                 "description": "Bounds mapping strategy for shift vectors"
               },
               "dimension": { "type": "integer", "minimum": 1 }
@@ -377,10 +377,14 @@
         "properties": {
           "parameters": {
             "type": "object",
-            "required": ["matrix_A"],
+            "required": ["A"],
             "properties": {
-              "matrix_A": { "type": "string", "minLength": 1, "description": "Path to matrix A data file" },
-              "optimum_pattern": { "type": "string", "description": "Pattern for generating the optimum vector" },
+              "A": { "type": "string", "minLength": 1, "description": "Path to matrix A data file" },
+              "B": { "type": ["string", "array"], "description": "Precomputed B vector" },
+              "optimum_point": {
+                "type": ["string", "array"],
+                "description": "Optional explicit optimum point"
+              },
               "dimension": { "type": "integer", "minimum": 1 }
             },
             "additionalProperties": false
@@ -399,10 +403,10 @@
         "properties": {
           "parameters": {
             "type": "object",
-            "required": ["matrix_A", "matrix_B", "alpha"],
+            "required": ["a", "b", "alpha"],
             "properties": {
-              "matrix_A": { "type": "string", "minLength": 1, "description": "Path to matrix A data file" },
-              "matrix_B": { "type": "string", "minLength": 1, "description": "Path to matrix B data file" },
+              "a": { "type": ["string", "array"], "description": "Matrix A data source for sine terms" },
+              "b": { "type": ["string", "array"], "description": "Matrix B data source for cosine terms" },
               "alpha": { "type": "string", "minLength": 1, "description": "Path to alpha vector file" },
               "dimension": { "type": "integer", "minimum": 1 }
             },

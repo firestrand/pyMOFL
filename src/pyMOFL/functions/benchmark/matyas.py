@@ -75,9 +75,6 @@ class MatyasFunction(OptimizationFunction):
         x1, x2 = X[:, 0], X[:, 1]
         return 0.26 * (x1**2 + x2**2) - 0.48 * x1 * x2
 
-    @staticmethod
-    def get_global_minimum(dimension: int = 2) -> tuple:
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
-        if dimension != 2:
-            raise ValueError("Matyas requires dimension=2")
         return np.array([0.0, 0.0]), 0.0

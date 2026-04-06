@@ -125,7 +125,8 @@ class TestGearTrainFunction:
         assert (values >= 0.0).all()
 
     def test_get_global_minimum(self):
-        """Test the static get_global_minimum method."""
-        min_point, min_value = GearTrainFunction.get_global_minimum()
+        """Test the get_global_minimum method."""
+        func = GearTrainFunction()
+        min_point, min_value = func.get_global_minimum()
         np.testing.assert_allclose(min_point, np.array([16, 19, 43, 49]))
         assert np.isclose(min_value, 1.643428e-6, atol=1e-8)

@@ -64,12 +64,17 @@ class OptimizationFunction(ABC):
         X = self._validate_batch_input(X)
         return np.array([self.evaluate(row) for row in X])
 
-    def violations(self, x: NDArray[Any]) -> float:
+    def violations(self, x: NDArray[Any]) -> NDArray[Any] | float:
         """
-        Returns the total constraint violation magnitude for x.
-        Override in subclasses for custom constraints.
+        Returns constraint violation information for x.
+        Subclasses may return either a scalar total violation or a
+        per-constraint vector.
         """
         return 0.0
+
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Return (optimum_point, optimum_value). Override in subclasses."""
+        raise NotImplementedError(f"{type(self).__name__} does not implement get_global_minimum")
 
     def _validate_input(self, x: NDArray[Any]) -> NDArray[Any]:
         """

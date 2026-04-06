@@ -35,7 +35,8 @@ class TestSchaffer1:
         assert np.isclose(func.evaluate(np.array([0.0, 0.0])), 0.0, atol=1e-12)
 
     def test_get_global_minimum(self):
-        point, value = Schaffer1Function.get_global_minimum()
+        func = Schaffer1Function()
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, [0.0, 0.0])
         assert value == 0.0
 
@@ -93,7 +94,8 @@ class TestSchaffer2:
         assert np.isclose(func.evaluate(np.array([0.0, 0.0])), 0.0, atol=1e-12)
 
     def test_get_global_minimum(self):
-        point, value = Schaffer2Function.get_global_minimum()
+        func = Schaffer2Function()
+        point, value = func.get_global_minimum()
         np.testing.assert_array_equal(point, [0.0, 0.0])
         assert value == 0.0
 
@@ -157,7 +159,7 @@ class TestSchaffer4:
     def test_global_minimum_value(self):
         """Global minimum ≈ 0.29257."""
         func = Schaffer4Function()
-        point, value = Schaffer4Function.get_global_minimum()
+        point, value = func.get_global_minimum()
         actual = func.evaluate(point)
         assert np.isclose(actual, value, atol=1e-4)
         assert np.isclose(value, 0.29258, atol=0.001)
