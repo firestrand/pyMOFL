@@ -23,6 +23,8 @@ class OptimizationFunction(ABC):
     initialization_bounds: Bounds
     operational_bounds: Bounds
     constraint_penalty: float = 1e8
+    name: str | None = None
+    function_id: str | None = None
 
     def __init__(
         self,

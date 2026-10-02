@@ -17,5 +17,18 @@ from . import compositions as compositions
 from . import functions as functions
 from . import utils as utils
 from .core.function import OptimizationFunction as OptimizationFunction
+from .loader import BenchmarkSuite as BenchmarkSuite
+from .loader import get_suite as get_suite
+from .loader import load as load
 
 scan_package()
+
+__all__ = [
+    "BenchmarkSuite",
+    "OptimizationFunction",
+    "compositions",
+    "functions",
+    "get_suite",
+    "load",
+    "utils",
+]
