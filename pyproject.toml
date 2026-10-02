@@ -41,6 +41,11 @@ cli = [
     "typer>=0.15",
     "rich>=13.0",
 ]
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
+]
 
 [project.scripts]
 pymofl = "pyMOFL.cli:app"
