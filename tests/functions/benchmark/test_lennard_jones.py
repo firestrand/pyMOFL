@@ -9,7 +9,8 @@ import pytest
 
 from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.bounds import Bounds
-from pyMOFL.functions import LennardJonesFunction
+from pyMOFL.functions import LennardJonesCECFunction, LennardJonesFunction
+from tests.utils.benchmark_validation import BenchmarkValidator
 
 
 class TestLennardJonesFunction:
@@ -51,6 +52,29 @@ class TestLennardJonesFunction:
         np.testing.assert_allclose(func.initialization_bounds.high, [1] * 18)
         np.testing.assert_allclose(func.operational_bounds.low, [-1] * 18)
         np.testing.assert_allclose(func.operational_bounds.high, [1] * 18)
+
+    def test_constructor_dimension_validation(self):
+        """Test strict dimension and n_atoms validation."""
+        # Non-multiples of 3 should be rejected (not silently shortened)
+        with pytest.raises(ValueError, match="multiple of 3"):
+            LennardJonesFunction(dimension=10)
+        with pytest.raises(ValueError, match="multiple of 3"):
+            LennardJonesFunction(dimension=5)
+
+        # Mismatch between dimension and n_atoms should be rejected
+        with pytest.raises(ValueError, match="dimension must equal 3 \\* n_atoms"):
+            LennardJonesFunction(dimension=12, n_atoms=5)
+        with pytest.raises(ValueError, match="dimension must equal 3 \\* n_atoms"):
+            LennardJonesFunction(dimension=9, n_atoms=4)
+
+        # n_atoms < 2 should be rejected
+        with pytest.raises(ValueError, match="n_atoms must be >= 2"):
+            LennardJonesFunction(n_atoms=1)
+
+        # Consistent dimension and n_atoms should succeed
+        func = LennardJonesFunction(dimension=12, n_atoms=4)
+        assert func.dimension == 12
+        assert func.n_atoms == 4
 
     def test_evaluate_octahedral(self):
         """Test the energy of an octahedral configuration."""
@@ -217,3 +241,67 @@ class TestLennardJonesFunction:
             coords.extend([float(parts[1]), float(parts[2]), float(parts[3])])
 
         return np.array(coords)
+
+
+class TestLennardJonesCECFunction:
+    """Tests for the CEC 2019 Lennard-Jones cluster function variant."""
+
+    def test_initialization(self):
+        """Test default initialization (18D, [-4, 4])."""
+        func = LennardJonesCECFunction()
+        assert func.dimension == 18
+        np.testing.assert_allclose(func.initialization_bounds.low, [-4.0] * 18)
+        np.testing.assert_allclose(func.initialization_bounds.high, [4.0] * 18)
+        np.testing.assert_allclose(func.operational_bounds.low, [-4.0] * 18)
+        np.testing.assert_allclose(func.operational_bounds.high, [4.0] * 18)
+
+    def test_initialization_invalid_dimension(self):
+        """Test invalid dimension validation and k outside CEC_MINIMA."""
+        with pytest.raises(ValueError):
+            LennardJonesCECFunction(dimension=5)
+        with pytest.raises(ValueError):
+            LennardJonesCECFunction(dimension=16)
+        # k outside CEC_MINIMA range [2, 25] (dim 6 to 75)
+        with pytest.raises(ValueError, match="multiple of 3 >= 6"):
+            LennardJonesCECFunction(dimension=3)  # k = 1
+        with pytest.raises(ValueError, match="only supports k in"):
+            LennardJonesCECFunction(dimension=78)  # k = 26
+        # Mismatch between dimension and n_atoms
+        with pytest.raises(ValueError, match="dimension must equal 3 \\* n_atoms"):
+            LennardJonesCECFunction(dimension=12, n_atoms=5)
+
+    def test_benchmark_contract(self):
+        """Test compliance with BenchmarkValidator contract and global minimum behavior."""
+        # For k=2 (6D), exact stored minimizer exists and evaluates to 0.0
+        func2 = LennardJonesCECFunction(dimension=6)
+        pt2, val2 = func2.get_global_minimum()
+        assert val2 == 0.0
+        assert abs(func2.evaluate(pt2)) < 1e-12
+        BenchmarkValidator.assert_contract(func2, check_global_minimum=True)
+
+        # For k=6 (18D), analytical coordinates are not stored: raises NotImplementedError
+        func18 = LennardJonesCECFunction(dimension=18)
+        with pytest.raises(NotImplementedError):
+            func18.get_global_minimum()
+        # BenchmarkValidator.assert_contract cleanly skips NotImplementedError
+        BenchmarkValidator.assert_contract(func18, check_global_minimum=True)
+
+    def test_evaluate_batch_matches_single(self):
+        """Test batch evaluation matches individual evaluations."""
+        func = LennardJonesCECFunction(dimension=18)
+        rng = np.random.default_rng(42)
+        X = rng.uniform(-2.0, 2.0, size=(10, 18))
+        batch_results = func.evaluate_batch(X)
+        single_results = np.array([func.evaluate(x) for x in X])
+        np.testing.assert_allclose(batch_results, single_results, rtol=1e-12, atol=1e-12)
+
+    def test_registry(self):
+        """Test registry retrieval for LennardJonesCEC."""
+        from pyMOFL.registry import get
+
+        func1 = get("LennardJonesCEC")(dimension=18)
+        func2 = get("lennard_jones_cec")(dimension=18)
+        assert isinstance(func1, LennardJonesCECFunction)
+        assert isinstance(func2, LennardJonesCECFunction)
+        x = np.ones(18)
+        assert func1.evaluate(x) == func2.evaluate(x)

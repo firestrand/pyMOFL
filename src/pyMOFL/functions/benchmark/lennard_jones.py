@@ -22,8 +22,11 @@ from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.function import OptimizationFunction
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.registry import register
 
 
+@register("LennardJones")
+@register("lennard_jones")
 class LennardJonesFunction(OptimizationFunction):
     """
     Lennard-Jones n-atom cluster potential energy function (SPSO ID-17).
@@ -76,11 +79,35 @@ class LennardJonesFunction(OptimizationFunction):
 
     def __init__(
         self,
-        n_atoms: int = 6,
+        n_atoms: int | None = None,
+        dimension: int | None = None,
         initialization_bounds: Bounds | None = None,
         operational_bounds: Bounds | None = None,
+        **kwargs,
     ):
-        dimension = 3 * n_atoms
+        if dimension is not None and n_atoms is not None:
+            if dimension != 3 * n_atoms:
+                raise ValueError(
+                    f"dimension must equal 3 * n_atoms when both are provided; got dimension={dimension}, n_atoms={n_atoms}"
+                )
+        elif dimension is not None:
+            if dimension % 3 != 0 or dimension < 6:
+                raise ValueError(
+                    f"dimension must be a multiple of 3 and >= 6; got dimension={dimension}"
+                )
+            n_atoms = dimension // 3
+        elif n_atoms is not None:
+            if n_atoms < 2:
+                raise ValueError(f"n_atoms must be >= 2; got {n_atoms}")
+            dimension = 3 * n_atoms
+        else:
+            n_atoms = 6
+            dimension = 18
+
+        if dimension % 3 != 0 or dimension < 6:
+            raise ValueError(
+                f"dimension must be a multiple of 3 and >= 6; got dimension={dimension}"
+            )
         default_init_bounds = Bounds(
             low=np.full(dimension, -2.0),
             high=np.full(dimension, 2.0),
@@ -168,3 +195,158 @@ class LennardJonesFunction(OptimizationFunction):
         if global_min_value is None:
             global_min_value = float(self.evaluate(global_min_point))
         return global_min_point, float(global_min_value)
+
+
+@register("LennardJonesCEC")
+@register("lennard_jones_cec")
+class LennardJonesCECFunction(OptimizationFunction):
+    """
+    Lennard-Jones atomic cluster potential energy function (CEC 2019 F3 variant).
+
+    Implements the atomic cluster potential energy function defined for the
+    CEC 2019 100-Digit Challenge:
+        f(x) = sum_{i < j} (1 / ud - 2) / ud + offset
+    where ud = r^6 = (dist^2)^3, with an overlapping atom penalty of 1e20 when
+    ud <= 1e-10. The offset shifts the theoretical minimum to 0.0.
+
+    Parameters
+    ----------
+    dimension : int, optional
+        Problem dimensionality (must be 3 * k where k >= 2 is number of atoms, default 18 for 6 atoms).
+    initialization_bounds : Bounds, optional
+        Bounds for random initialization. Defaults to [-4.0, 4.0]^D.
+    operational_bounds : Bounds, optional
+        Bounds for domain enforcement. Defaults to [-4.0, 4.0]^D.
+    """
+
+    CEC_MINIMA = [
+        -1.0,
+        -3.0,
+        -6.0,
+        -9.103852,
+        -12.7120622568,
+        -16.505384,
+        -19.821489,
+        -24.113360,
+        -28.422532,
+        -32.765970,
+        -37.967600,
+        -44.326801,
+        -47.845157,
+        -52.322627,
+        -56.815742,
+        -61.317995,
+        -66.530949,
+        -72.659782,
+        -77.1777043,
+        -81.684571,
+        -86.809782,
+        -92.844472,
+        -97.348815,
+        -102.372663,
+    ]
+
+    def __init__(
+        self,
+        dimension: int = 18,
+        n_atoms: int | None = None,
+        initialization_bounds: Bounds | None = None,
+        operational_bounds: Bounds | None = None,
+        **kwargs,
+    ):
+        if n_atoms is not None and dimension is not None and kwargs.get("_from_factory"):
+            pass
+        elif dimension is not None and n_atoms is not None:
+            if dimension != 3 * n_atoms:
+                raise ValueError(
+                    f"dimension must equal 3 * n_atoms when both are provided; got dimension={dimension}, n_atoms={n_atoms}"
+                )
+        elif n_atoms is not None:
+            dimension = 3 * n_atoms
+        elif dimension is None:
+            dimension = 18
+
+        if dimension % 3 != 0 or dimension < 6:
+            raise ValueError(
+                f"LennardJonesCECFunction dimension must be a multiple of 3 >= 6, got {dimension}"
+            )
+
+        k = dimension // 3
+        if k < 2 or (k - 2) >= len(self.CEC_MINIMA):
+            raise ValueError(
+                f"LennardJonesCECFunction only supports k in [2, {len(self.CEC_MINIMA) + 1}] atoms "
+                f"(dimension 6 to {3 * (len(self.CEC_MINIMA) + 1)}), got k={k} (dimension={dimension})"
+            )
+        self._k = k
+        self._offset = -self.CEC_MINIMA[k - 2]
+
+        if initialization_bounds is None:
+            initialization_bounds = Bounds(
+                low=np.full(dimension, -4.0, dtype=np.float64),
+                high=np.full(dimension, 4.0, dtype=np.float64),
+                mode=BoundModeEnum.INITIALIZATION,
+                qtype=QuantizationTypeEnum.CONTINUOUS,
+            )
+        if operational_bounds is None:
+            operational_bounds = Bounds(
+                low=np.full(dimension, -4.0, dtype=np.float64),
+                high=np.full(dimension, 4.0, dtype=np.float64),
+                mode=BoundModeEnum.OPERATIONAL,
+                qtype=QuantizationTypeEnum.CONTINUOUS,
+            )
+
+        super().__init__(
+            dimension=dimension,
+            initialization_bounds=initialization_bounds,
+            operational_bounds=operational_bounds,
+        )
+
+        self._i_idx, self._j_idx = np.triu_indices(self._k, k=1)
+
+    def evaluate(self, x: np.ndarray) -> float:
+        """Evaluate CEC 2019 Lennard-Jones potential."""
+        x = self._validate_input(x)
+        coords = x.reshape(self._k, 3)
+        diff = coords[self._i_idx] - coords[self._j_idx]
+        ed = np.sum(diff**2, axis=-1)
+        ud = ed**3
+        valid = ud > 1e-10
+        pairs = np.full_like(ud, 1e20)
+        ud_v = ud[valid]
+        pairs[valid] = (1.0 / ud_v - 2.0) / ud_v
+        return float(np.sum(pairs) + self._offset)
+
+    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+        """Batch evaluate CEC 2019 Lennard-Jones potential."""
+        X = self._validate_batch_input(X)
+        N = X.shape[0]
+        coords = X.reshape(N, self._k, 3)
+        diff = coords[:, self._i_idx, :] - coords[:, self._j_idx, :]
+        ed = np.sum(diff**2, axis=-1)
+        ud = ed**3
+        valid = ud > 1e-10
+        pairs = np.full_like(ud, 1e20)
+        ud_v = ud[valid]
+        pairs[valid] = (1.0 / ud_v - 2.0) / ud_v
+        return np.sum(pairs, axis=-1) + self._offset
+
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Get the global minimum of the CEC Lennard-Jones function.
+
+        Returns
+        -------
+        tuple[np.ndarray, float]
+            (global_min_point, 0.0) for k=2.
+
+        Raises
+        ------
+        NotImplementedError
+            For k > 2, analytical minimum coordinates are not stored.
+        """
+        if self._k == 2:
+            min_pt = np.zeros(6, dtype=np.float64)
+            min_pt[3] = 1.0  # atom 1 at (0, 0, 0), atom 2 at (1, 0, 0); distance = 1.0
+            return min_pt, 0.0
+        raise NotImplementedError(
+            f"LennardJonesCECFunction (k={self._k}) does not have an analytical global minimum configuration."
+        )

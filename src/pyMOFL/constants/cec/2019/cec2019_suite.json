@@ -1,0 +1,399 @@
+{
+  "suite_id": "cec2019",
+  "name": "CEC 2019 100-Digit Challenge Benchmark Suite",
+  "description": "CEC 2019 10-function suite for the 100-Digit Challenge on Single Objective Numerical Optimization.",
+  "version": "1.0",
+  "functions": [
+    {
+      "id": "cec19_f01_chebyshev",
+      "category": "Chebyshev Polynomial Fitting",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "chebyshev"
+        }
+      },
+      "dimensions": {
+        "supported": [
+          9
+        ],
+        "default": 9
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -8192,
+          "max": 8192
+        }
+      }
+    },
+    {
+      "id": "cec19_f02_hilbert",
+      "category": "Inverse Hilbert Matrix",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "hilbert"
+        }
+      },
+      "dimensions": {
+        "supported": [
+          16
+        ],
+        "default": 16
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -16384,
+          "max": 16384
+        }
+      }
+    },
+    {
+      "id": "cec19_f03_lennard_jones",
+      "category": "Lennard-Jones Potential",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "lennard_jones_cec"
+        }
+      },
+      "dimensions": {
+        "supported": [
+          18
+        ],
+        "default": 18
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -4,
+          "max": 4
+        }
+      }
+    },
+    {
+      "id": "cec19_f04_rastrigin",
+      "category": "Shifted Rotated Rastrigin",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "rastrigin",
+          "function": {
+            "type": "scale",
+            "parameters": {
+              "factor": 0.0512,
+              "multiply": true
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f04/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f04/shift_data.txt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec19_f05_griewank",
+      "category": "Shifted Rotated Griewank",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "griewank",
+          "function": {
+            "type": "scale",
+            "parameters": {
+              "factor": 6.0,
+              "multiply": true
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f05/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f05/shift_data.txt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec19_f06_weierstrass",
+      "category": "Shifted Rotated Weierstrass",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "weierstrass",
+          "function": {
+            "type": "scale",
+            "parameters": {
+              "factor": 0.005,
+              "multiply": true
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f06/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f06/shift_data.txt"
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec19_f07_schwefel",
+      "category": "Shifted Rotated Modified Schwefel",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "schwefel_sin",
+          "parameters": {
+            "boundary_handling": true
+          },
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 420.9687462275036
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": 10.0,
+                "multiply": true
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "transpose": true,
+                  "matrix": "f07/M_D{dim}.txt"
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f07/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec19_f08_escaffer6",
+      "category": "Shifted Rotated Expanded Schaffer F6",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "schaffer_f6_expanded",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "transpose": true,
+              "matrix": "f08/M_D{dim}.txt"
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f08/shift_data.txt"
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec19_f09_happycat",
+      "category": "Shifted Rotated HappyCat",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "happycat",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": -1.0
+            },
+            "function": {
+              "type": "scale",
+              "parameters": {
+                "factor": 0.05,
+                "multiply": true
+              },
+              "function": {
+                "type": "rotate",
+                "parameters": {
+                  "transpose": true,
+                  "matrix": "f09/M_D{dim}.txt"
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f09/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": "cec19_f10_ackley",
+      "category": "Shifted Rotated Ackley",
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1.0
+        },
+        "function": {
+          "type": "ackley",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "transpose": true,
+              "matrix": "f10/M_D{dim}.txt"
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f10/shift_data.txt"
+              }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [
+          10
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100,
+          "max": 100
+        }
+      }
+    }
+  ]
+}
