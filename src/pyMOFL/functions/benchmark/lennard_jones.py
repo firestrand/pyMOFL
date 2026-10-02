@@ -85,48 +85,54 @@ class LennardJonesFunction(OptimizationFunction):
         operational_bounds: Bounds | None = None,
         **kwargs,
     ):
-        if dimension is not None and n_atoms is not None:
+        dim: int
+        atoms: int
+        if n_atoms is not None and n_atoms < 2:
+            raise ValueError(f"n_atoms must be >= 2; got {n_atoms}")
+
+        if dimension is None and n_atoms is None:
+            atoms = 6
+            dim = 18
+        elif dimension is not None and n_atoms is not None:
             if dimension != 3 * n_atoms:
                 raise ValueError(
                     f"dimension must equal 3 * n_atoms when both are provided; got dimension={dimension}, n_atoms={n_atoms}"
                 )
+            dim = dimension
+            atoms = n_atoms
         elif dimension is not None:
             if dimension % 3 != 0 or dimension < 6:
                 raise ValueError(
                     f"dimension must be a multiple of 3 and >= 6; got dimension={dimension}"
                 )
-            n_atoms = dimension // 3
-        elif n_atoms is not None:
-            if n_atoms < 2:
-                raise ValueError(f"n_atoms must be >= 2; got {n_atoms}")
-            dimension = 3 * n_atoms
+            dim = dimension
+            atoms = dimension // 3
         else:
-            n_atoms = 6
-            dimension = 18
+            assert n_atoms is not None
+            atoms = n_atoms
+            dim = 3 * n_atoms
 
-        if dimension % 3 != 0 or dimension < 6:
-            raise ValueError(
-                f"dimension must be a multiple of 3 and >= 6; got dimension={dimension}"
-            )
+        if dim % 3 != 0 or dim < 6:
+            raise ValueError(f"dimension must be a multiple of 3 and >= 6; got dimension={dim}")
         default_init_bounds = Bounds(
-            low=np.full(dimension, -2.0),
-            high=np.full(dimension, 2.0),
+            low=np.full(dim, -2.0),
+            high=np.full(dim, 2.0),
             mode=BoundModeEnum.INITIALIZATION,
             qtype=QuantizationTypeEnum.CONTINUOUS,
         )
         default_oper_bounds = Bounds(
-            low=np.full(dimension, -2.0),
-            high=np.full(dimension, 2.0),
+            low=np.full(dim, -2.0),
+            high=np.full(dim, 2.0),
             mode=BoundModeEnum.OPERATIONAL,
             qtype=QuantizationTypeEnum.CONTINUOUS,
         )
         super().__init__(
-            dimension=dimension,
+            dimension=dim,
             initialization_bounds=initialization_bounds or default_init_bounds,
             operational_bounds=operational_bounds or default_oper_bounds,
         )
-        self.n_atoms = n_atoms
-        self.global_minimum = self.LJ_GLOBAL_MINIMA.get(n_atoms, None)
+        self.n_atoms: int = atoms
+        self.global_minimum = self.LJ_GLOBAL_MINIMA.get(atoms, None)
 
     def evaluate(self, x: np.ndarray) -> float:
         """
