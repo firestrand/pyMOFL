@@ -13,6 +13,13 @@ from .boundary_penalty import BoundaryPenaltyTransform
 from .cauchy_noise import CauchyNoiseTransform
 from .composed import ComposedFunction
 from .conditioning import ConditioningTransform
+from .decomposition import (
+    ComponentGroup,
+    DecomposedBatchResult,
+    DecomposedResult,
+    DecomposedTransform,
+    GroupingTransform,
+)
 from .discretize import DiscretizeTransform
 from .fused_asy import FusedBufferAliasAsymmetricTransform
 from .gaussian_noise import GaussianNoiseTransform
@@ -40,11 +47,16 @@ __all__ = [
     "BlockDiagonalRotateTransform",
     "BoundaryPenaltyTransform",
     "CauchyNoiseTransform",
+    "ComponentGroup",
     "ComposedFunction",
     "ConditioningTransform",
+    "DecomposedBatchResult",
+    "DecomposedResult",
+    "DecomposedTransform",
     "DiscretizeTransform",
     "FusedBufferAliasAsymmetricTransform",
     "GaussianNoiseTransform",
+    "GroupingTransform",
     "IndexedRotateTransform",
     "IndexedScaleTransform",
     "IndexedShiftTransform",

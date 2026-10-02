@@ -1,0 +1,2039 @@
+{
+  "suite_id": "cec2010",
+  "name": "CEC 2010 Large-Scale Global Optimization Benchmark Suite",
+  "description": "Benchmark functions for the CEC 2010 Special Session and Competition on Large-Scale Global Optimization (Tang et al., 2010)",
+  "version": "1.0",
+  "functions": [
+    {
+      "id": "cec10_f01_shifted_elliptic",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "elliptic",
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f01/vector_shift_D1000.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "cec10_f02_shifted_rastrigin",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -5.0,
+        "high": 5.0
+      },
+      "function": {
+        "type": "rastrigin",
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f02/vector_shift_D1000.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "cec10_f03_shifted_ackley",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -32.0,
+        "high": 32.0
+      },
+      "function": {
+        "type": "ackley",
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f03/vector_shift_D1000.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "cec10_f04_single_group_m_rotated_elliptic",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f04/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50
+            ],
+            "block_rotations": [
+              "f04/matrix_rotation_D50.txt"
+            ],
+            "separable_size": 950,
+            "transpose": true
+          },
+          "weights": [
+            1000000.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f04/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 950
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f05_single_group_m_rotated_rastrigin",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -5.0,
+        "high": 5.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f05/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50
+            ],
+            "block_rotations": [
+              "f05/matrix_rotation_D50.txt"
+            ],
+            "separable_size": 950,
+            "transpose": true
+          },
+          "weights": [
+            1000000.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f05/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 950
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f06_single_group_m_rotated_ackley",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -32.0,
+        "high": 32.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f06/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50
+            ],
+            "block_rotations": [
+              "f06/matrix_rotation_D50.txt"
+            ],
+            "separable_size": 950,
+            "transpose": true
+          },
+          "weights": [
+            1000000.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f06/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 950
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f07_single_group_schwefel",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f07/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50
+            ],
+            "separable_size": 950
+          },
+          "weights": [
+            1000000.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f07/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "sphere",
+            "parameters": {
+              "dimension": 950
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f08_single_group_rosenbrock",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f08/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50
+            ],
+            "separable_size": 950
+          },
+          "weights": [
+            1000000.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f08/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "sphere",
+            "parameters": {
+              "dimension": 950
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f09_d2m_group_m_rotated_elliptic",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f09/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ],
+            "block_rotations": [
+              "f09/matrix_rotation_D50.txt"
+            ],
+            "separable_size": 500,
+            "transpose": true
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f09/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 500
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f10_d2m_group_m_rotated_rastrigin",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -5.0,
+        "high": 5.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f10/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ],
+            "block_rotations": [
+              "f10/matrix_rotation_D50.txt"
+            ],
+            "separable_size": 500,
+            "transpose": true
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f10/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 500
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f11_d2m_group_m_rotated_ackley",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -32.0,
+        "high": 32.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f11/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ],
+            "block_rotations": [
+              "f11/matrix_rotation_D50.txt"
+            ],
+            "separable_size": 500,
+            "transpose": true
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f11/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 500
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f12_d2m_group_schwefel",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f12/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ],
+            "separable_size": 500
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f12/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "sphere",
+            "parameters": {
+              "dimension": 500
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f13_d2m_group_rosenbrock",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f13/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ],
+            "separable_size": 500
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f13/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "sphere",
+            "parameters": {
+              "dimension": 500
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f14_dm_group_m_rotated_elliptic",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f14/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ],
+            "block_rotations": [
+              "f14/matrix_rotation_D50.txt"
+            ],
+            "transpose": true
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f14/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "elliptic",
+            "parameters": {
+              "dimension": 50
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f15_dm_group_m_rotated_rastrigin",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -5.0,
+        "high": 5.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f15/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ],
+            "block_rotations": [
+              "f15/matrix_rotation_D50.txt"
+            ],
+            "transpose": true
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f15/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rastrigin",
+            "parameters": {
+              "dimension": 50
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f16_dm_group_m_rotated_ackley",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -32.0,
+        "high": 32.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f16/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ],
+            "block_rotations": [
+              "f16/matrix_rotation_D50.txt"
+            ],
+            "transpose": true
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f16/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "ackley",
+            "parameters": {
+              "dimension": 50
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f17_dm_group_schwefel",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f17/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ]
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f17/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "schwefel_1_2",
+            "parameters": {
+              "dimension": 50
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f18_dm_group_rosenbrock",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f18/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50,
+              50
+            ]
+          },
+          "weights": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f18/vector_shift_D1000.txt"
+          }
+        },
+        "functions": [
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          },
+          {
+            "type": "rosenbrock",
+            "parameters": {
+              "dimension": 50
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "cec10_f19_shifted_schwefel",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "schwefel_1_2",
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f19/vector_shift_D1000.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "cec10_f20_shifted_rosenbrock",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "rosenbrock",
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f20/vector_shift_D1000.txt"
+          }
+        }
+      }
+    }
+  ]
+}

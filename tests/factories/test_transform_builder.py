@@ -252,6 +252,57 @@ class TestBuildMany:
         assert penalty_t == []
 
 
+class TestGroupingTransforms:
+    """Test building GroupingTransform and DecomposedTransform."""
+
+    def test_grouping_from_sizes(self, builder):
+        R = np.eye(3)
+        t = builder.build(
+            "grouping",
+            {
+                "block_sizes": [3, 3],
+                "block_rotations": [R, R],
+                "separable_size": 4,
+                "permutation": list(range(1, 11)),  # 1-indexed to test normalization
+            },
+            dimension=10,
+        )
+        assert t.dimension == 10
+        assert len(t.groups) == 3
+        assert np.array_equal(t.permutation, np.arange(10))
+        assert t.groups[0].dimension == 3
+        assert t.groups[1].dimension == 3
+        assert t.groups[2].dimension == 4
+        assert t.groups[2].group_type == "separable"
+
+    def test_grouping_broadcast_rotation(self, builder):
+        R = np.eye(2)
+        t = builder.build(
+            "decomposed_transform",
+            {
+                "block_sizes": [2, 2, 2],
+                "block_rotations": [R],  # Single rotation broadcast across 3 blocks
+            },
+            dimension=6,
+        )
+        assert len(t.groups) == 3
+        assert all(g.rotation_matrix is not None for g in t.groups)
+
+    def test_grouping_overlapping_window(self, builder):
+        t = builder.build(
+            "grouping",
+            {
+                "group_size": 4,
+                "overlap_size": 1,
+                "num_groups": 3,
+            },
+            dimension=10,
+        )
+        assert t.dimension == 10
+        assert len(t.groups) == 3
+        assert t.groups[0].group_type == "overlapping"
+
+
 class TestUnknownType:
     """Test error handling for unknown transform types."""
 

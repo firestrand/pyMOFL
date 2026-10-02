@@ -81,8 +81,15 @@ class ConfigParser:
                     return walk(inner)
                 return None, {}, []
 
-            # Composition/hybrid nodes are returned as-is
-            if t in {"composition", "min", "lower_envelope", "hybrid"}:
+            # Composition/hybrid/decomposed nodes are returned as-is
+            if t in {
+                "composition",
+                "min",
+                "lower_envelope",
+                "hybrid",
+                "decomposed",
+                "decomposed_function",
+            }:
                 return t, node, []
 
             # Base function found
@@ -116,8 +123,15 @@ class ConfigParser:
 
         base_type, base_params, transforms = walk(config)
 
-        # For compositions/hybrids, wrap in ParsedConfig with any outer transforms
-        is_comp = base_type in {"composition", "min", "lower_envelope", "hybrid"}
+        # For compositions/hybrids/decomposed, wrap in ParsedConfig with any outer transforms
+        is_comp = base_type in {
+            "composition",
+            "min",
+            "lower_envelope",
+            "hybrid",
+            "decomposed",
+            "decomposed_function",
+        }
         if is_comp:
             return ParsedConfig(
                 base_type=base_type,

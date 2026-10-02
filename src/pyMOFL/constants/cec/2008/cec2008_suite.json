@@ -1,0 +1,199 @@
+{
+  "suite_id": "cec2008",
+  "name": "CEC 2008 Large-Scale Global Optimization Benchmark Suite",
+  "description": "Benchmark functions for the CEC 2008 Special Session and Competition on Large-Scale Global Optimization (Tang et al., 2007)",
+  "version": "1.0",
+  "functions": [
+    {
+      "id": "cec08_f01_sphere",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [100, 500, 1000],
+        "default": 500,
+        "custom_dimensions": true
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -450.0
+        },
+        "function": {
+          "type": "sphere",
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": "f01/vector_shift_D1000.txt"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec08_f02_schwefel_2_21",
+      "category": "Unimodal",
+      "dimensions": {
+        "supported": [100, 500, 1000],
+        "default": 500,
+        "custom_dimensions": true
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -450.0
+        },
+        "function": {
+          "type": "schwefel_2_21",
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": "f02/vector_shift_D1000.txt"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec08_f03_rosenbrock",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [100, 500, 1000],
+        "default": 500,
+        "custom_dimensions": true
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -390.0
+        },
+        "function": {
+          "type": "rosenbrock",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 1.0
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f03/vector_shift_D1000.txt"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec08_f04_rastrigin",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [100, 500, 1000],
+        "default": 500,
+        "custom_dimensions": true
+      },
+      "search_space": {
+        "low": -5.0,
+        "high": 5.0
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -330.0
+        },
+        "function": {
+          "type": "rastrigin",
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": "f04/vector_shift_D1000.txt"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec08_f05_griewank",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [100, 500, 1000],
+        "default": 500,
+        "custom_dimensions": true
+      },
+      "search_space": {
+        "low": -600.0,
+        "high": 600.0
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -180.0
+        },
+        "function": {
+          "type": "griewank",
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": "f05/vector_shift_D1000.txt"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec08_f06_ackley",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [100, 500, 1000],
+        "default": 500,
+        "custom_dimensions": true
+      },
+      "search_space": {
+        "low": -32.0,
+        "high": 32.0
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": -140.0
+        },
+        "function": {
+          "type": "ackley",
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": "f06/vector_shift_D1000.txt"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec08_f07_fast_fractal",
+      "category": "Multimodal",
+      "dimensions": {
+        "supported": [100, 500, 1000],
+        "default": 500,
+        "custom_dimensions": true
+      },
+      "search_space": {
+        "low": -1.0,
+        "high": 1.0
+      },
+      "function": {
+        "type": "fast_fractal_double_dip",
+        "parameters": {}
+      }
+    }
+  ]
+}

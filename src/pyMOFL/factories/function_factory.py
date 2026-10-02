@@ -223,7 +223,7 @@ class FunctionFactory:
         if parsed.base_type is None:
             raise ValueError("No base function found in configuration")
 
-        # Composition/hybrid delegation
+        # Composition/hybrid/decomposed delegation
         if parsed.is_composition:
             comp_config = parsed.raw_composition_config
             assert comp_config is not None
@@ -231,6 +231,10 @@ class FunctionFactory:
             # Hybrid function delegation
             if parsed.base_type == "hybrid":
                 return self._build_hybrid(comp_config, parsed.transforms)
+
+            # Decomposed function delegation
+            if parsed.base_type in {"decomposed", "decomposed_function"}:
+                return self._build_decomposed(comp_config, parsed.transforms)
 
             dim = comp_config.get("parameters", {}).get(
                 "dimension",
@@ -461,6 +465,131 @@ class FunctionFactory:
 
         return ComposedFunction(
             base_function=hybrid,
+            input_transforms=input_transforms,
+            output_transforms=output_transforms,
+            penalty_transforms=penalty_transforms,
+        )
+
+    def _build_decomposed(
+        self,
+        decomposed_config: dict[str, Any],
+        outer_transforms: list[tuple[str, dict[str, Any]]],
+    ) -> ComposedFunction:
+        """Build a decomposed function from config.
+
+        Decomposition pipeline:
+        1. Outer transforms on full vector (e.g. shift)
+        2. DecomposedFunction splits variables into sub-components via GroupingTransform
+        3. Component functions evaluate each sub-vector
+        4. Scaled summation with optional bias
+        """
+        from pyMOFL.compositions.decomposed_function import DecomposedFunction
+        from pyMOFL.functions.transformations.decomposition import GroupingTransform
+        from pyMOFL.utils.suite_config import force_inject_dimension
+
+        params = dict(decomposed_config.get("parameters", {}))
+        dim = params.get("dimension") or params.get("dim")
+        if dim is None:
+            dim = ConfigParser.extract_dimension(decomposed_config)
+        if dim is None:
+            raise ValueError("Decomposed function: cannot determine dimension")
+        dim = int(dim)
+
+        # Parse inner transforms from nested "function" node (e.g. outer shift on full vector)
+        inner_config = decomposed_config.get("function")
+        inner_parsed = self._parser.parse(inner_config) if inner_config else None
+
+        input_transforms: list[VectorTransform] = []
+        if inner_parsed:
+            for ttype, tparams in inner_parsed.transforms:
+                t = self._transform_builder.build(ttype, tparams, dim)
+                if isinstance(t, VectorTransform):
+                    input_transforms.append(t)
+
+        # Build GroupingTransform
+        grouping_params = dict(params.get("grouping", params))
+        grouping_params.setdefault("dimension", dim)
+        grouping_transform = self._transform_builder.build("grouping", grouping_params, dim)
+        assert isinstance(grouping_transform, GroupingTransform)
+
+        # Build component functions
+        functions_configs = decomposed_config.get("functions", [])
+        component_functions = []
+        if functions_configs:
+            for i, func_node in enumerate(functions_configs):
+                group_dim = grouping_transform.groups[i].dimension
+                injected = force_inject_dimension(func_node, group_dim)
+                sub_func = self.create_function(injected)
+                component_functions.append(sub_func)
+
+        non_sep_func = None
+        if "non_separable_function" in decomposed_config:
+            non_sep_node = decomposed_config["non_separable_function"]
+            non_sep_groups = [
+                g for g in grouping_transform.groups if g.group_type == "non_separable"
+            ]
+            if non_sep_groups and any(
+                g.dimension != non_sep_groups[0].dimension for g in non_sep_groups
+            ):
+                non_sep_func = [
+                    self.create_function(force_inject_dimension(non_sep_node, g.dimension))
+                    for g in non_sep_groups
+                ]
+            else:
+                ns_dim = non_sep_groups[0].dimension if non_sep_groups else dim
+                injected = force_inject_dimension(non_sep_node, ns_dim)
+                non_sep_func = self.create_function(injected)
+
+        sep_func = None
+        if "separable_function" in decomposed_config:
+            sep_node = decomposed_config["separable_function"]
+            sep_groups = [g for g in grouping_transform.groups if g.group_type == "separable"]
+            s_dim = sep_groups[0].dimension if sep_groups else dim
+            injected = force_inject_dimension(sep_node, s_dim)
+            sep_func = self.create_function(injected)
+
+        overlap_func = None
+        if "overlapping_function" in decomposed_config:
+            overlap_node = decomposed_config["overlapping_function"]
+            overlap_groups = [g for g in grouping_transform.groups if g.group_type == "overlapping"]
+            if overlap_groups and any(
+                g.dimension != overlap_groups[0].dimension for g in overlap_groups
+            ):
+                overlap_func = [
+                    self.create_function(force_inject_dimension(overlap_node, g.dimension))
+                    for g in overlap_groups
+                ]
+            else:
+                ov_dim = overlap_groups[0].dimension if overlap_groups else dim
+                injected = force_inject_dimension(overlap_node, ov_dim)
+                overlap_func = self.create_function(injected)
+
+        weights = params.get("weights")
+        bias = float(params.get("bias", 0.0))
+
+        decomposed = DecomposedFunction(
+            grouping_transform=grouping_transform,
+            component_functions=component_functions if component_functions else None,
+            non_separable_function=non_sep_func,
+            separable_function=sep_func,
+            overlapping_function=overlap_func,
+            weights=weights,
+            bias=bias,
+        )
+
+        output_transforms: list[ScalarTransform] = []
+        penalty_transforms: list[PenaltyTransform] = []
+        for ttype, tparams in outer_transforms:
+            t = self._transform_builder.build(ttype, tparams, dim)
+            if isinstance(t, PenaltyTransform):
+                penalty_transforms.append(t)
+            elif isinstance(t, ScalarTransform):
+                output_transforms.append(t)
+            elif isinstance(t, VectorTransform):
+                input_transforms.append(t)
+
+        return ComposedFunction(
+            base_function=decomposed,
             input_transforms=input_transforms,
             output_transforms=output_transforms,
             penalty_transforms=penalty_transforms,

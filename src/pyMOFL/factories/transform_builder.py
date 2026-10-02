@@ -21,6 +21,7 @@ from pyMOFL.functions.transformations import (
     DiscretizeTransform,
     FusedBufferAliasAsymmetricTransform,
     GaussianNoiseTransform,
+    GroupingTransform,
     IndexedRotateTransform,
     IndexedScaleTransform,
     IndexedShiftTransform,
@@ -119,6 +120,13 @@ class TransformBuilder:
             return BlockDiagonalRotateTransform(blocks=blocks)
         if transform_type == "fused_asy":
             return self._build_fused_asy(params, dimension)
+        if transform_type in {
+            "grouping",
+            "grouping_transform",
+            "decomposed",
+            "decomposed_transform",
+        }:
+            return self._build_grouping(params, dimension)
 
         # Penalty transforms (vector → scalar, additive)
         if transform_type in {"boundary_penalty", "f_pen"}:
@@ -385,4 +393,153 @@ class TransformBuilder:
         inner_type = str(params.get("inner_type", "oscillation"))
         inner_params = dict(params.get("inner_params", {}))
         inner = self.build(inner_type, inner_params, dimension)
+        if not isinstance(inner, VectorTransform):
+            raise TypeError(
+                f"Fused asymmetric transform requires VectorTransform inner, got {type(inner).__name__}"
+            )
         return FusedBufferAliasAsymmetricTransform(inner=inner, beta=beta, dimension=dimension)
+
+    def _build_grouping(self, params: dict[str, Any], dimension: int) -> GroupingTransform:
+        """Build a GroupingTransform from config parameters."""
+        permutation = params.get("permutation")
+        if isinstance(permutation, str):
+            perm = self._data_loader.load_vector(permutation, dimension).astype(int)
+            if len(perm) == dimension and np.min(perm) == 1 and np.max(perm) == dimension:
+                perm = perm - 1
+            permutation = perm
+        elif permutation is not None:
+            perm = np.asarray(permutation, dtype=int)
+            if len(perm) == dimension and np.min(perm) == 1 and np.max(perm) == dimension:
+                perm = perm - 1
+            permutation = perm
+
+        default_transpose = params.get("transpose", True)
+
+        def _load_rot(rot_src: Any, m_dim: int) -> np.ndarray:
+            if isinstance(rot_src, dict):
+                mat_file = rot_src.get("matrix", rot_src.get("file", rot_src.get("rotation")))
+                trans = rot_src.get("transpose", default_transpose)
+                mat = self._data_loader.load_matrix(mat_file, m_dim)
+                return mat.T if trans else mat
+            if isinstance(rot_src, str):
+                mat = self._data_loader.load_matrix(rot_src, m_dim)
+                return mat.T if default_transpose else mat
+            arr = np.asarray(rot_src, dtype=np.float64)
+            return arr.T if default_transpose else arr
+
+        if "block_sizes" in params:
+            block_sizes = params["block_sizes"]
+            overlap_size = params.get("overlap_size")
+            separable_size = int(params.get("separable_size", 0))
+            raw_rotations = params.get("block_rotations")
+            block_rotations = None
+            if raw_rotations is not None:
+                if isinstance(raw_rotations, dict) and not any(
+                    k in raw_rotations for k in ("matrix", "file", "rotation")
+                ):
+                    loaded_rots = []
+                    for s in block_sizes:
+                        rot_entry = raw_rotations.get(str(s), raw_rotations.get(s))
+                        if rot_entry is None:
+                            raise ValueError(
+                                f"No rotation matrix found for block size {s} in {raw_rotations}"
+                            )
+                        loaded_rots.append(_load_rot(rot_entry, s))
+                    block_rotations = loaded_rots
+                else:
+                    if isinstance(raw_rotations, (str, dict)):
+                        raw_rotations = [raw_rotations]
+                    loaded_rots = []
+                    for idx, r in enumerate(raw_rotations):
+                        m_dim = block_sizes[idx] if idx < len(block_sizes) else block_sizes[0]
+                        loaded_rots.append(_load_rot(r, m_dim))
+                    if len(loaded_rots) == 1 and len(block_sizes) > 1:
+                        block_rotations = [loaded_rots[0] for _ in block_sizes]
+                    else:
+                        block_rotations = loaded_rots
+
+            if overlap_size is not None:
+                overlap_size = int(overlap_size)
+                shift_src = params.get(
+                    "shift_file", params.get("shift_vectors", params.get("vector"))
+                )
+                shift_vectors = None
+                if isinstance(shift_src, str):
+                    full_shift = self._data_loader.load_vector(shift_src, sum(block_sizes))
+                    shift_vectors = []
+                    curr = 0
+                    for s in block_sizes:
+                        shift_vectors.append(full_shift[curr : curr + s])
+                        curr += s
+                elif isinstance(shift_src, list):
+                    shift_vectors = [np.asarray(s, dtype=np.float64) for s in shift_src]
+
+                return GroupingTransform.from_overlapping_sizes(
+                    dimension=dimension,
+                    block_sizes=block_sizes,
+                    overlap_size=overlap_size,
+                    block_rotations=block_rotations,
+                    shift_vectors=shift_vectors,
+                    permutation=permutation,
+                )
+
+            return GroupingTransform.from_sizes(
+                dimension=dimension,
+                block_sizes=block_sizes,
+                block_rotations=block_rotations,
+                separable_size=separable_size,
+                permutation=permutation,
+            )
+
+        if "group_size" in params and "overlap_size" in params:
+            group_size = int(params["group_size"])
+            overlap_size = int(params["overlap_size"])
+            num_groups = params.get("num_groups")
+            num_groups = int(num_groups) if num_groups is not None else None
+            raw_rotations = params.get("block_rotations")
+            block_rotations = None
+            if raw_rotations is not None:
+                if isinstance(raw_rotations, (str, dict)):
+                    raw_rotations = [raw_rotations]
+                block_rotations = [_load_rot(r, group_size) for r in raw_rotations]
+            return GroupingTransform.from_overlapping_window(
+                dimension=dimension,
+                group_size=group_size,
+                overlap_size=overlap_size,
+                num_groups=num_groups,
+                block_rotations=block_rotations,
+                permutation=permutation,
+            )
+
+        non_sep_groups = params.get("non_separable_groups")
+        raw_rotations = params.get("block_rotations")
+        block_rotations = None
+        if raw_rotations is not None and non_sep_groups is not None:
+            if isinstance(raw_rotations, (str, dict)):
+                raw_rotations = [raw_rotations]
+            loaded_rots = []
+            for idx, r in enumerate(raw_rotations):
+                m_dim = (
+                    len(non_sep_groups[idx])
+                    if idx < len(non_sep_groups)
+                    else len(non_sep_groups[0])
+                )
+                loaded_rots.append(_load_rot(r, m_dim))
+            if len(loaded_rots) == 1 and len(non_sep_groups) > 1:
+                block_rotations = [loaded_rots[0] for _ in non_sep_groups]
+            else:
+                block_rotations = loaded_rots
+
+        separable_indices = params.get("separable_indices")
+        overlapping_groups = params.get("overlapping_groups")
+        overlapping_rotations = params.get("overlapping_rotations")
+
+        return GroupingTransform(
+            dimension=dimension,
+            permutation=permutation,
+            non_separable_groups=non_sep_groups,
+            block_rotations=block_rotations,
+            separable_indices=separable_indices,
+            overlapping_groups=overlapping_groups,
+            overlapping_rotations=overlapping_rotations,
+        )

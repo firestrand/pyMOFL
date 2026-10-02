@@ -1,0 +1,1113 @@
+{
+  "suite_id": "cec2013_lsgo",
+  "name": "CEC 2013 Large-Scale Global Optimization Benchmark Suite",
+  "description": "Benchmark functions for the CEC 2013 Special Session and Competition on Large-Scale Global Optimization (Li et al., 2013)",
+  "version": "1.0",
+  "functions": [
+    {
+      "id": "cec13_lsgo_f01_shifted_elliptic",
+      "category": "Fully Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "high_conditioned_elliptic",
+        "function": {
+          "type": "oscillation",
+          "parameters": {
+            "boundary_only": false
+          },
+          "function": {
+            "type": "shift",
+            "parameters": {
+              "vector": "f01/vector_shift_D1000.txt"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f02_shifted_rastrigin",
+      "category": "Fully Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -5.0,
+        "high": 5.0
+      },
+      "function": {
+        "type": "rastrigin",
+        "function": {
+          "type": "conditioning",
+          "parameters": {
+            "alpha": 10.0
+          },
+          "function": {
+            "type": "asymmetric",
+            "parameters": {
+              "beta": 0.2
+            },
+            "function": {
+              "type": "oscillation",
+              "parameters": {
+                "boundary_only": false
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f02/vector_shift_D1000.txt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f03_shifted_ackley",
+      "category": "Fully Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -32.0,
+        "high": 32.0
+      },
+      "function": {
+        "type": "ackley",
+        "function": {
+          "type": "conditioning",
+          "parameters": {
+            "alpha": 10.0
+          },
+          "function": {
+            "type": "asymmetric",
+            "parameters": {
+              "beta": 0.2
+            },
+            "function": {
+              "type": "oscillation",
+              "parameters": {
+                "boundary_only": false
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f03/vector_shift_D1000.txt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f04_7group_rotated_elliptic",
+      "category": "Partially Additively Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f04/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              25,
+              25,
+              100,
+              50,
+              25,
+              25
+            ],
+            "block_rotations": {
+              "25": "f04/matrix_rotation_D25.txt",
+              "50": "f04/matrix_rotation_D50.txt",
+              "100": "f04/matrix_rotation_D100.txt"
+            },
+            "separable_size": 700,
+            "transpose": false
+          },
+          "weights": [
+            45.69963061477328,
+            1.564615888932325,
+            18465.32344576193,
+            0.01108949891829191,
+            13.62598489888553,
+            0.3015150617722511,
+            59.6078373100912,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f04/vector_shift_D1000.txt"
+          }
+        },
+        "non_separable_function": {
+          "type": "high_conditioned_elliptic",
+          "function": {
+            "type": "oscillation",
+            "parameters": {
+              "boundary_only": false
+            }
+          }
+        },
+        "separable_function": {
+          "type": "high_conditioned_elliptic",
+          "function": {
+            "type": "oscillation",
+            "parameters": {
+              "boundary_only": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f05_7group_rotated_rastrigin",
+      "category": "Partially Additively Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -5.0,
+        "high": 5.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f05/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              25,
+              25,
+              100,
+              50,
+              25,
+              25
+            ],
+            "block_rotations": {
+              "25": "f05/matrix_rotation_D25.txt",
+              "50": "f05/matrix_rotation_D50.txt",
+              "100": "f05/matrix_rotation_D100.txt"
+            },
+            "separable_size": 700,
+            "transpose": false
+          },
+          "weights": [
+            0.1807559981875739,
+            9081.137957372908,
+            24.27180711217444,
+            1.86308808032975e-06,
+            17698.08075760589,
+            0.0002815181918094626,
+            0.01525403796219806,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f05/vector_shift_D1000.txt"
+          }
+        },
+        "non_separable_function": {
+          "type": "rastrigin",
+          "function": {
+            "type": "conditioning",
+            "parameters": {
+              "alpha": 10.0
+            },
+            "function": {
+              "type": "asymmetric",
+              "parameters": {
+                "beta": 0.2
+              },
+              "function": {
+                "type": "oscillation",
+                "parameters": {
+                  "boundary_only": false
+                }
+              }
+            }
+          }
+        },
+        "separable_function": {
+          "type": "rastrigin",
+          "function": {
+            "type": "conditioning",
+            "parameters": {
+              "alpha": 10.0
+            },
+            "function": {
+              "type": "asymmetric",
+              "parameters": {
+                "beta": 0.2
+              },
+              "function": {
+                "type": "oscillation",
+                "parameters": {
+                  "boundary_only": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f06_7group_rotated_ackley",
+      "category": "Partially Additively Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -32.0,
+        "high": 32.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f06/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              25,
+              25,
+              100,
+              50,
+              25,
+              25
+            ],
+            "block_rotations": {
+              "25": "f06/matrix_rotation_D25.txt",
+              "50": "f06/matrix_rotation_D50.txt",
+              "100": "f06/matrix_rotation_D100.txt"
+            },
+            "separable_size": 700,
+            "transpose": false
+          },
+          "weights": [
+            0.03527316509198532,
+            5.315636074945294e-05,
+            0.8707826395272957,
+            49513.74201115565,
+            0.08312474568178191,
+            3.476438011305293e-05,
+            282.2934975418022,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f06/vector_shift_D1000.txt"
+          }
+        },
+        "non_separable_function": {
+          "type": "ackley",
+          "function": {
+            "type": "conditioning",
+            "parameters": {
+              "alpha": 10.0
+            },
+            "function": {
+              "type": "asymmetric",
+              "parameters": {
+                "beta": 0.2
+              },
+              "function": {
+                "type": "oscillation",
+                "parameters": {
+                  "boundary_only": false
+                }
+              }
+            }
+          }
+        },
+        "separable_function": {
+          "type": "ackley",
+          "function": {
+            "type": "conditioning",
+            "parameters": {
+              "alpha": 10.0
+            },
+            "function": {
+              "type": "asymmetric",
+              "parameters": {
+                "beta": 0.2
+              },
+              "function": {
+                "type": "oscillation",
+                "parameters": {
+                  "boundary_only": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f07_7group_rotated_schwefel",
+      "category": "Partially Additively Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f07/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              25,
+              25,
+              100,
+              50,
+              25,
+              25
+            ],
+            "block_rotations": {
+              "25": "f07/matrix_rotation_D25.txt",
+              "50": "f07/matrix_rotation_D50.txt",
+              "100": "f07/matrix_rotation_D100.txt"
+            },
+            "separable_size": 700,
+            "transpose": false
+          },
+          "weights": [
+            679.9025375867747,
+            0.9321555273560842,
+            2122.850158593588,
+            0.5060110308419518,
+            434.5961765462675,
+            33389.62449652032,
+            2.569238407592332,
+            1.0
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f07/vector_shift_D1000.txt"
+          }
+        },
+        "non_separable_function": {
+          "type": "schwefel_1_2",
+          "function": {
+            "type": "asymmetric",
+            "parameters": {
+              "beta": 0.2
+            },
+            "function": {
+              "type": "oscillation",
+              "parameters": {
+                "boundary_only": false
+              }
+            }
+          }
+        },
+        "separable_function": {
+          "type": "sphere"
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f08_20group_rotated_elliptic",
+      "category": "Partially Additively Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f08/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              25,
+              25,
+              100,
+              100,
+              25,
+              25,
+              50,
+              25,
+              100,
+              25,
+              100,
+              50,
+              25,
+              25,
+              25,
+              100,
+              50,
+              25
+            ],
+            "block_rotations": {
+              "25": "f08/matrix_rotation_D25.txt",
+              "50": "f08/matrix_rotation_D50.txt",
+              "100": "f08/matrix_rotation_D100.txt"
+            },
+            "separable_size": 0,
+            "transpose": false
+          },
+          "weights": [
+            4.630303898328862,
+            0.6864279131323788,
+            1143756360.088768,
+            2.007758000992542,
+            789.3671746186714,
+            16.33320168691342,
+            6.074996976773932,
+            0.06466850615348552,
+            0.07569676542592878,
+            35.67259952037679,
+            7.97255089712091e-06,
+            10.78226361560055,
+            4.199965822662956e-06,
+            0.001923872337445647,
+            0.001677064168931893,
+            686.7975656834401,
+            0.1571465735122922,
+            0.04417781474359776,
+            0.3543888360330344,
+            0.006051787005326174
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f08/vector_shift_D1000.txt"
+          }
+        },
+        "non_separable_function": {
+          "type": "high_conditioned_elliptic",
+          "function": {
+            "type": "oscillation",
+            "parameters": {
+              "boundary_only": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f09_20group_rotated_rastrigin",
+      "category": "Partially Additively Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -5.0,
+        "high": 5.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f09/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              25,
+              25,
+              100,
+              100,
+              25,
+              25,
+              50,
+              25,
+              100,
+              25,
+              100,
+              50,
+              25,
+              25,
+              25,
+              100,
+              50,
+              25
+            ],
+            "block_rotations": {
+              "25": "f09/matrix_rotation_D25.txt",
+              "50": "f09/matrix_rotation_D50.txt",
+              "100": "f09/matrix_rotation_D100.txt"
+            },
+            "separable_size": 0,
+            "transpose": false
+          },
+          "weights": [
+            1756.996997333392,
+            570.7338357630722,
+            3.355970801461051,
+            1.036411046690371,
+            62822.29234664552,
+            1.731558445257169,
+            0.08980493862761418,
+            0.0008071244581233227,
+            1403745.636331398,
+            8716.208361607407,
+            0.003344616275362139,
+            1.34951151390475,
+            0.004776798216929033,
+            5089.913308957042,
+            12.66641964611824,
+            0.0003588940639560592,
+            0.2400156872122657,
+            3.964353127212945,
+            0.001428559155593465,
+            0.005228218198001427
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f09/vector_shift_D1000.txt"
+          }
+        },
+        "non_separable_function": {
+          "type": "rastrigin",
+          "function": {
+            "type": "conditioning",
+            "parameters": {
+              "alpha": 10.0
+            },
+            "function": {
+              "type": "asymmetric",
+              "parameters": {
+                "beta": 0.2
+              },
+              "function": {
+                "type": "oscillation",
+                "parameters": {
+                  "boundary_only": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f10_20group_rotated_ackley",
+      "category": "Partially Additively Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -32.0,
+        "high": 32.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f10/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              25,
+              25,
+              100,
+              100,
+              25,
+              25,
+              50,
+              25,
+              100,
+              25,
+              100,
+              50,
+              25,
+              25,
+              25,
+              100,
+              50,
+              25
+            ],
+            "block_rotations": {
+              "25": "f10/matrix_rotation_D25.txt",
+              "50": "f10/matrix_rotation_D50.txt",
+              "100": "f10/matrix_rotation_D100.txt"
+            },
+            "separable_size": 0,
+            "transpose": false
+          },
+          "weights": [
+            0.3127435060483861,
+            15.12775129002843,
+            2323.355051932917,
+            0.0008059163159991055,
+            11.42081047046656,
+            3.554186402049341,
+            29.98730853486525,
+            0.99814770438828,
+            1.615139127369899,
+            1.512835249551407,
+            0.6084813080072065,
+            4464853.632306907,
+            6.807672126970494e-05,
+            0.1363174627449513,
+            0.0007887145947891588,
+            59885.12760160356,
+            1.85232881407715,
+            24.78342741548038,
+            0.5431794716904831,
+            39.24040541316312
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f10/vector_shift_D1000.txt"
+          }
+        },
+        "non_separable_function": {
+          "type": "ackley",
+          "function": {
+            "type": "conditioning",
+            "parameters": {
+              "alpha": 10.0
+            },
+            "function": {
+              "type": "asymmetric",
+              "parameters": {
+                "beta": 0.2
+              },
+              "function": {
+                "type": "oscillation",
+                "parameters": {
+                  "boundary_only": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f11_20group_rotated_schwefel",
+      "category": "Partially Additively Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 1000,
+          "grouping": {
+            "permutation": "f11/vector_permutation_D1000.txt",
+            "block_sizes": [
+              50,
+              50,
+              25,
+              25,
+              100,
+              100,
+              25,
+              25,
+              50,
+              25,
+              100,
+              25,
+              100,
+              50,
+              25,
+              25,
+              25,
+              100,
+              50,
+              25
+            ],
+            "block_rotations": {
+              "25": "f11/matrix_rotation_D25.txt",
+              "50": "f11/matrix_rotation_D50.txt",
+              "100": "f11/matrix_rotation_D100.txt"
+            },
+            "separable_size": 0,
+            "transpose": false
+          },
+          "weights": [
+            0.01613441050029006,
+            0.1286113102576636,
+            0.001204762698494153,
+            0.3492354534770768,
+            3.988703102369622,
+            7.446972342274892,
+            2.613875947071485,
+            1.860151050804902e-05,
+            0.07799241383970082,
+            4946500.039233495,
+            907.5677350872909,
+            1245.438955040323,
+            0.0001277872704005029,
+            0.002545171687133515,
+            0.01229630267562622,
+            0.2253262515782924,
+            16011.68013995448,
+            4.152882294482328,
+            4208.608600430911,
+            8.983034451382988e-06
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f11/vector_shift_D1000.txt"
+          }
+        },
+        "non_separable_function": {
+          "type": "schwefel_1_2",
+          "function": {
+            "type": "asymmetric",
+            "parameters": {
+              "beta": 0.2
+            },
+            "function": {
+              "type": "oscillation",
+              "parameters": {
+                "boundary_only": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f12_shifted_rosenbrock",
+      "category": "Overlapping",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "rosenbrock",
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f12/vector_shift_D1000.txt"
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f13_overlapping_conforming_schwefel",
+      "category": "Overlapping",
+      "dimensions": {
+        "supported": [
+          905
+        ],
+        "default": 905,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 905,
+          "grouping": {
+            "permutation": "f13/vector_permutation_D905.txt",
+            "block_sizes": [
+              50,
+              50,
+              25,
+              25,
+              100,
+              100,
+              25,
+              25,
+              50,
+              25,
+              100,
+              25,
+              100,
+              50,
+              25,
+              25,
+              25,
+              100,
+              50,
+              25
+            ],
+            "overlap_size": 5,
+            "block_rotations": {
+              "25": "f13/matrix_rotation_D25.txt",
+              "50": "f13/matrix_rotation_D50.txt",
+              "100": "f13/matrix_rotation_D100.txt"
+            },
+            "transpose": false
+          },
+          "weights": [
+            0.4353328319185867,
+            0.009916326715665044,
+            0.05427408462402158,
+            29.36277114669338,
+            11490.33037696204,
+            24.12830828465555,
+            3.451118275947202,
+            2.326453155544301,
+            0.001766789509539211,
+            0.02539477160659147,
+            19.9959220973553,
+            0.0003668001927378567,
+            0.001356048928320048,
+            0.03874911849895608,
+            88.89452353634552,
+            57901.31382337087,
+            0.008485316099078568,
+            0.07362038148350014,
+            0.688309295752457,
+            119314.8936123031
+          ],
+          "bias": 0.0
+        },
+        "function": {
+          "type": "shift",
+          "parameters": {
+            "vector": "f13/vector_shift_D905.txt"
+          }
+        },
+        "overlapping_function": {
+          "type": "schwefel_1_2",
+          "function": {
+            "type": "asymmetric",
+            "parameters": {
+              "beta": 0.2
+            },
+            "function": {
+              "type": "oscillation",
+              "parameters": {
+                "boundary_only": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f14_overlapping_conflicting_schwefel",
+      "category": "Overlapping",
+      "dimensions": {
+        "supported": [
+          905
+        ],
+        "default": 905,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "decomposed",
+        "parameters": {
+          "dimension": 905,
+          "grouping": {
+            "permutation": "f14/vector_permutation_D905.txt",
+            "block_sizes": [
+              50,
+              50,
+              25,
+              25,
+              100,
+              100,
+              25,
+              25,
+              50,
+              25,
+              100,
+              25,
+              100,
+              50,
+              25,
+              25,
+              25,
+              100,
+              50,
+              25
+            ],
+            "overlap_size": 5,
+            "shift_file": "f14/vector_shift_D1000.txt",
+            "block_rotations": {
+              "25": "f14/matrix_rotation_D25.txt",
+              "50": "f14/matrix_rotation_D50.txt",
+              "100": "f14/matrix_rotation_D100.txt"
+            },
+            "transpose": false
+          },
+          "weights": [
+            0.4753902976291743,
+            498729.4349012464,
+            328.1032851136715,
+            0.3231599525017396,
+            136.4562810151285,
+            9.025518074644136,
+            0.092439618796505,
+            0.0001099484417540517,
+            0.009366186525282616,
+            299.6790409975172,
+            4.939589864702469,
+            81.36413957775696,
+            0.6544027477491213,
+            11.61197332124502,
+            2860774.320110003,
+            8.583578119678344e-05,
+            23.56951753728851,
+            0.04810314216448019,
+            1.4318494811719,
+            12.16976123256558
+          ],
+          "bias": 0.0
+        },
+        "overlapping_function": {
+          "type": "schwefel_1_2",
+          "function": {
+            "type": "asymmetric",
+            "parameters": {
+              "beta": 0.2
+            },
+            "function": {
+              "type": "oscillation",
+              "parameters": {
+                "boundary_only": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec13_lsgo_f15_shifted_schwefel",
+      "category": "Fully Non-Separable",
+      "dimensions": {
+        "supported": [
+          1000
+        ],
+        "default": 1000,
+        "custom_dimensions": false
+      },
+      "search_space": {
+        "low": -100.0,
+        "high": 100.0
+      },
+      "function": {
+        "type": "schwefel_1_2",
+        "function": {
+          "type": "asymmetric",
+          "parameters": {
+            "beta": 0.2
+          },
+          "function": {
+            "type": "oscillation",
+            "parameters": {
+              "boundary_only": false
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f15/vector_shift_D1000.txt"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
