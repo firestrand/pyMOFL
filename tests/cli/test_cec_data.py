@@ -44,6 +44,33 @@ class TestSuiteCLI:
         assert result.exit_code == 0
         assert "All referenced files exist." in result.output
 
+    def test_validate_competition_suites(self):
+        for sid in ["cec2008", "cec2010", "cec2015_niching", "cec2024", "cec2025"]:
+            result = runner.invoke(app, ["suite", "validate", "--suite-id", sid])
+            assert result.exit_code == 0
+            assert "All referenced files exist." in result.output
+
+    def test_suite_list_competition_suites(self):
+        r_08 = runner.invoke(app, ["suite", "list", "--suite-id", "cec2008"])
+        assert r_08.exit_code == 0
+        assert "cec08_f01" in r_08.output
+
+        r_10 = runner.invoke(app, ["suite", "list", "--suite-id", "cec2010"])
+        assert r_10.exit_code == 0
+        assert "cec10_f01" in r_10.output
+
+        r_nich = runner.invoke(app, ["suite", "list", "--suite-id", "cec2015_niching"])
+        assert r_nich.exit_code == 0
+        assert "cec15_nich_f01" in r_nich.output
+
+        r_24 = runner.invoke(app, ["suite", "list", "--suite-id", "cec2024"])
+        assert r_24.exit_code == 0
+        assert "cec24_f01" in r_24.output
+
+        r_25 = runner.invoke(app, ["suite", "list", "--suite-id", "cec2025"])
+        assert r_25.exit_code == 0
+        assert "cec25_f01" in r_25.output
+
     def test_validate_missing_reference(self, tmp_path: Path):
         suite_dir = tmp_path / "suite"
         suite_dir.mkdir()
