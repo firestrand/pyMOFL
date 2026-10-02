@@ -169,7 +169,7 @@ class HybridFunction(OptimizationFunction):
         # Compute the weighted sum
         return float(np.dot(self.weights, values))
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """
         Vectorized batch evaluation of the hybrid function.
 
@@ -177,6 +177,8 @@ class HybridFunction(OptimizationFunction):
         ----------
         X : np.ndarray
             Input array of shape (n_points, dimension).
+        out : np.ndarray | None, optional
+            Pre-allocated output array of shape (n_points,).
 
         Returns
         -------
@@ -185,7 +187,25 @@ class HybridFunction(OptimizationFunction):
         """
         X = self._validate_batch_input(X)
         n_points = X.shape[0]
-        results = np.zeros(n_points)
-        for idx in range(n_points):
-            results[idx] = self.evaluate(X[idx])
+        n_components = len(self.components)
+
+        values = np.empty((n_points, n_components), dtype=np.float64)
+
+        for i, (component, (start, end)) in enumerate(
+            zip(self.components, self.partitions, strict=False)
+        ):
+            x_subset = X[:, start:end]
+            if x_subset.shape[1] != component.dimension:
+                if x_subset.shape[1] < component.dimension:
+                    pad_width = ((0, 0), (0, component.dimension - x_subset.shape[1]))
+                    x_subset = np.pad(x_subset, pad_width)
+                else:
+                    x_subset = x_subset[:, : component.dimension]
+
+            values[:, i] = component.evaluate_batch(x_subset)
+
+        results = np.dot(values, self.weights)
+        if out is not None:
+            out[:] = results
+            return out
         return results

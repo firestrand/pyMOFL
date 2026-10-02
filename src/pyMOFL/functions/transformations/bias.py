@@ -38,14 +38,15 @@ class BiasTransform(ScalarTransform):
         """
         return y + self.bias
 
-    def transform_batch(self, Y: np.ndarray) -> np.ndarray:
+    def transform_batch(self, Y: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """
         Apply bias transformation to batch.
 
         Args:
             Y: Batch of scalars
+            out: Optional pre-allocated buffer of shape matching Y
 
         Returns:
             Batch of biased scalars: Y + bias
         """
-        return np.asarray(Y) + self.bias
+        return np.add(np.asarray(Y), self.bias, out=out)

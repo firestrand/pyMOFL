@@ -66,7 +66,7 @@ class DeceptiveFunction(OptimizationFunction):
 
     def _g(self, x: np.ndarray) -> np.ndarray:
         """Compute the piecewise deceptive function g_i for each component."""
-        alpha = self._alpha
+        alpha = np.broadcast_to(self._alpha, x.shape)
         g = np.empty_like(x)
 
         # Region 1: 0 <= x_i <= 4*alpha_i/5
@@ -92,16 +92,16 @@ class DeceptiveFunction(OptimizationFunction):
         avg_g = np.sum(g) / self.dimension
         return float(-(avg_g**2))
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """Compute Deceptive function for a batch of points."""
         X = self._validate_batch_input(X)
-        n = X.shape[0]
-        results = np.empty(n)
-        for i in range(n):
-            g = self._g(X[i])
-            avg_g = np.sum(g) / self.dimension
-            results[i] = -(avg_g**2)
-        return results
+        g = self._g(X)
+        avg_g = np.sum(g, axis=1) / self.dimension
+        res = -(avg_g**2)
+        if out is not None:
+            out[:] = res
+            return out
+        return res
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Deceptive function.

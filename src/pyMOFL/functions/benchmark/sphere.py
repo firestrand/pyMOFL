@@ -85,10 +85,10 @@ class SphereFunction(OptimizationFunction):
         x = self._validate_input(x)
         return float(np.sum(x**2))
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """Compute sphere function for batch."""
         X = self._validate_batch_input(X)
-        return np.sum(X**2, axis=1)
+        return np.sum(X**2, axis=1, out=out)
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """

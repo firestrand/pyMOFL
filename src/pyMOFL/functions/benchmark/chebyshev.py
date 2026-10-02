@@ -111,14 +111,32 @@ class ChebyshevFunction(OptimizationFunction):
 
         return float(sum_val)
 
-    def evaluate_batch(self, X: NDArray) -> NDArray:
+    def evaluate_batch(self, X: NDArray, out: NDArray | None = None) -> NDArray:
         """Batch evaluation of Chebyshev polynomial fitting function."""
         X = self._validate_batch_input(X)
-        N = X.shape[0]
-        results = np.zeros(N, dtype=np.float64)
-        for i in range(N):
-            results[i] = self.evaluate(X[i])
-        return results
+        # Evaluate polynomial P(y) across sample points for all batch rows using Horner's method
+        px = np.tile(X[:, 0:1], (1, len(self._sample_y)))
+        sample_y_row = self._sample_y[None, :]
+        for j in range(1, self.dimension):
+            px = sample_y_row * px + X[:, j : j + 1]
+
+        # Penalize deviations outside [-1, 1]
+        violations = np.abs(px) > 1.0
+        sum_val = np.sum(np.where(violations, (1.0 - np.abs(px)) ** 2, 0.0), axis=1)
+
+        # Boundary condition at 1.2
+        p_12 = X[:, 0].copy()
+        for j in range(1, self.dimension):
+            p_12 = 1.2 * p_12 + X[:, j]
+
+        # CEC 2019 reference implementation runs the boundary check twice (i in {-1, 1})
+        boundary_violation = p_12 < self._dx
+        sum_val += np.where(boundary_violation, 2.0 * (p_12**2), 0.0)
+
+        if out is not None:
+            out[:] = sum_val
+            return out
+        return sum_val
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Return the known global minimum point and value for standard dimensions."""

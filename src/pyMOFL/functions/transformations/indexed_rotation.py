@@ -8,6 +8,7 @@ from __future__ import annotations
 import numpy as np
 
 from .base import VectorTransform
+from .linear import linear_transform_batch
 
 
 class IndexedRotateTransform(VectorTransform):
@@ -51,3 +52,7 @@ class IndexedRotateTransform(VectorTransform):
     def __call__(self, x: np.ndarray) -> np.ndarray:
         x = np.asarray(x, dtype=np.float64)
         return self.matrix.T @ x
+
+    def transform_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
+        X = np.asarray(X, dtype=np.float64)
+        return linear_transform_batch(X, self.matrix, out=out)

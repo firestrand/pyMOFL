@@ -52,12 +52,13 @@ class RotateTransform(VectorTransform):
 
         return linear_transform(x, self.matrix)
 
-    def transform_batch(self, X: np.ndarray) -> np.ndarray:
+    def transform_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """
         Apply rotation transformation to batch.
 
         Args:
             X: Batch of input vectors (N x dimension)
+            out: Optional pre-allocated buffer of shape (N x dimension)
 
         Returns:
             Batch of rotated vectors
@@ -68,4 +69,4 @@ class RotateTransform(VectorTransform):
                 f"Input dimension {X.shape[1]} doesn't match matrix dimension {self.dimension}"
             )
 
-        return linear_transform_batch(X, self.matrix)
+        return linear_transform_batch(X, self.matrix, out=out)

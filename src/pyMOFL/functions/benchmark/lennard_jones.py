@@ -157,7 +157,7 @@ class LennardJonesFunction(OptimizationFunction):
                     energy += 4.0 * (inv_dist12 - inv_dist6)
         return float(energy)
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """
         Vectorized batch evaluation of the Lennard-Jones potential energy.
 
@@ -165,6 +165,8 @@ class LennardJonesFunction(OptimizationFunction):
         ----------
         X : np.ndarray
             Input array of shape (n_points, 3 * n_atoms).
+        out : np.ndarray | None, optional
+            Pre-allocated output buffer of shape (n_points,).
 
         Returns
         -------
@@ -172,7 +174,26 @@ class LennardJonesFunction(OptimizationFunction):
             The potential energy for each point.
         """
         X = self._validate_batch_input(X)
-        return np.array([self.evaluate(x) for x in X])
+        N = X.shape[0]
+        coords = X.reshape(N, self.n_atoms, 3)
+        i_idx, j_idx = np.triu_indices(self.n_atoms, k=1)
+        diff = coords[:, i_idx, :] - coords[:, j_idx, :]
+        dist2 = np.sum(diff**2, axis=-1)
+
+        valid = dist2 >= 1e-12
+        energy = np.full_like(dist2, 1e10)
+
+        d2_v = dist2[valid]
+        inv_dist2 = 1.0 / d2_v
+        inv_dist6 = inv_dist2**3
+        inv_dist12 = inv_dist6**2
+        energy[valid] = 4.0 * (inv_dist12 - inv_dist6)
+
+        total = np.sum(energy, axis=-1)
+        if out is not None:
+            out[:] = total
+            return out
+        return total
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get the global minimum of the Lennard-Jones function.

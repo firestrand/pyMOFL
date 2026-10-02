@@ -29,7 +29,7 @@ class BoundaryPenaltyTransform(PenaltyTransform):
         violations = np.maximum(0.0, np.abs(x) - self.bound)
         return float(np.sum(violations**2))
 
-    def compute_batch(self, X: np.ndarray) -> np.ndarray:
+    def compute_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """Compute penalties for a batch of vectors.
 
         Returns
@@ -38,4 +38,4 @@ class BoundaryPenaltyTransform(PenaltyTransform):
         """
         X = np.asarray(X, dtype=np.float64)
         violations = np.maximum(0.0, np.abs(X) - self.bound)
-        return np.sum(violations**2, axis=1)
+        return np.sum(violations**2, axis=1, out=out)

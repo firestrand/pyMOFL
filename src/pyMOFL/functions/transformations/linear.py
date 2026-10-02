@@ -17,12 +17,14 @@ def linear_transform(v: np.ndarray, M: np.ndarray) -> np.ndarray:
         return M.T @ v
 
 
-def linear_transform_batch(X: np.ndarray, M: np.ndarray) -> np.ndarray:
+def linear_transform_batch(
+    X: np.ndarray, M: np.ndarray, out: np.ndarray | None = None
+) -> np.ndarray:
     X = np.asarray(X, dtype=np.float64)
     M = np.asarray(M, dtype=np.float64)
     # Apply to each row: X @ M
     with np.errstate(invalid="ignore", over="ignore", divide="ignore"):
-        return X @ M
+        return np.matmul(X, M, out=out)
 
 
 class LinearTransform:
@@ -32,8 +34,8 @@ class LinearTransform:
     def __call__(self, v: np.ndarray) -> np.ndarray:
         return linear_transform(v, self.M)
 
-    def transform_batch(self, X: np.ndarray) -> np.ndarray:
-        return linear_transform_batch(X, self.M)
+    def transform_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
+        return linear_transform_batch(X, self.M, out=out)
 
 
 # Alias for tests that may reference an optimized version

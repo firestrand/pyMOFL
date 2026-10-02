@@ -91,6 +91,9 @@ class WeightedComposition(OptimizationFunction):
         self.inverse_distance_weight = bool(inverse_distance_weight)
         self.dominance_suppression = bool(dominance_suppression)
         self.non_continuous = bool(non_continuous)
+        self._optima_arr = np.array(self.optima, dtype=np.float64)
+        self._sigmas2 = np.array(self.sigmas, dtype=np.float64) ** 2
+        self._biases_arr = np.array(self.biases, dtype=np.float64)
 
     def _compute_weights(self, x: np.ndarray) -> np.ndarray:
         """Compute Gaussian weights from raw distances to component optima.
@@ -106,7 +109,7 @@ class WeightedComposition(OptimizationFunction):
             [np.sum((x - self.optima[i]) ** 2) for i in range(n)],
             dtype=np.float64,
         )
-        sigmas2 = np.array(self.sigmas, dtype=np.float64) ** 2
+        sigmas2 = self._sigmas2
         w = np.exp(-(d2 / (2.0 * self.dimension * sigmas2)))
 
         if self.inverse_distance_weight:
@@ -120,16 +123,48 @@ class WeightedComposition(OptimizationFunction):
                 w *= np.sqrt(1.0 / d2)
 
         if self.dominance_suppression:
-            maxw = np.max(w)
+            maxw = float(np.max(w))
             if maxw > 0.0:
+                factor = 1.0 - min(maxw, 1.0) ** 10.0
                 mask = w != maxw
-                w[mask] *= 1.0 - maxw**10.0
+                w[mask] *= factor
 
         s = np.sum(w)
         if s > 0.0:
             w = w / s
         else:
             w[:] = 1.0 / n
+        return w
+
+    def _compute_weights_batch(self, X: np.ndarray) -> np.ndarray:
+        """Vectorized computation of Gaussian weights for a batch of points."""
+        n = len(self.components)
+        # diff: (N, n, D)
+        diff = X[:, None, :] - self._optima_arr[None, :, :]
+        # d2: (N, n)
+        d2 = np.sum(diff**2, axis=2)
+        sigmas2 = self._sigmas2[None, :]
+        w = np.exp(-(d2 / (2.0 * self.dimension * sigmas2)))
+
+        if self.inverse_distance_weight:
+            zero_mask = d2 == 0.0
+            has_zero = np.any(zero_mask, axis=1, keepdims=True)
+            inv_d = np.zeros_like(d2)
+            nz = ~zero_mask
+            inv_d[nz] = np.sqrt(1.0 / d2[nz])
+            w *= inv_d
+            if np.any(has_zero):
+                w = np.where(has_zero, np.where(zero_mask, 1e99, 0.0), w)
+
+        if self.dominance_suppression:
+            maxw = np.max(w, axis=1, keepdims=True)
+            factor = 1.0 - np.minimum(maxw, 1.0) ** 10.0
+            mask = (w != maxw) & (maxw > 0.0)
+            w = np.where(mask, w * factor, w)
+
+        s = np.sum(w, axis=1, keepdims=True)
+        pos = s > 0.0
+        w = np.where(pos, w / np.where(pos, s, 1.0), 1.0 / n)
         return w
 
     def _noncontinuous_map(self, x: np.ndarray) -> np.ndarray:
@@ -159,7 +194,23 @@ class WeightedComposition(OptimizationFunction):
             total += float(w[i] * (f + self.biases[i]))
         return float(total)
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """Evaluate the weighted composition for a batch of points."""
         X = self._validate_batch_input(X)
-        return np.array([self.evaluate(row) for row in X], dtype=np.float64)
+        N = X.shape[0]
+        n = len(self.components)
+
+        X_eval = self._noncontinuous_map(X) if self.non_continuous else X
+        w = self._compute_weights_batch(X_eval)
+
+        F = np.empty((N, n), dtype=np.float64)
+        for i, comp in enumerate(self.components):
+            F[:, i] = comp.evaluate_batch(X_eval)
+
+        shifted_F = F + self._biases_arr[None, :]
+        total = self.global_bias + np.sum(w * shifted_F, axis=1)
+
+        if out is not None:
+            out[:] = total
+            return out
+        return total

@@ -114,15 +114,49 @@ class SchwefelSinFunction(OptimizationFunction):
         f += _SCHWEFEL_CONSTANT * D
         return float(f)
 
-    def evaluate_batch(self, X: NDArray) -> NDArray:
+    def evaluate_batch(self, X: NDArray, out: NDArray | None = None) -> NDArray:
         """Compute Schwefel function for batch."""
         X = self._validate_batch_input(X)
         if not self._boundary_handling:
-            return _SCHWEFEL_CONSTANT * self.dimension - np.sum(
+            val = _SCHWEFEL_CONSTANT * self.dimension - np.sum(
                 X * np.sin(np.sqrt(np.abs(X))), axis=1
             )
-        # CEC 2014 boundary handling per sample
-        return np.array([self.evaluate(X[i]) for i in range(X.shape[0])])
+            if out is not None:
+                out[:] = val
+                return out
+            return val
+
+        # CEC 2014 boundary handling vectorized across (N, D)
+        D = self.dimension
+        term = np.zeros_like(X)
+        penalty = np.zeros_like(X)
+
+        mask_pos = X > 500.0
+        mask_neg = X < -500.0
+        mask_std = ~(mask_pos | mask_neg)
+
+        if np.any(mask_std):
+            x_std = X[mask_std]
+            term[mask_std] = -x_std * np.sin(np.sqrt(np.abs(x_std)))
+
+        if np.any(mask_pos):
+            z_pos = X[mask_pos]
+            clamped_pos = 500.0 - np.fmod(z_pos, 500.0)
+            term[mask_pos] = -clamped_pos * np.sin(np.sqrt(clamped_pos))
+            penalty[mask_pos] = ((z_pos - 500.0) / 100.0) ** 2
+
+        if np.any(mask_neg):
+            z_neg = X[mask_neg]
+            mod_val = np.fmod(np.abs(z_neg), 500.0)
+            clamped_neg = 500.0 - mod_val
+            term[mask_neg] = -(-500.0 + mod_val) * np.sin(np.sqrt(clamped_neg))
+            penalty[mask_neg] = ((z_neg + 500.0) / 100.0) ** 2
+
+        total = np.sum(term, axis=1) + (np.sum(penalty, axis=1) / D) + (_SCHWEFEL_CONSTANT * D)
+        if out is not None:
+            out[:] = total
+            return out
+        return total
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """

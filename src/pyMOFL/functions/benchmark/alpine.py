@@ -73,19 +73,14 @@ class Alpine1Function(OptimizationFunction):
 
         return float(result)
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """Evaluate Alpine 1 function for batch."""
         X = self._validate_batch_input(X)
-        n_points, n_dims = X.shape
-        results = np.zeros(n_points)
-
-        for j in range(n_points):
-            result = 0.0
-            for i in range(n_dims):
-                result += abs(X[j, i] * np.sin(X[j, i]) + 0.1 * X[j, i])
-            results[j] = result
-
-        return results
+        val = np.sum(np.abs(X * np.sin(X) + 0.1 * X), axis=1)
+        if out is not None:
+            out[:] = val
+            return out
+        return val
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""
@@ -144,25 +139,17 @@ class Alpine2Function(OptimizationFunction):
 
         return float(result)
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """Evaluate Alpine 2 function for batch."""
         X = self._validate_batch_input(X)
-        n_points, n_dims = X.shape
-        results = np.zeros(n_points)
-
-        for j in range(n_points):
-            result = 1.0
-            zero_found = False
-
-            for i in range(n_dims):
-                if X[j, i] <= 0:
-                    zero_found = True
-                    break
-                result *= np.sqrt(X[j, i]) * np.sin(X[j, i])
-
-            results[j] = 0.0 if zero_found else result
-
-        return results
+        has_nonpos = np.any(X <= 0.0, axis=1)
+        safe_X = np.where(X > 0.0, X, 1.0)
+        prod = np.prod(np.sqrt(safe_X) * np.sin(safe_X), axis=1)
+        prod[has_nonpos] = 0.0
+        if out is not None:
+            out[:] = prod
+            return out
+        return prod
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get global minimum."""

@@ -35,3 +35,7 @@ class IndexedShiftTransform(VectorTransform):
     def __call__(self, x: np.ndarray) -> np.ndarray:
         x = np.asarray(x, dtype=np.float64)
         return x - self.shift
+
+    def transform_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
+        X = np.asarray(X, dtype=np.float64)
+        return np.subtract(X, self.shift, out=out)

@@ -50,12 +50,13 @@ class ShiftTransform(VectorTransform):
         # NumPy broadcasting handles scalar shift automatically
         return x - self.shift
 
-    def transform_batch(self, X: np.ndarray) -> np.ndarray:
+    def transform_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """
         Apply shift transformation to batch.
 
         Args:
             X: Batch of input vectors (N x dimension)
+            out: Optional pre-allocated buffer of shape (N x dimension)
 
         Returns:
             Batch of shifted vectors: X - shift
@@ -66,4 +67,4 @@ class ShiftTransform(VectorTransform):
                 f"Input dimension {X.shape[1]} doesn't match shift dimension {self.dimension}"
             )
         # NumPy broadcasting handles scalar shift automatically
-        return X - self.shift
+        return np.subtract(X, self.shift, out=out)

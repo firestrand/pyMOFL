@@ -122,10 +122,27 @@ class ColaFunction(OptimizationFunction):
                 result += (r_ij - _FULL_D[i, j]) ** 2
         return float(result)
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """Evaluate the Cola function for a batch of points."""
         X = self._validate_batch_input(X)
-        return np.array([self.evaluate(x) for x in X])
+        N = X.shape[0]
+        coords = np.zeros((N, 10, 2), dtype=np.float64)
+        coords[:, 1, 0] = X[:, 0]
+        for k in range(3, 11):
+            coords[:, k - 1, 0] = X[:, 2 * k - 5]
+            coords[:, k - 1, 1] = X[:, 2 * k - 4]
+
+        i_idx, j_idx = np.triu_indices(10, k=1)
+        target_d = _FULL_D[i_idx, j_idx]
+
+        diff = coords[:, i_idx, :] - coords[:, j_idx, :]
+        r_ij = np.sqrt(np.sum(diff**2, axis=-1))
+        res = np.sum((r_ij - target_d[None, :]) ** 2, axis=1)
+
+        if out is not None:
+            out[:] = res
+            return out
+        return res
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """Get approximate global minimum.

@@ -201,7 +201,7 @@ class NetworkFunction(OptimizationFunction):
 
         return float(f)
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """
         Evaluate the Network function on a batch of points.
 
@@ -209,19 +209,35 @@ class NetworkFunction(OptimizationFunction):
         ----------
         X : np.ndarray
             Input array of shape (n_points, dimension).
+        out : np.ndarray | None, optional
+            Pre-allocated output buffer of shape (n_points,).
+
         Returns
         -------
         np.ndarray
             The function values for each point.
         """
-        # Validate the batch input
         X = self._validate_batch_input(X)
+        N = X.shape[0]
+        n_binary = self.bts_count * self.bsc_count
 
-        # Initialize results array
-        results = np.zeros(X.shape[0])
+        conn = (
+            (X[:, :n_binary] >= 0.5).reshape(N, self.bsc_count, self.bts_count).astype(np.float64)
+        )
+        bsc_positions = X[:, n_binary:].reshape(N, self.bsc_count, 2)
 
-        # Process each point individually
-        for i in range(X.shape[0]):
-            results[i] = self.evaluate(X[i])
+        # Check BTS constraints
+        connection_sum = np.sum(conn, axis=1)  # shape (N, bts_count)
+        penalties = np.sum(np.abs(connection_sum - 1.0) > 1e-10, axis=1) * self.penalty
 
+        # Distances between connected BSC and BTS
+        dx = self.bts_positions[None, None, :, 0] - bsc_positions[:, :, None, 0]
+        dy = self.bts_positions[None, None, :, 1] - bsc_positions[:, :, None, 1]
+        dist = np.sqrt(dx * dx + dy * dy)
+        total_dist = np.sum(conn * dist, axis=(1, 2))
+
+        results = penalties + total_dist
+        if out is not None:
+            out[:] = results
+            return out
         return results

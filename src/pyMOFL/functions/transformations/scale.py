@@ -52,15 +52,16 @@ class ScaleTransform(VectorTransform):
         x = np.asarray(x, dtype=np.float64)
         return x / self.factor
 
-    def transform_batch(self, X: np.ndarray) -> np.ndarray:
+    def transform_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """
         Apply scale transformation to batch.
 
         Args:
             X: Batch of input vectors (N x dimension)
+            out: Optional pre-allocated buffer of shape (N x dimension)
 
         Returns:
             Batch of scaled vectors: X / factor
         """
         X = np.asarray(X, dtype=np.float64)
-        return X / self.factor
+        return np.divide(X, self.factor, out=out)

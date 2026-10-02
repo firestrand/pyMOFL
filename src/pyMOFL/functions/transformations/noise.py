@@ -57,5 +57,20 @@ class NoiseTransform(ScalarTransform):
 
         return value * noise_factor
 
+    def transform_batch(self, Y: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
+        """
+        Apply noise to batch of scalar values.
+
+        Args:
+            Y: Array of function values
+            out: Optional pre-allocated buffer of shape matching Y
+
+        Returns:
+            Values with noise applied
+        """
+        Y_arr = np.asarray(Y, dtype=np.float64)
+        noise_factor = 1.0 + self.noise_level * np.abs(np.random.randn(*Y_arr.shape))
+        return np.multiply(Y_arr, noise_factor, out=out)
+
     def __repr__(self) -> str:
         return f"NoiseTransform(noise_level={self.noise_level})"

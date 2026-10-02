@@ -109,12 +109,13 @@ class ComposedFunction(OptimizationFunction):
 
         return float(result)
 
-    def evaluate_batch(self, X: np.ndarray) -> np.ndarray:
+    def evaluate_batch(self, X: np.ndarray, out: np.ndarray | None = None) -> np.ndarray:
         """
         Evaluate the composed function on a batch.
 
         Args:
             X: Batch of input vectors
+            out: Optional pre-allocated buffer of shape (n_points,)
 
         Returns:
             Batch of results
@@ -127,14 +128,32 @@ class ComposedFunction(OptimizationFunction):
             X = transform.transform_batch(X)
 
         # Evaluate base function
-        results = self.base_function.evaluate_batch(X)
+        try:
+            results = self.base_function.evaluate_batch(X, out=out)  # type: ignore[unknown-argument]
+        except TypeError:
+            results = self.base_function.evaluate_batch(X)
+
+        if out is not None and results is not out:
+            out[:] = results
+            results = out
 
         # Apply output transformations in order
         for transform in self.output_transforms:
-            results = transform.transform_batch(results)
+            try:
+                results = transform.transform_batch(results, out=out)  # type: ignore[unknown-argument]
+            except TypeError:
+                results = transform.transform_batch(results)
+            if out is not None and results is not out:
+                out[:] = results
+                results = out
 
         # Add penalty transforms (computed on raw input)
         for penalty in self.penalty_transforms:
-            results = results + penalty.compute_batch(raw_X)
+            pen_val = penalty.compute_batch(raw_X)
+            if out is not None:
+                out += pen_val
+                results = out
+            else:
+                results = results + pen_val
 
         return results
