@@ -129,3 +129,33 @@ class TestOscillationTransform:
         transform = OscillationTransform()
         with pytest.raises(ValueError, match="2D"):
             transform.transform_batch(np.ones((2, 3, 4)))
+
+
+class TestObjectiveOscillationTransform:
+    """COCO transform_obj_oscillate, the scalar form of T_osz."""
+
+    def test_matches_vector_formula(self):
+        from pyMOFL.functions.transformations.oscillation import ObjectiveOscillationTransform
+
+        scalar = ObjectiveOscillationTransform()
+        vector = OscillationTransform()
+        values = np.array([0.0, 1.0, 2.5, 1e-8, 1e6, -0.3, -4.0])
+        for value in values:
+            np.testing.assert_allclose(
+                scalar(float(value)),
+                vector(np.array([value]))[0],
+                rtol=1e-12,
+                atol=0.0,
+            )
+
+    def test_batch_matches_scalar(self):
+        from pyMOFL.functions.transformations.oscillation import ObjectiveOscillationTransform
+
+        scalar = ObjectiveOscillationTransform()
+        values = np.array([0.0, 3.0, -1.5, 40.0])
+        np.testing.assert_allclose(
+            scalar.transform_batch(values),
+            np.array([scalar(float(v)) for v in values]),
+            rtol=1e-12,
+            atol=0.0,
+        )

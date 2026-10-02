@@ -35,7 +35,7 @@ tests/                         # Test suite mirroring src/
 
 ### 2.1 Base Class: `OptimizationFunction`
 
-All benchmark functions must inherit from [`OptimizationFunction`](src/pyMOFL/core/function.py):
+All benchmark functions must inherit from [`OptimizationFunction`](../src/pyMOFL/core/function.py):
 
 * **Evaluation Contract**: Subclasses must implement:
   * `evaluate(x: NDArray) -> float`: Evaluates a single $D$-dimensional point.
@@ -48,7 +48,7 @@ All benchmark functions must inherit from [`OptimizationFunction`](src/pyMOFL/co
 
 ### 2.2 Functional Transformations Pipeline
 
-Transformations are pure, stateless operators in [`pyMOFL.functions.transformations`](src/pyMOFL/functions/transformations/):
+Transformations are pure, stateless operators in [`pyMOFL.functions.transformations`](../src/pyMOFL/functions/transformations/):
 
 1. **`VectorTransform` (Input Transformations)**:
    * Subclasses must implement `__call__(x: NDArray) -> NDArray` and `transform_batch(X: NDArray) -> NDArray`.
@@ -62,7 +62,7 @@ Transformations are pure, stateless operators in [`pyMOFL.functions.transformati
 
 ### 2.3 Function Composition: `ComposedFunction`
 
-Complex benchmark landscapes (such as shifted/rotated/biased variants in CEC and BBOB) are constructed via [`ComposedFunction`](src/pyMOFL/functions/transformations/composed.py):
+Complex benchmark landscapes (such as shifted/rotated/biased variants in CEC and BBOB) are constructed via [`ComposedFunction`](../src/pyMOFL/functions/transformations/composed.py):
 
 ```python
 composed = ComposedFunction(
@@ -84,14 +84,14 @@ $$f(\mathbf{x}) = y' + \sum_j P_j(\mathbf{x})$$
 
 ### 2.4 Multi-Function Composites
 
-Located in [`pyMOFL.compositions`](src/pyMOFL/compositions/):
+Located in [`pyMOFL.compositions`](../src/pyMOFL/compositions/):
 * **`WeightedComposition`**: Combines multiple functions using dynamic Gaussian distance-based weights (standard in CEC 2005/2014/2017 composition functions).
 * **`HybridFunction`**: Partitions input dimensions across multiple sub-functions with distinct rotation/scaling matrices.
 * **`MinComposition`**: Computes the lower envelope (minimum) across multiple attraction basins (used in GNBG).
 
 ### 2.5 Config-Driven Instantiation & Registry
 
-* **Unified Component Registry**: Every concrete benchmark function is decorated with `@register("alias_name")` in [`pyMOFL.registry`](src/pyMOFL/registry.py).
+* **Unified Component Registry**: Every concrete benchmark function is decorated with `@register("alias_name")` in [`pyMOFL.registry`](../src/pyMOFL/registry.py).
 * **`FunctionFactory`**: Constructs complete composed or composite functions from nested JSON configurations, automatically resolving data matrices and shift vectors via `DataLoader`.
 
 ---
@@ -124,12 +124,12 @@ Located in [`pyMOFL.compositions`](src/pyMOFL/compositions/):
    * Tests in `tests/` strictly mirror `src/pyMOFL/`.
    * Unit tests for each benchmark function live in `tests/functions/benchmark/test_<name>.py`.
 2. **Shared Test Helpers**:
-   * Use [`BenchmarkValidator`](tests/utils/benchmark_validation.py) for every benchmark function to verify standard contracts:
+   * Use [`BenchmarkValidator`](../tests/utils/benchmark_validation.py) for every benchmark function to verify standard contracts:
      ```python
      BenchmarkValidator.assert_contract(func)
      BenchmarkValidator.assert_contract_multiple_dimensions(FunctionClass, dimensions=[2, 5, 10])
      ```
-   * Use [`TransformValidator`](tests/utils/transform_validation.py) for new transformation classes.
+   * Use [`TransformValidator`](../tests/utils/transform_validation.py) for new transformation classes.
 3. **Numerical Accuracy**:
    * Use `pytest.approx` or `np.testing.assert_allclose`.
-   * For known reference deviations or upstream library bugs (documented in [`docs/xfail_analysis.md`](docs/xfail_analysis.md)), use `pytest.xfail` with a detailed explanation.
+   * For known reference deviations or upstream library bugs (documented in [`xfail_analysis.md`](xfail_analysis.md)), use `pytest.xfail` with a detailed explanation.

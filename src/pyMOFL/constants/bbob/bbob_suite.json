@@ -216,6 +216,8 @@
       "transforms": [
         "shift",
         "rotate",
+        "obj_oscillate",
+        "power",
         "bias"
       ],
       "properties": [
@@ -230,18 +232,30 @@
           "value": null
         },
         "function": {
-          "type": "rotate",
+          "type": "power",
           "parameters": {
-            "matrix": null
+            "exponent": 0.9
           },
           "function": {
-            "type": "shift",
-            "parameters": {
-              "vector": null
-            },
+            "type": "obj_oscillate",
+            "parameters": {},
             "function": {
-              "type": "attractive_sector",
-              "parameters": {}
+              "type": "rotate",
+              "parameters": {
+                "matrix": null
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": null
+                },
+                "function": {
+                  "type": "attractive_sector",
+                  "parameters": {
+                    "powered": false
+                  }
+                }
+              }
             }
           }
         }

@@ -160,10 +160,10 @@ uv run pymofl suite list --suite-id cec2005_suite --json
 
 ## Documentation & Function Catalog
 
-- **[Function Catalog](docs/function_catalog.md)**: Complete index of all 175 benchmark function classes and 336 registered aliases across classical, modern, CEC, and BBOB benchmarks.
-- **[Coding Guidelines](CODING_GUIDELINES.md)**: Architecture guide, functional transform pipeline, and coding conventions.
-- **[Contributing Guide](CONTRIBUTING.md)**: Setup instructions, workflow, and testing contracts for new contributors.
-- **[Roadmap](ROADMAP.md)**: Current development status and planned competition suites.
+- **[Function Catalog](function_catalog.md)**: Complete index of all 175 benchmark function classes and 336 registered aliases across classical, modern, CEC, and BBOB benchmarks.
+- **[Coding Guidelines](coding_guidelines.md)**: Architecture guide, functional transform pipeline, and coding conventions.
+- **[Contributing Guide](contributing.md)**: Setup instructions, workflow, and testing contracts for new contributors.
+- **[Roadmap](roadmap.md)**: Current development status and planned competition suites.
 
 ## Project Orientation
 

@@ -7,9 +7,10 @@ where s_i = 100 if x_i * x_opt_i > 0, else 1.
 Only a hypercone of roughly (1/2)^D volume fraction of the search space
 has the favorable s_i = 100 scaling, making the function highly asymmetric.
 
-The T_osz transformation and Q*Lambda*R rotations are not included in
-this base function — they are applied externally via ComposedFunction
-when constructing the full BBOB f6 suite function.
+Q*Lambda*R rotation is applied outside this class. The BBOB suite also
+passes ``powered=False`` and the original ``x_opt``, then applies objective
+T_osz and the 0.9 power as scalar transforms. The default ``powered=True``
+keeps the standalone formula ``(weighted sum of squares) ** 0.9``.
 
 References
 ----------
@@ -45,6 +46,12 @@ class AttractiveSectorFunction(OptimizationFunction):
         The dimensionality of the function.
     x_opt : np.ndarray, optional
         Reference direction for sector weighting. Defaults to ones(D).
+        The BBOB suite passes the original COCO xopt. The comparison is
+        against the already shifted and rotated vector.
+    powered : bool, optional
+        When True (default), raise the weighted sum of squares to 0.9.
+        The BBOB suite sets this False and applies objective oscillation
+        and the power as outer scalar transforms.
     initialization_bounds : Bounds, optional
         Bounds for random initialization. Defaults to [-5, 5]^D.
     operational_bounds : Bounds, optional
@@ -57,6 +64,7 @@ class AttractiveSectorFunction(OptimizationFunction):
         x_opt: NDArray | None = None,
         initialization_bounds: Bounds | None = None,
         operational_bounds: Bounds | None = None,
+        powered: bool = True,
         **kwargs,
     ):
         if initialization_bounds is None:
@@ -87,20 +95,25 @@ class AttractiveSectorFunction(OptimizationFunction):
                 )
         else:
             self._x_opt = np.ones(dimension, dtype=np.float64)
+        self._powered = bool(powered)
 
     def evaluate(self, x: NDArray) -> float:
         """Compute the Attractive Sector function value."""
         x = self._validate_input(x)
         s = np.where(x * self._x_opt > 0, 100.0, 1.0)
         inner_sum = np.sum((s * x) ** 2)
-        return float(inner_sum**0.9)
+        if self._powered:
+            inner_sum = inner_sum**0.9
+        return float(inner_sum)
 
     def evaluate_batch(self, X: NDArray) -> NDArray:
         """Compute Attractive Sector function for batch."""
         X = self._validate_batch_input(X)
         s = np.where(X * self._x_opt > 0, 100.0, 1.0)
         inner_sums = np.sum((s * X) ** 2, axis=1)
-        return inner_sums**0.9
+        if self._powered:
+            return inner_sums**0.9
+        return inner_sums
 
     def get_global_minimum(self) -> tuple[np.ndarray, float]:
         """

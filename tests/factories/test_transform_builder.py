@@ -104,6 +104,14 @@ class TestVectorTransforms:
         t = builder.build("t_osz", {}, dimension=5)
         assert isinstance(t, OscillationTransform)
 
+    def test_obj_oscillate_is_scalar(self, builder):
+        from pyMOFL.functions.transformations.oscillation import ObjectiveOscillationTransform
+
+        t = builder.build("obj_oscillate", {}, dimension=5)
+        assert isinstance(t, ObjectiveOscillationTransform)
+        assert isinstance(t, ScalarTransform)
+        np.testing.assert_allclose(t(4.0), OscillationTransform()(np.array([4.0]))[0])
+
     def test_asymmetric(self, builder):
         t = builder.build("asymmetric", {"beta": 0.5}, dimension=5)
         assert isinstance(t, AsymmetricTransform)

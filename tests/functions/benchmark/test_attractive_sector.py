@@ -4,8 +4,9 @@ Tests for the Attractive Sector function (BBOB f6 base).
 Base formula: f(x) = sum((s_i * x_i)^2)^0.9
 where s_i = 100 if x_i * x_opt_i > 0, else 1.
 
-The T_osz transformation and Q*Lambda*R rotations are applied externally
-via ComposedFunction in the BBOB suite config (Phase 3).
+Rotations are applied outside this class. Objective oscillation is also
+applied outside when ``powered`` is False, which is how the BBOB suite
+builds f6. The default ``powered=True`` evaluates ``sum ** 0.9``.
 """
 
 import numpy as np
@@ -106,3 +107,13 @@ class TestAttractiveSectorFunction:
 
         cls = get("attractive_sector")
         assert cls is not None
+
+    def test_unpowered_returns_weighted_sum(self):
+        """Suite construction applies T_osz and the 0.9 power outside the raw sum."""
+        from pyMOFL.functions.benchmark.attractive_sector import AttractiveSectorFunction
+
+        func = AttractiveSectorFunction(dimension=2, powered=False)
+        # s = [100, 1] at x = [1, 0] with default x_opt = ones
+        np.testing.assert_allclose(func.evaluate(np.array([1.0, 0.0])), 10000.0, rtol=0.0, atol=0.0)
+        powered = AttractiveSectorFunction(dimension=2, powered=True)
+        np.testing.assert_allclose(powered.evaluate(np.array([1.0, 0.0])), 10000.0**0.9, rtol=1e-12)

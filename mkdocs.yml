@@ -1,0 +1,76 @@
+site_name: pyMOFL
+site_description: Python Modular Optimization Function Library
+site_author: Travis Silvers
+repo_url: https://github.com/firestrand/pyMOFL
+docs_dir: docs
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Function Catalog: function_catalog.md
+  - Architecture & Guidelines: coding_guidelines.md
+  - Contributing: contributing.md
+  - Benchmark Suites:
+    - CEC 2005: CEC2005_Tech-Report.md
+    - GNBG: GNBG_Functions.md
+    - SPSO: SPSO_Functions.md
+    - Known Deviations: xfail_analysis.md
+  - Roadmap: roadmap.md
+  - Development:
+    - CEC gap analysis: cec_gap_analysis.md
+    - Cross-library gap analysis: cross_library_gap_analysis.md
+    - Implementation plan: implementation_plan.md
+  - Literature notes:
+    - Ackley: literature_ackley/README.md
+    - Ackley, active subspaces: literature_ackley/demo_2020_active_subspaces.md
+    - Ackley, Jamil and Yang: literature_ackley/jamil_yang_2013_literature_survey.md
+    - Ackley, GPU benchmarking: literature_ackley/kumar_2024_gpu_benchmarking.md
+    - Griewank: literature_griewank/README.md
+    - Griewank, GPU search: literature_griewank/zhang_2025_gpu_complete_search.md
+    - Rastrigin: literature_rastrigin/README.md
+    - Rastrigin, GPU benchmarking: literature_rastrigin/kumar_2024_gpu_benchmarking.md
+    - Rosenbrock: literature_rosenbrock/README.md
+    - Rosenbrock, GPU benchmarking: literature_rosenbrock/kumar_2024_gpu_benchmarking.md
+    - Schwefel: literature_schwefel/README.md
+    - Schwefel, CUDA: literature_schwefel/ding_tan_2014_cuda_benchmark.md
+    - Schwefel, Jamil and Yang: literature_schwefel/jamil_yang_2013_literature_survey.md
+    - Schwefel, ten benchmarks: literature_schwefel/yang_2023_ten_benchmarks.md
+
+# Source links in the catalog and guidelines point at the repository tree,
+# outside docs/. Report those as info so strict mode still catches broken
+# links between documentation pages.
+validation:
+  links:
+    not_found: info
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - admonition
+  - tables
+  - attr_list

@@ -190,3 +190,10 @@ debug_archive/
 # Literature processing data (PDFs, cache, downloaded content)
 utility_scripts/literature_processing/data/
 utility_scripts/literature_processing/cache/
+
+# LaTeX auxiliary files
+docs/paper/*.aux
+docs/paper/*.bbl
+docs/paper/*.blg
+docs/paper/*.log
+docs/paper/*.out

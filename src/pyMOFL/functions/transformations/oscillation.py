@@ -10,7 +10,7 @@ where x_hat = log(|x_i|), c1 = 10 if x_i > 0 else 5.5, c2 = 7.9 if x_i > 0 else 
 
 import numpy as np
 
-from .base import VectorTransform
+from .base import ScalarTransform, VectorTransform
 
 
 class OscillationTransform(VectorTransform):
@@ -82,3 +82,19 @@ class OscillationTransform(VectorTransform):
         c2 = 7.9 if val > 0 else 3.1
         sign = 1.0 if val > 0 else -1.0
         return sign * np.exp(x_hat + 0.049 * (np.sin(c1 * x_hat) + np.sin(c2 * x_hat)))
+
+
+class ObjectiveOscillationTransform(ScalarTransform):
+    """Scalar objective oscillation (COCO ``transform_obj_oscillate``).
+
+    Same element formula as :class:`OscillationTransform`. BBOB f6 applies it
+    to the raw attractive-sector sum before the 0.9 power.
+    """
+
+    def __call__(self, y: float) -> float:
+        return float(OscillationTransform._osz_scalar(float(y)))
+
+    def transform_batch(self, Y: np.ndarray) -> np.ndarray:
+        values = np.asarray(Y, dtype=np.float64)
+        flat = OscillationTransform()(values.reshape(-1))
+        return flat.reshape(values.shape)

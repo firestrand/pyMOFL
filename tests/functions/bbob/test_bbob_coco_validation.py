@@ -17,7 +17,7 @@ from pyMOFL.factories.bbob_suite_factory import BBOBSuiteFactory  # noqa: E402
 from pyMOFL.utils.bbob_instance import BBOBInstanceGenerator  # noqa: E402
 
 # Functions with full COCO parity (external transform chains match exactly)
-PARITY_FIDS = [1, 2, 8, 10, 12, 13, 15]
+PARITY_FIDS = [1, 2, 6, 8, 10, 12, 13, 15]
 
 # Functions with monolithic COCO implementations (can't match via external transforms)
 # f5: COCO uses sqrt(10) slopes with boundary clipping, no shift

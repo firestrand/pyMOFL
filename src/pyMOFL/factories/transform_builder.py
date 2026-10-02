@@ -28,6 +28,7 @@ from pyMOFL.functions.transformations import (
     NoiseTransform,
     NonContinuousTransform,
     NormalizeTransform,
+    ObjectiveOscillationTransform,
     OffsetTransform,
     OscillationTransform,
     PenaltyTransform,
@@ -125,6 +126,8 @@ class TransformBuilder:
             return BoundaryPenaltyTransform(bound=bound)
 
         # Scalar transforms
+        if transform_type in {"obj_oscillate", "t_osz_obj"}:
+            return ObjectiveOscillationTransform()
         if transform_type == "bias":
             return BiasTransform(float(params.get("value", params.get("bias", 0.0))))
         if transform_type == "power":

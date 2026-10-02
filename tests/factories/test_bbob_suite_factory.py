@@ -224,3 +224,22 @@ class TestBBOBSuiteFactory:
         result = func.evaluate(params["xopt"])
         # Should be close to fopt (sphere(shifted_origin) = 0 + fopt)
         np.testing.assert_allclose(result, params["fopt"], atol=1e-6)
+
+    def test_f6_applies_objective_oscillation_before_power(self, factory):
+        """COCO f6 is raw sector sum, then T_osz, then ^0.9, then fopt."""
+        from pyMOFL.functions.transformations.bias import BiasTransform
+        from pyMOFL.functions.transformations.oscillation import ObjectiveOscillationTransform
+        from pyMOFL.functions.transformations.power import PowerTransform
+        from pyMOFL.utils.bbob_instance import BBOBInstanceGenerator
+
+        func = factory.create_function(fid=6, iid=1, dim=4)
+        assert func.base_function._powered is False
+        params = BBOBInstanceGenerator().generate_instance(fid=6, iid=1, dim=4)
+        np.testing.assert_allclose(func.base_function._x_opt, params["xopt"])
+        assert [type(t) for t in func.output_transforms] == [
+            ObjectiveOscillationTransform,
+            PowerTransform,
+            BiasTransform,
+        ]
+        assert func.output_transforms[1].exponent == 0.9
+        np.testing.assert_allclose(func.evaluate(params["xopt"]), params["fopt"], atol=1e-8)

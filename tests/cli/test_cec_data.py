@@ -25,6 +25,13 @@ class TestSuiteCLI:
         assert "--suite-id" in result.output
         assert "--search" in result.output
 
+    def test_suite_list_gnbg(self):
+        result = runner.invoke(app, ["suite", "list", "--suite-id", "gnbg_suite"])
+        assert result.exit_code == 0
+        assert "gnbg_f01" in result.output
+        assert "gnbg_f24" in result.output
+        assert "2, 10, 30, 50, 100" in result.output
+
     def test_suite_validate_help(self):
         result = runner.invoke(app, ["suite", "validate", "--help"])
         assert result.exit_code == 0

@@ -280,12 +280,23 @@ class BBOBSuiteFactory:
         # COCO wants M @ x, so we pass M.T to get (M.T).T @ x = M @ x.
 
         if fid == 6:
-            # f6 Attractive Sector: shift(xopt) → affine(R1*L*R2) → attractive_sector
-            #   + output: T_osz(y) → y^0.9 → +fopt
-            # COCO: no penalty. Output transforms not yet supported (TODO).
+            # f6 Attractive Sector (COCO order):
+            # shift(xopt) → affine(R1 Λ^10 R2) → raw sector sum
+            # → objective T_osz → power 0.9 → bias(fopt).
+            # Sector weights compare the original xopt with the affine-transformed vector.
+            base = {
+                "type": base_type,
+                "parameters": {
+                    "dimension": dim,
+                    "x_opt": xopt.tolist(),
+                    "powered": False,
+                },
+            }
             M = self._build_affine_matrix(R, Q, 10.0, dim)
             transforms.append(("shift", {"vector": xopt.tolist()}))
             transforms.append(("rotate", {"matrix": M.T.tolist()}))
+            transforms.append(("obj_oscillate", {}))
+            transforms.append(("power", {"exponent": 0.9}))
             transforms.append(("bias", {"value": fopt}))
         elif fid == 7:
             # f7 Step Ellipsoidal: MONOLITHIC in COCO (all transforms internal)

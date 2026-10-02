@@ -24,7 +24,7 @@ from .noise import NoiseTransform
 from .non_continuous import NonContinuousTransform
 from .normalize import NormalizeTransform
 from .offset import OffsetTransform
-from .oscillation import OscillationTransform
+from .oscillation import ObjectiveOscillationTransform, OscillationTransform
 from .permutation import PermutationTransform
 from .power import PowerTransform
 from .quantized import Quantized
@@ -52,6 +52,7 @@ __all__ = [
     "NoiseTransform",
     "NonContinuousTransform",
     "NormalizeTransform",
+    "ObjectiveOscillationTransform",
     "OffsetTransform",
     "OscillationTransform",
     "PenaltyTransform",
