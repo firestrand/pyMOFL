@@ -8,7 +8,9 @@ from typing import Annotated
 
 import typer
 
-from . import suite
+from . import catalog, suite
+from . import eval as cli_eval
+from . import info as cli_info
 
 app = typer.Typer(
     name="pymofl",
@@ -17,7 +19,7 @@ app = typer.Typer(
 )
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
     version: Annotated[
@@ -58,4 +60,17 @@ def main(
     ctx.obj["json"] = output_json
 
 
+# Top-level ergonomics commands
+app.command("info", help="Inspect metadata, formulation, bounds, and optima for a function.")(
+    cli_info.info
+)
+app.command(
+    "eval", help="Evaluate a benchmark function at specified points or randomized batches."
+)(cli_eval.eval_fn)
+app.command(
+    "list", help="List and search benchmark functions available across suites and registry."
+)(catalog.list_functions)
+app.command("suites", help="List all benchmark suites supported by pyMOFL.")(catalog.list_suites)
+
+# Legacy suite utilities
 app.add_typer(suite.app, name="suite", help="Suite utilities for benchmark configurations.")
