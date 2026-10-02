@@ -146,6 +146,9 @@ class AckleyFunction(OptimizationFunction):
         return global_min_point, global_min_value
 
 
+@register("Ackley2")
+@register("ackley_2")
+@register("ackley2")
 class Ackley2Function(OptimizationFunction):
     """
     Ackley 2 function: f(x, y) = -200 * exp(-0.02 * sqrt(x_1^2 + x_2^2))
@@ -201,6 +204,9 @@ class Ackley2Function(OptimizationFunction):
         return np.zeros(2), -200.0
 
 
+@register("Ackley3")
+@register("ackley_3")
+@register("ackley3")
 class Ackley3Function(OptimizationFunction):
     """
     Ackley 3 function: f(x,y) = -200*exp(-0.02*sqrt(x^2+y^2)) + 5*exp(cos(3x)+sin(3y))
@@ -264,6 +270,9 @@ class Ackley3Function(OptimizationFunction):
         return Ackley3Function._GLOBAL_MIN_X.copy(), Ackley3Function._GLOBAL_MIN_VALUE
 
 
+@register("Ackley4")
+@register("ackley_4")
+@register("ackley4")
 class Ackley4Function(OptimizationFunction):
     """
     Ackley 4 (Modified Ackley) function:

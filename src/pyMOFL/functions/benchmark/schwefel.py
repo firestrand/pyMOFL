@@ -405,6 +405,8 @@ class Schwefel_2_13(OptimizationFunction):
         return self.alpha.copy(), 0.0
 
 
+@register("Schwefel")
+@register("schwefel")
 class SchwefelFunction(OptimizationFunction):
     """
     Schwefel function (offset form of Problem 2.26).
@@ -458,6 +460,8 @@ class SchwefelFunction(OptimizationFunction):
         return np.full(self.dimension, 420.9687), 0.0
 
 
+@register("Schwefel_2_4")
+@register("schwefel_2_4")
 class Schwefel_2_4(OptimizationFunction):
     """
     Schwefel 2.4 function (Extended Rosenbrock with star dependency on x_1).
@@ -510,6 +514,8 @@ class Schwefel_2_4(OptimizationFunction):
         return np.ones(self.dimension), 0.0
 
 
+@register("Schwefel_2_20")
+@register("schwefel_2_20")
 class Schwefel_2_20(OptimizationFunction):
     """
     Schwefel 2.20 function: f(x) = Σ |x_i|
@@ -559,6 +565,8 @@ class Schwefel_2_20(OptimizationFunction):
         return np.zeros(self.dimension), 0.0
 
 
+@register("Schwefel_2_21")
+@register("schwefel_2_21")
 class Schwefel_2_21(OptimizationFunction):
     """
     Schwefel 2.21 function: f(x) = max_i |x_i|
@@ -608,6 +616,8 @@ class Schwefel_2_21(OptimizationFunction):
         return np.zeros(self.dimension), 0.0
 
 
+@register("Schwefel_2_22")
+@register("schwefel_2_22")
 class Schwefel_2_22(OptimizationFunction):
     """
     Schwefel 2.22 function: f(x) = Σ |x_i| + Π |x_i|
@@ -660,6 +670,8 @@ class Schwefel_2_22(OptimizationFunction):
         return np.zeros(self.dimension), 0.0
 
 
+@register("Schwefel_2_23")
+@register("schwefel_2_23")
 class Schwefel_2_23(OptimizationFunction):
     """
     Schwefel 2.23 function: f(x) = Σ x_i^10
@@ -710,6 +722,8 @@ class Schwefel_2_23(OptimizationFunction):
         return np.zeros(self.dimension), 0.0
 
 
+@register("Schwefel_2_25")
+@register("schwefel_2_25")
 class Schwefel_2_25(OptimizationFunction):
     """
     Schwefel 2.25 function: f(x) = Σ_{i=1}^{D-1} (x_i² - x_{i+1})² + (x_i - 1)²
@@ -760,6 +774,8 @@ class Schwefel_2_25(OptimizationFunction):
         return np.ones(self.dimension), 0.0
 
 
+@register("Schwefel_2_26")
+@register("schwefel_2_26")
 class Schwefel_2_26(OptimizationFunction):
     """
     Schwefel 2.26 function: f(x) = -Σ x_i sin(sqrt(|x_i|))
@@ -811,6 +827,8 @@ class Schwefel_2_26(OptimizationFunction):
         return np.full(self.dimension, 420.9687), -418.9829 * self.dimension
 
 
+@register("Schwefel_2_36")
+@register("schwefel_2_36")
 class Schwefel_2_36(OptimizationFunction):
     """
     Schwefel 2.36 function (sine-root sum on non-negative domain).

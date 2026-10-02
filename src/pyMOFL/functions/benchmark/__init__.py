@@ -46,6 +46,7 @@ from .brown import BrownFunction
 from .buche_rastrigin import BucheRastriginFunction
 from .bukin import Bukin6Function
 from .camel import SixHumpCamelFunction, ThreeHumpCamelFunction
+from .chebyshev import ChebyshevFunction
 from .chichinadze import ChichinadzeFunction
 from .chung_reynolds import ChungReynoldsFunction
 from .cola import ColaFunction
@@ -78,6 +79,7 @@ from .el_attar import ElAttarVidyasagarDuttaFunction
 from .elliptic import HighConditionedElliptic
 from .exp2 import Exp2Function
 from .exponential_function import ExponentialFunction
+from .fractal import FastFractalDoubleDip
 from .freudenstein_roth import FreudensteinRothFunction
 from .gallagher_peaks import GallagherPeaksFunction
 from .gear_train import GearTrainFunction
@@ -89,6 +91,7 @@ from .hansen import HansenFunction
 from .happycat import HappyCatFunction, HGBatFunction
 from .hartmann import Hartmann3Function, Hartmann6Function
 from .helical_valley import HelicalValleyFunction
+from .hilbert import HilbertFunction
 from .himmelblau import HimmelblauFunction
 from .holder_table import HolderTableFunction
 from .hosaki import HosakiFunction
@@ -97,7 +100,7 @@ from .katsuura import KatsuuraFunction
 from .keane import KeaneFunction
 from .kowalik import KowalikFunction
 from .langermann import LangermannFunction
-from .lennard_jones import LennardJonesFunction
+from .lennard_jones import LennardJonesCECFunction, LennardJonesFunction
 from .leon import LeonFunction
 from .levy import LevyCEC2022Function, LevyCECFunction, LevyFunction  # noqa: F401
 from .linear_slope import LinearSlopeFunction
@@ -125,6 +128,16 @@ from .multi_modal_func import MultiModalFunction
 from .needle_eye import NeedleEyeFunction
 from .network import NetworkFunction
 from .new_function import NewFunction01Function, NewFunction02Function
+from .niching import (
+    ExpandedDecreasingMinimaFunction,
+    ExpandedEqualMinimaFunction,
+    ExpandedFiveUnevenPeakTrapFunction,
+    ExpandedHimmelblauFunction,
+    ExpandedSixHumpCamelFunction,
+    ExpandedTwoPeakTrapFunction,
+    ExpandedUnevenMinimaFunction,
+    ModifiedVincentFunction,
+)
 from .odd_square import OddSquareFunction
 from .parsopoulos import ParsopoulosFunction
 from .perm import PermFunction
@@ -210,6 +223,7 @@ __all__ = [
     "BrownFunction",
     "BucheRastriginFunction",
     "Bukin6Function",
+    "ChebyshevFunction",
     "ChichinadzeFunction",
     "ChungReynoldsFunction",
     "ColaFunction",
@@ -240,7 +254,15 @@ __all__ = [
     "EggholderFunction",
     "ElAttarVidyasagarDuttaFunction",
     "Exp2Function",
+    "ExpandedDecreasingMinimaFunction",
+    "ExpandedEqualMinimaFunction",
+    "ExpandedFiveUnevenPeakTrapFunction",
+    "ExpandedHimmelblauFunction",
+    "ExpandedSixHumpCamelFunction",
+    "ExpandedTwoPeakTrapFunction",
+    "ExpandedUnevenMinimaFunction",
     "ExponentialFunction",
+    "FastFractalDoubleDip",
     "FreudensteinRothFunction",
     "GallagherPeaksFunction",
     "GearTrainFunction",
@@ -256,6 +278,7 @@ __all__ = [
     "Hartmann6Function",
     "HelicalValleyFunction",
     "HighConditionedElliptic",
+    "HilbertFunction",
     "HimmelblauFunction",
     "HolderTableFunction",
     "HosakiFunction",
@@ -264,6 +287,7 @@ __all__ = [
     "KeaneFunction",
     "KowalikFunction",
     "LangermannFunction",
+    "LennardJonesCECFunction",
     "LennardJonesFunction",
     "LeonFunction",
     "LevyCEC2022Function",
@@ -287,6 +311,7 @@ __all__ = [
     "Mishra09Function",
     "Mishra10Function",
     "Mishra11Function",
+    "ModifiedVincentFunction",
     "MultiBasinFunction",
     "MultiModalFunction",
     "NeedleEyeFunction",

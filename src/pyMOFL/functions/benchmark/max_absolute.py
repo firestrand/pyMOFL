@@ -17,6 +17,8 @@ from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 from pyMOFL.registry import register
 
 
+@register("MaxAbsolute")
+@register("max_absolute")
 @register("yao_liu_04")
 class MaxAbsolute(OptimizationFunction):
     def __init__(
@@ -83,3 +85,9 @@ class MaxAbsolute(OptimizationFunction):
         if Y.ndim == 1:
             return np.abs(Y)
         return np.max(np.abs(Y), axis=1)
+
+    def get_global_minimum(self) -> tuple[np.ndarray, float]:
+        """Return the global minimum point and value."""
+        if self.base_function is not None:
+            return self.base_function.get_global_minimum()
+        return np.zeros(self.dimension), 0.0

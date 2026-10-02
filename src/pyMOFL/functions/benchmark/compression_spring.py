@@ -18,8 +18,11 @@ from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.function import OptimizationFunction
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.registry import register
 
 
+@register("CompressionSpring")
+@register("compression_spring")
 class CompressionSpringFunction(OptimizationFunction):
     """
     Compression Spring Function (SPSO ID-21).

@@ -18,8 +18,11 @@ from pyMOFL.core.bound_mode_enum import BoundModeEnum
 from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.function import OptimizationFunction
 from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
+from pyMOFL.registry import register
 
 
+@register("Perm")
+@register("perm")
 class PermFunction(OptimizationFunction):
     """
     Perm (0,d,β) function with d=5, β=0.5 (SPSO ID-20).
