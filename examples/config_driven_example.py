@@ -11,14 +11,16 @@ from pathlib import Path
 import numpy as np
 
 from pyMOFL.factories import DataLoader, FunctionFactory, FunctionRegistry
-from pyMOFL.utils import load_suite_function_config
 from pyMOFL.functions.transformations import ComposedFunction
+from pyMOFL.utils import load_suite_function_config
 
 
 def _factory() -> FunctionFactory:
     project_root = Path(__file__).resolve().parent.parent
     constants_dir = project_root / "src" / "pyMOFL" / "constants" / "cec" / "2005"
-    return FunctionFactory(data_loader=DataLoader(base_path=constants_dir), registry=FunctionRegistry())
+    return FunctionFactory(
+        data_loader=DataLoader(base_path=constants_dir), registry=FunctionRegistry()
+    )
 
 
 def show_structure() -> None:
@@ -34,7 +36,9 @@ def build_function(function_id: str, dimension: int = 10) -> ComposedFunction:
     """Build one suite function by id from shipped CEC2005 config."""
 
     project_root = Path(__file__).resolve().parent.parent
-    suite_path = project_root / "src" / "pyMOFL" / "constants" / "cec" / "2005" / "cec2005_suite.json"
+    suite_path = (
+        project_root / "src" / "pyMOFL" / "constants" / "cec" / "2005" / "cec2005_suite.json"
+    )
 
     function_cfg = load_suite_function_config(suite_path, function_id, dimension=dimension)
 
