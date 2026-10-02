@@ -1,6 +1,6 @@
 # pyMOFL Benchmark Function Catalog
 
-This catalog provides a comprehensive index of all **175 concrete benchmark function classes** and **336 registered component aliases** in `pyMOFL`.
+This catalog provides a comprehensive index of all **177 concrete benchmark function classes** and **344 registered component aliases** in `pyMOFL`.
 
 ## Quick Usage
 
@@ -19,7 +19,7 @@ f2 = SphereCls(dimension=10)
 
 ## Categories
 
-- [Scalable Functions (52 functions)](#scalable-functions)
+- [Scalable Functions (54 functions)](#scalable-functions)
 - [BBOB Primitives (7 functions)](#bbob-primitives)
 - [Fixed 2D Functions (69 functions)](#fixed-2d-functions)
 - [Fixed Dimension (3D-6D) Functions (17 functions)](#fixed-dimension-3d-6d-functions)
@@ -40,6 +40,7 @@ f2 = SphereCls(dimension=10)
 | `BrownFunction` | `Brown`, `brown` | Scalable (D ≥ 1) | [brown.py](../src/pyMOFL/functions/benchmark/brown.py) | Brown function. |
 | `ChebyshevFunction` | `Chebyshev`, `chebyshev` | D=9 | [chebyshev.py](../src/pyMOFL/functions/benchmark/chebyshev.py) | Storn's Chebyshev Polynomial Fitting benchmark function (CEC 2019 F1). |
 | `ChungReynoldsFunction` | `ChungReynolds`, `chung_reynolds` | Scalable (D ≥ 1) | [chung_reynolds.py](../src/pyMOFL/functions/benchmark/chung_reynolds.py) | Chung-Reynolds function. |
+| `DecomposedFunction` | `DecomposedFunction`, `decomposed_function` | Scalable (D ≥ 1) | [decomposed_function.py](../src/pyMOFL/compositions/decomposed_function.py) | Decomposed optimization function. |
 | `DiscusFunction` | `Discus`, `discus` | Scalable (D ≥ 1) | [bent_cigar.py](../src/pyMOFL/functions/benchmark/bent_cigar.py) | Discus (Tablet) function. |
 | `DixonPriceFunction` | `DixonPrice`, `dixon_price` | Scalable (D ≥ 1) | [dixon_price.py](../src/pyMOFL/functions/benchmark/dixon_price.py) | Dixon-Price function. |
 | `ExpandedDecreasingMinimaFunction` | `DecreasingMinima`, `ExpandedDecreasingMinima`, `decreasing_minima`, `expanded_decreasing_minima` | D=1 | [niching.py](../src/pyMOFL/functions/benchmark/niching.py) | Expanded Decreasing Minima benchmark function. |
@@ -47,6 +48,7 @@ f2 = SphereCls(dimension=10)
 | `ExpandedFiveUnevenPeakTrapFunction` | `ExpandedFiveUnevenPeakTrap`, `FiveUnevenPeakTrap`, `expanded_five_uneven_peak_trap`, `five_uneven_peak_trap` | D=1 | [niching.py](../src/pyMOFL/functions/benchmark/niching.py) | Expanded Five-Uneven-Peak Trap benchmark function. |
 | `ExpandedTwoPeakTrapFunction` | `ExpandedTwoPeakTrap`, `TwoPeakTrap`, `expanded_two_peak_trap`, `two_peak_trap` | D=1 | [niching.py](../src/pyMOFL/functions/benchmark/niching.py) | Expanded Two-Peak Trap benchmark function. |
 | `ExpandedUnevenMinimaFunction` | `ExpandedUnevenMinima`, `UnevenMinima`, `expanded_uneven_minima`, `uneven_minima` | D=1 | [niching.py](../src/pyMOFL/functions/benchmark/niching.py) | Expanded Uneven Minima benchmark function. |
+| `FastFractalDoubleDip` | `DoubleDip`, `FastFractal`, `FastFractalDoubleDip`, `fast_fractal_double_dip` | D=1000 | [fractal.py](../src/pyMOFL/functions/benchmark/fractal.py) | FastFractal "DoubleDip" function (CEC 2008 F7). |
 | `GriewankFunction` | `Griewank`, `griewank` | Scalable (D ≥ 1) | [griewank.py](../src/pyMOFL/functions/benchmark/griewank.py) | Griewank function. |
 | `GriewankOfRosenbrock` | `GriewankOfRosenbrock`, `griewankOfRosenbrock`, `griewank_of_rosenbrock` | Scalable (D ≥ 1) | [rosenbrock.py](../src/pyMOFL/functions/benchmark/rosenbrock.py) | Griewank of Rosenbrock (F8F2) expanded function (multimodal). |
 | `HGBatFunction` | `HGBat`, `hgbat` | Scalable (D ≥ 1) | [happycat.py](../src/pyMOFL/functions/benchmark/happycat.py) | HGBat function. |
@@ -62,7 +64,7 @@ f2 = SphereCls(dimension=10)
 | `LunacekBiRastriginCECFunction` | `LunacekBiRastriginCEC`, `lunacek_bi_rastrigin_cec` | Scalable (D ≥ 1) | [lunacek.py](../src/pyMOFL/functions/benchmark/lunacek.py) | Lunacek Bi-Rastrigin function (CEC variant). |
 | `LunacekBiRastriginFunction` | `LunacekBiRastrigin`, `lunacek_bi_rastrigin` | Scalable (D ≥ 1) | [lunacek.py](../src/pyMOFL/functions/benchmark/lunacek.py) | Lunacek Bi-Rastrigin function. |
 | `LunacekRotatedCosineFunction` | `LunacekRotatedCosine`, `lunacek_rotated_cosine` | Scalable (D ≥ 1) | [lunacek.py](../src/pyMOFL/functions/benchmark/lunacek.py) | Lunacek Bi-Rastrigin with rotation applied only to the cosine term. |
-| `MaxAbsolute` | `yao_liu_04` | Scalable (D ≥ 1) | [max_absolute.py](../src/pyMOFL/functions/benchmark/max_absolute.py) |  |
+| `MaxAbsolute` | `MaxAbsolute`, `max_absolute`, `yao_liu_04` | Scalable (D ≥ 1) | [max_absolute.py](../src/pyMOFL/functions/benchmark/max_absolute.py) |  |
 | `MichalewiczFunction` | `Michalewicz`, `michalewicz` | Scalable (D ≥ 1) | [michalewicz.py](../src/pyMOFL/functions/benchmark/michalewicz.py) | Michalewicz function. |
 | `MultiBasinFunction` | `GNBG`, `multi_basin` | Scalable (D ≥ 1) | [multi_basin.py](../src/pyMOFL/functions/benchmark/multi_basin.py) | Generalized Multi-Basin generator (GNBG Baseline). |
 | `MultiModalFunction` | `MultiModal`, `multi_modal` | Scalable (D ≥ 1) | [multi_modal_func.py](../src/pyMOFL/functions/benchmark/multi_modal_func.py) | Multi-Modal function. |

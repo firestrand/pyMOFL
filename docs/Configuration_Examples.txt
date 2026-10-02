@@ -1,0 +1,369 @@
+{
+  "suite_id": "cec2022_suite",
+  "name": "CEC 2022 Benchmark Suite",
+  "description": "Benchmark functions from the CEC 2022 single-objective bound-constrained optimization competition.",
+  "function_family": "Example",
+  "version": "1.0",
+  "functions": [
+    {
+      "id": "cec22_function_1_zakharov",
+      "function": {
+        "type": "bias",
+        "parameters": { "value": 300 },
+        "function": {
+          "type": "zakharov",
+          "parameters": {},
+          "function": {
+            "type": "rotate",
+            "parameters": { "matrix": "M1" },
+            "function": {
+              "type": "shift",
+              "parameters": { "vector": "o1" }
+            }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [10, 20],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 2,
+          "max": null,
+          "step": 1
+        }
+      },
+      "search_range": {
+        "min": -100,
+        "max": 100
+      }
+    },
+    {
+      "id": "cec22_hybrid_function_1",
+      "function": {
+        "type": "bias",
+        "parameters": { "value": 1800 },
+        "function": {
+          "type": "sum",
+          "parameters": {
+            "proportions": [0.4, 0.4, 0.2]
+          },
+          "functions": [
+            {
+              "type": "bent_cigar",
+              "parameters": {},
+              "function": {
+                "type": "rotate",
+                "parameters": { "matrix": "M1" },
+                "function": {
+                  "type": "shift",
+                  "parameters": { "vector": "o1" }
+                }
+              }
+            },
+            {
+              "type": "hgbat",
+              "parameters": {},
+              "function": {
+                "type": "rotate",
+                "parameters": { "matrix": "M2" },
+                "function": {
+                  "type": "shift",
+                  "parameters": { "vector": "o2" }
+                }
+              }
+            },
+            {
+              "type": "rastrigin",
+              "parameters": {},
+              "function": {
+                "type": "rotate",
+                "parameters": { "matrix": "M3" },
+                "function": {
+                  "type": "shift",
+                  "parameters": { "vector": "o3" }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [5, 10, 15, 20, 25, 30, 40],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 5,
+          "max": null,
+          "step": 5
+        }
+      },
+      "search_range": {
+        "min": -100,
+        "max": 100
+      }
+    },
+    {
+      "id": "cec22_composition_function_1",
+      "function": {
+        "type": "bias",
+        "parameters": { "value": 2300 },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "sigma": [10, 20, 30, 40, 50]
+          },
+          "functions": [
+            {
+              "type": "bias",
+              "parameters": { "value": 0 },
+              "function": {
+                "type": "weight",
+                "parameters": { "value": 1 },
+                "function": {
+                  "type": "rosenbrock",
+                  "parameters": {},
+                  "function": {
+                    "type": "rotate",
+                    "parameters": { "matrix": "M1" },
+                    "function": {
+                      "type": "shift",
+                      "parameters": { "vector": "o1" }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "bias",
+              "parameters": { "value": 200 },
+              "function": {
+                "type": "weight",
+                "parameters": { "value": 1e-6 },
+                "function": {
+                  "type": "elliptic",
+                  "parameters": {},
+                  "function": {
+                    "type": "rotate",
+                    "parameters": { "matrix": "M2" },
+                    "function": {
+                      "type": "shift",
+                      "parameters": { "vector": "o2" }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "bias",
+              "parameters": { "value": 300 },
+              "function": {
+                "type": "weight",
+                "parameters": { "value": 1e-6 },
+                "function": {
+                  "type": "bent_cigar",
+                  "parameters": {},
+                  "function": {
+                    "type": "rotate",
+                    "parameters": { "matrix": "M3" },
+                    "function": {
+                      "type": "shift",
+                      "parameters": { "vector": "o3" }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "bias",
+              "parameters": { "value": 100 },
+              "function": {
+                "type": "weight",
+                "parameters": { "value": 1e-6 },
+                "function": {
+                  "type": "discus",
+                  "parameters": {},
+                  "function": {
+                    "type": "rotate",
+                    "parameters": { "matrix": "M4" },
+                    "function": {
+                      "type": "shift",
+                      "parameters": { "vector": "o4" }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "bias",
+              "parameters": { "value": 400 },
+              "function": {
+                "type": "weight",
+                "parameters": { "value": 1e-6 },
+                "function": {
+                  "type": "elliptic",
+                  "parameters": {},
+                  "function": {
+                    "type": "rotate",
+                    "parameters": { "matrix": "M5" },
+                    "function": {
+                      "type": "shift",
+                      "parameters": { "vector": "o5" }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dimensions": {
+        "supported": [10, 20],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 2,
+          "max": null,
+          "step": 1
+        }
+      },
+      "search_range": {
+        "min": -100,
+        "max": 100
+      }
+    },
+    {
+      "id": "bbob_rastrigin_noisy",
+      "function_family": "BBOB",
+      "function": {
+        "type": "noise",
+        "parameters": {
+          "model": "gaussian",
+          "stddev": 0.05
+        },
+        "function": {
+          "type": "rastrigin",
+          "parameters": { "instance": 3 },
+          "function": {
+            "type": "shift",
+            "parameters": { "vector": "o_bbob_rastrigin_3" }
+          }
+        }
+      },
+      "dimensions": {
+        "supported": [2, 5, 10, 20, 40],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 2,
+          "max": null,
+          "step": 1,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": { "min": -5, "max": 5 },
+        "boundary_condition": "clip"
+      }
+    },
+    {
+      "id": "bbob_linear_slope",
+      "function_family": "BBOB",
+      "function": {
+        "type": "linear_slope",
+        "parameters": {
+          "slope_vector": "slope_bbob_1"
+        }
+      },
+      "dimensions": {
+        "supported": [5, 10, 20],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 5,
+          "max": null,
+          "step": 1,
+          "quantization": null
+        }
+      },
+      "search_space": {
+        "default_bounds": { "min": -5, "max": 5 },
+        "per_dimension_bounds": [
+          { "min": -3, "max": 3 },
+          { "min": -4, "max": 4 },
+          { "min": -2, "max": 2 },
+          { "min": -5, "max": 5 },
+          { "min": -1, "max": 1 }
+        ],
+        "boundary_condition": "clip"
+      }
+    },
+    {
+      "id": "clerc_ackley_quantized",
+      "function_family": "ClercPSO2012",
+      "function": {
+        "type": "ackley",
+        "parameters": {
+          "a": 20,
+          "b": 0.2,
+          "c": 2 * 3.141592653589793
+        }
+      },
+      "dimensions": {
+        "supported": [5, 10, 20],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 5,
+          "max": 100,
+          "step": 1,
+          "quantization": 0.5
+        }
+      },
+      "search_space": {
+        "default_bounds": { "min": -32, "max": 32 },
+        "boundary_condition": "clip"
+      }
+    },
+    {
+      "id": "clerc_rosenbrock_wrapped",
+      "function_family": "ClercPSO2012",
+      "function": {
+        "type": "rosenbrock",
+        "parameters": {
+          "a": 1,
+          "b": 100
+        }
+      },
+      "dimensions": {
+        "supported": [2, 10, 20],
+        "default": 10,
+        "custom_dimensions": {
+          "min": 2,
+          "max": null,
+          "step": 1
+        }
+      },
+      "search_space": {
+        "default_bounds": { "min": -30, "max": 30 },
+        "boundary_condition": "wrap"
+      }
+    },
+    {
+      "id": "clerc_griewank_reflective",
+      "function_family": "ClercPSO2012",
+      "function": {
+        "type": "griewank",
+        "parameters": {}
+      },
+      "dimensions": {
+        "supported": [2, 10, 30, 50],
+        "default": 30,
+        "custom_dimensions": {
+          "min": 2,
+          "max": null,
+          "step": 1
+        }
+      },
+      "search_space": {
+        "default_bounds": { "min": -600, "max": 600 },
+        "boundary_condition": "reflect"
+      }
+    }
+  ]
+}
+

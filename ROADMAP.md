@@ -29,90 +29,91 @@ These milestones are done and shipped in v0.3.0.
 | Classical benchmarks | 175 registered classes (336 aliases) |
 | GNBG suite factory | GNBGSuiteFactory for 24 problem instances with MinComposition |
 | Documentation & Catalog | Function catalog (docs/function_catalog.md), updated coding guidelines, CONTRIBUTING.md, and quickstart notebook |
+| CEC 2015 Niching suite | F1-F15 with 8 multimodal niching base functions, compositions, and golden C validation |
+| CEC 2019 suite | F1-F10 (100-Digit Challenge) with Chebyshev, Hilbert, Lennard-Jones |
+| CEC 2024 suite | 29 active functions evaluated at 30D with U-score protocol |
+| CEC 2025 suite | 24 GNBG-II instances with GNBGSuiteFactory and config-driven pipeline |
+| CEC 2008 LSGO suite | F1-F7 scalable to D in {100, 500, 1000} with FastFractalDoubleDip and Schwefel 2.21 |
+| CEC 2010 LSGO suite | F1-F20 (1000D) with cooperative decomposition pipeline and block rotation matrices |
 
 ---
 
-## In Progress
+## Completed: CLI Suite Listing Polish & Function Catalog
 
-### CLI Suite Listing Polish
 - [x] Add GNBG to CLI suite listing (`pymofl suite list --suite-id gnbg_suite`)
 - [x] Function catalog/index page listing all functions by category with registry aliases
-- [ ] Final refactoring pass for DRY violations and dead code
+- [x] Final refactoring pass for DRY violations and dead code
 
 ---
 
-## Planned: CEC 2024
+## Completed: CEC 2024
 
-**CEC 2024 Competition on Single Objective Numerical Optimization** reuses the core CEC primitives already implemented in pyMOFL. Requires:
+**CEC 2024 Competition on Single Objective Numerical Optimization** reuses the core CEC primitives already implemented in pyMOFL:
 
-- [ ] Obtain CEC 2024 technical report and reference code
-- [ ] Create `constants/cec/2024/` directory with shift vectors and rotation matrices
-- [ ] Create `cec2024_suite.json` suite configuration
-- [ ] Generate or obtain golden validation datasets
-- [ ] Validate against reference implementation
-
-**Expected scope:** ~30 functions (shifted/rotated/composed variants of existing base functions). No new base function code anticipated -- all 26 core CEC primitives are implemented.
+- [x] Obtain CEC 2024 technical report and reference code
+- [x] Create `constants/cec/2024/` directory with shift vectors and rotation matrices
+- [x] Create `cec2024_suite.json` suite configuration (29 active problems at D=30)
+- [x] Validate against competition definition and reference outputs (`tests/benchmark_suites/test_cec2024_suite.py`)
 
 ---
 
-## Planned: CEC 2025
+## Completed: CEC 2025
 
-**CEC 2025** adopts the **GNBG-II** framework as its standard benchmark suite. This is a significant departure from previous CEC years that used fixed-formula functions with shift/rotate transforms.
+**CEC 2025** adopts the **GNBG-II** framework as its standard benchmark suite:
 
 - [x] `GNBGSuiteFactory` provides the 24 GNBG-II instances
-- [ ] Obtain CEC 2025 competition parameter files (24 GNBG-II instances)
-- [ ] Create `constants/cec/2025/` directory with GNBG parameter data
-- [ ] Create `cec2025_suite.json` suite configuration
-- [ ] Validate against GNBG reference implementation
-
-**Expected scope:** 24 functions defined via GNBG parametric generator. The `MinComposition` class and GNBG transform pipeline handle construction; the work is primarily data integration and validation.
+- [x] Integrate CEC 2025 competition parameter files (24 GNBG-II instances)
+- [x] Create `constants/cec/2025/` directory with GNBG parameter data
+- [x] Create `cec2025_suite.json` suite configuration
+- [x] Validate against GNBG reference implementation (`tests/benchmark_suites/test_cec2025_suite.py`)
 
 ---
 
-## Completed: CEC 2019
+## Completed: CEC 2015 Niching
 
-CEC 2019 "100-Digit Challenge" (10 functions):
-
-- [x] Implement `ChebyshevFunction` (polynomial fitting, D=9 or D=16)
-- [x] Implement `HilbertFunction` (matrix norm, D=16)
-- [x] Implement `LennardJonesCECFunction` and support `dimension` kwarg in `LennardJonesFunction`
-- [x] Create `cec2019_suite.json` with all 10 functions (F1-F10)
-- [x] Extract reference data (rotation matrices and shift vectors) into `constants/cec/2019/`
-- [x] Validate against official C reference implementation (`tests/benchmark_suites/test_cec2019_suite.py`)
-
-
----
-
-## Planned: CEC 2015 Niching
-
-CEC 2015 Multimodal Optimization competition uses 8 specialized "expanded" base functions not yet implemented:
+CEC 2015 Multimodal Optimization competition uses 8 specialized "expanded" base functions and 7 composition functions:
 
 | Function | Base Dim | Notes |
 |----------|:--------:|-------|
-| Expanded Two-Peak Trap | 1D->D | Sum-of-pairs pattern |
-| Expanded Five-Uneven-Peak Trap | 1D->D | |
-| Expanded Equal Minima | 1D->D | |
-| Expanded Decreasing Minima | 1D->D | |
-| Expanded Uneven Minima | 1D->D | |
-| Expanded Himmelblau | 2D->D | Base `HimmelblauFunction` exists |
-| Expanded Six-Hump Camel Back | 2D->D | Base `SixHumpCamelFunction` exists |
-| Modified Vincent | Scalable | |
+| Expanded Two-Peak Trap | 1D->D | Piecewise with quadratic boundary extension |
+| Expanded Five-Uneven-Peak Trap | 1D->D | Exact C piecewise definition |
+| Expanded Equal Minima | 1D->D | 5^D equal global minima |
+| Expanded Decreasing Minima | 1D->D | Exponentially modulated uneven minima |
+| Expanded Uneven Minima | 1D->D | Scaled non-uniform minima |
+| Expanded Himmelblau | 2D->D | Non-overlapping pairs |
+| Expanded Six-Hump Camel Back | 2D->D | Non-overlapping pairs, normalized minimum |
+| Modified Vincent | Scalable | Logarithmic scaling with boundary penalty |
 
 - [x] Implement 8 niching base functions (`src/pyMOFL/functions/benchmark/niching.py`)
-- [ ] Create `cec2015_niching_suite.json`
-- [ ] Validate against CEC 2015 niching technical report
+- [x] Extract input data and matrices into `constants/cec/2015_niching/`
+- [x] Create `cec2015_niching_suite.json`
+- [x] Validate against CEC 2015 niching compiled C reference (`tests/benchmark_suites/test_cec2015_niching_suite.py`)
+
+---
+
+## Completed: CEC 2008 & CEC 2010 (Large-Scale Global Optimization Suites)
+
+- [x] Implement `FastFractalDoubleDip` (CEC 2008 F7) verified against C++/Java reference
+- [x] Register `Schwefel_2_21` as an official scalable benchmark alias
+- [x] Package shift vectors and configure `cec2008_suite.json` (F1-F7, D in {100, 500, 1000})
+- [x] Build variable grouping and decomposition pipeline (`GroupingTransform`, `DecomposedTransform`, `DecomposedFunction`)
+- [x] Extract 1000D shift vectors, permutation vectors, and 50x50 rotation matrices into `constants/cec/2010/`
+- [x] Configure `cec2010_suite.json` across all 20 functions (fully separable, single group m=50, D/(2m) groups, D/m groups, and fully non-separable)
+- [x] Validate against official competition code and verify global minimum recovery (`tests/benchmark_suites/test_cec2008_suite.py`, `tests/benchmark_suites/test_cec2010_suite.py`)
+
+---
+
+## Completed: CEC 2013 LSGO (Large-Scale Global Optimization Suite)
+
+- [x] Package official shift vectors, permutation vectors, and 25x25, 50x50, 100x100 block rotation matrices into `constants/cec/2013_lsgo/`
+- [x] Extend decomposition infrastructure with `GroupingTransform.from_overlapping_sizes` for non-uniform subcomponent block sizes sharing variables
+- [x] Implement per-group conflicting shift support in `ComponentGroup` and `GroupingTransform` (for overlapping F14)
+- [x] Configure `cec2013_lsgo_suite.json` across all 15 functions (Fully Separable F1-F3, Partially Additively Separable F4-F11 with 7-20 subcomponents, Overlapping F12-F14 at D=905/1000, and Fully Non-Separable F15)
+- [x] Validate against official compiled C++ competition reference code down to machine precision (< 1e-12) (`tests/benchmark_suites/test_cec2013_lsgo_suite.py`)
 
 ---
 
 ## Backlog
-
-### CEC 2008 Large-Scale Optimization
-
-7 functions requiring 2 new base implementations (`FastFractalDoubleDip`, `Schwefel_2_21`) and variable grouping infrastructure for large-scale (D=100-1000) problems.
-
-### CEC 2010 Large-Scale Optimization
-
-20 functions requiring variable grouping infrastructure (cooperative decomposition). Dimensions up to D=1000. Significant architectural work for the grouping/decomposition framework.
 
 ### BBOB Bi-Objective (bbob-biobj)
 
