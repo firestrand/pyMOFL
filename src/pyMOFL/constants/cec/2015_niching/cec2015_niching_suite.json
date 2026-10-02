@@ -1,0 +1,1364 @@
+{
+  "suite_id": "cec2015_niching",
+  "name": "CEC 2015 Niching Benchmark Suite",
+  "description": "CEC 2015 Special Session and Competition on Niching Numerical Optimization (F1-F15).",
+  "version": "1.0",
+  "functions": [
+    {
+      "id": "cec15_nich_f01_two_peak_trap",
+      "name": "Expanded Two-Peak Trap",
+      "category": "Expanded Multimodal",
+      "dimensions": {
+        "supported": [
+          2,
+          5,
+          10,
+          20
+        ],
+        "default": 5
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -20.0,
+          "max": 20.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 100.0
+        },
+        "function": {
+          "type": "expanded_two_peak_trap",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 20.0
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f01/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "shift",
+                "parameters": {
+                  "vector": "f01/shift_data.txt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f02_five_uneven_peak_trap",
+      "name": "Expanded Five-Uneven-Peak Trap",
+      "category": "Expanded Multimodal",
+      "dimensions": {
+        "supported": [
+          2,
+          5,
+          8
+        ],
+        "default": 2
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -30.0,
+          "max": 30.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 200.0
+        },
+        "function": {
+          "type": "expanded_five_uneven_peak_trap",
+          "function": {
+            "type": "rotate",
+            "parameters": {
+              "transpose": true,
+              "matrix": "f02/M_D{dim}.txt"
+            },
+            "function": {
+              "type": "shift",
+              "parameters": {
+                "vector": "f02/shift_data.txt"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f03_equal_minima",
+      "name": "Expanded Equal Minima",
+      "category": "Expanded Multimodal",
+      "dimensions": {
+        "supported": [
+          2,
+          3,
+          4
+        ],
+        "default": 2
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -1.0,
+          "max": 1.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 300.0
+        },
+        "function": {
+          "type": "expanded_equal_minima",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 0.1
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f03/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.05,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f03/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f04_decreasing_minima",
+      "name": "Expanded Decreasing Minima",
+      "category": "Expanded Multimodal",
+      "dimensions": {
+        "supported": [
+          2,
+          5,
+          10,
+          20
+        ],
+        "default": 5
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -1.0,
+          "max": 1.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 400.0
+        },
+        "function": {
+          "type": "expanded_decreasing_minima",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 0.1
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f04/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.05,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f04/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f05_uneven_minima",
+      "name": "Expanded Uneven Minima",
+      "category": "Expanded Multimodal",
+      "dimensions": {
+        "supported": [
+          2,
+          3,
+          4
+        ],
+        "default": 2
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -1.0,
+          "max": 1.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 500.0
+        },
+        "function": {
+          "type": "expanded_uneven_minima",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 0.079699392688696
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f05/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.05,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f05/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f06_himmelblau",
+      "name": "Expanded Himmelblau",
+      "category": "Expanded Multimodal",
+      "dimensions": {
+        "supported": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "default": 4
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -6.0,
+          "max": 6.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 600.0
+        },
+        "function": {
+          "type": "expanded_himmelblau",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "vector": "f06/offset_D{dim}.txt"
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f06/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.2,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f06/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f07_six_hump_camel",
+      "name": "Expanded Six-Hump Camel",
+      "category": "Expanded Multimodal",
+      "dimensions": {
+        "supported": [
+          2,
+          6,
+          10,
+          16
+        ],
+        "default": 6
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -2.0,
+          "max": 2.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 700.0
+        },
+        "function": {
+          "type": "expanded_six_hump_camel",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "vector": "f07/offset_D{dim}.txt"
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f07/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.05,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f07/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f08_modified_vincent",
+      "name": "Modified Vincent",
+      "category": "Expanded Multimodal",
+      "dimensions": {
+        "supported": [
+          2,
+          3,
+          4,
+          10,
+          20,
+          30
+        ],
+        "default": 2
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -10.0,
+          "max": 10.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 800.0
+        },
+        "function": {
+          "type": "modified_vincent",
+          "function": {
+            "type": "offset",
+            "parameters": {
+              "value": 4.1112
+            },
+            "function": {
+              "type": "rotate",
+              "parameters": {
+                "transpose": true,
+                "matrix": "f08/M_D{dim}.txt"
+              },
+              "function": {
+                "type": "scale",
+                "parameters": {
+                  "factor": 0.2,
+                  "multiply": true
+                },
+                "function": {
+                  "type": "shift",
+                  "parameters": {
+                    "vector": "f08/shift_data.txt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f09_composition_1",
+      "name": "Composition Function 1",
+      "category": "Composition",
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          20,
+          30
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100.0,
+          "max": 100.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 900.0
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f09/shift_data.txt",
+            "rotation_file": "f09/M_D{dim}.txt",
+            "num_functions": 10,
+            "lambdas": [
+              1.0,
+              1.0,
+              1e-06,
+              1e-06,
+              1e-06,
+              1e-06,
+              0.0001,
+              0.0001,
+              1e-05,
+              1e-05
+            ],
+            "sigmas": [
+              10,
+              20,
+              10,
+              20,
+              10,
+              20,
+              10,
+              20,
+              10,
+              20
+            ],
+            "biases": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "sphere"
+            },
+            {
+              "type": "sphere"
+            },
+            {
+              "type": "high_conditioned_elliptic"
+            },
+            {
+              "type": "high_conditioned_elliptic"
+            },
+            {
+              "type": "bent_cigar"
+            },
+            {
+              "type": "bent_cigar"
+            },
+            {
+              "type": "discus"
+            },
+            {
+              "type": "discus"
+            },
+            {
+              "type": "different_powers"
+            },
+            {
+              "type": "different_powers"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f10_composition_2",
+      "name": "Composition Function 2",
+      "category": "Composition",
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          20,
+          30
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100.0,
+          "max": 100.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1000.0
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f10/shift_data.txt",
+            "rotation_file": "f10/M_D{dim}.txt",
+            "num_functions": 10,
+            "lambdas": [
+              1e-06,
+              1e-06,
+              1e-05,
+              1e-05,
+              1e-06,
+              1e-06,
+              0.0001,
+              0.0001,
+              1.0,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              20,
+              30,
+              40,
+              50,
+              60,
+              70,
+              80,
+              90,
+              100
+            ],
+            "biases": [
+              0,
+              10,
+              20,
+              30,
+              40,
+              50,
+              60,
+              70,
+              80,
+              90
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "high_conditioned_elliptic"
+            },
+            {
+              "type": "high_conditioned_elliptic"
+            },
+            {
+              "type": "different_powers"
+            },
+            {
+              "type": "different_powers"
+            },
+            {
+              "type": "bent_cigar"
+            },
+            {
+              "type": "bent_cigar"
+            },
+            {
+              "type": "discus"
+            },
+            {
+              "type": "discus"
+            },
+            {
+              "type": "sphere"
+            },
+            {
+              "type": "sphere"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f11_composition_3",
+      "name": "Composition Function 3",
+      "category": "Composition",
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          20,
+          30
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100.0,
+          "max": 100.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1100.0
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f11/shift_data.txt",
+            "rotation_file": "f11/M_D{dim}.txt",
+            "num_functions": 10,
+            "lambdas": [
+              0.1,
+              0.1,
+              10.0,
+              10.0,
+              10.0,
+              10.0,
+              100.0,
+              100.0,
+              1.0,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              10,
+              10,
+              10,
+              10,
+              10,
+              10,
+              10,
+              10,
+              10
+            ],
+            "biases": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "rosenbrock"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "rosenbrock"
+              }
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "happy_cat"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "happy_cat"
+              }
+            },
+            {
+              "type": "schaffer_f6_expanded"
+            },
+            {
+              "type": "schaffer_f6_expanded"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f12_composition_4",
+      "name": "Composition Function 4",
+      "category": "Composition",
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          20,
+          30
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100.0,
+          "max": 100.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1200.0
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f12/shift_data.txt",
+            "rotation_file": "f12/M_D{dim}.txt",
+            "num_functions": 10,
+            "lambdas": [
+              0.1,
+              0.1,
+              10.0,
+              10.0,
+              10.0,
+              10.0,
+              100.0,
+              100.0,
+              1.0,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              10,
+              20,
+              20,
+              30,
+              30,
+              40,
+              40,
+              50,
+              50
+            ],
+            "biases": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "rosenbrock"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "rosenbrock"
+              }
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "happy_cat"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "happy_cat"
+              }
+            },
+            {
+              "type": "schaffer_f6_expanded"
+            },
+            {
+              "type": "schaffer_f6_expanded"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f13_composition_5",
+      "name": "Composition Function 5",
+      "category": "Composition",
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          20,
+          30
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100.0,
+          "max": 100.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1300.0
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f13/shift_data.txt",
+            "rotation_file": "f13/M_D{dim}.txt",
+            "num_functions": 10,
+            "lambdas": [
+              0.1,
+              10.0,
+              10.0,
+              0.1,
+              2.5,
+              0.001,
+              100.0,
+              2.5,
+              10.0,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              20,
+              30,
+              40,
+              50,
+              60,
+              70,
+              80,
+              90,
+              100
+            ],
+            "biases": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "rosenbrock"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "hgbat"
+              }
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "ackley"
+            },
+            {
+              "type": "weierstrass"
+            },
+            {
+              "type": "katsuura"
+            },
+            {
+              "type": "schaffer_f6_expanded"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "griewank_of_rosenbrock"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "happy_cat"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f14_composition_6",
+      "name": "Composition Function 6",
+      "category": "Composition",
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          20,
+          30
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100.0,
+          "max": 100.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1400.0
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f14/shift_data.txt",
+            "rotation_file": "f14/M_D{dim}.txt",
+            "num_functions": 10,
+            "lambdas": [
+              10.0,
+              1.0,
+              10.0,
+              1.0,
+              10.0,
+              1.0,
+              10.0,
+              1.0,
+              10.0,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              10,
+              20,
+              20,
+              30,
+              30,
+              40,
+              40,
+              50,
+              50
+            ],
+            "biases": [
+              0,
+              20,
+              40,
+              60,
+              80,
+              100,
+              120,
+              140,
+              160,
+              180
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cec15_nich_f15_composition_7",
+      "name": "Composition Function 7",
+      "category": "Composition",
+      "dimensions": {
+        "supported": [
+          2,
+          10,
+          20,
+          30
+        ],
+        "default": 10
+      },
+      "search_space": {
+        "default_bounds": {
+          "min": -100.0,
+          "max": 100.0
+        }
+      },
+      "function": {
+        "type": "bias",
+        "parameters": {
+          "value": 1500.0
+        },
+        "function": {
+          "type": "composition",
+          "parameters": {
+            "shift_file": "f15/shift_data.txt",
+            "rotation_file": "f15/M_D{dim}.txt",
+            "num_functions": 10,
+            "lambdas": [
+              0.1,
+              10.0,
+              10.0,
+              0.1,
+              2.5,
+              0.001,
+              100.0,
+              2.5,
+              10.0,
+              1.0
+            ],
+            "sigmas": [
+              10,
+              10,
+              20,
+              20,
+              30,
+              30,
+              40,
+              40,
+              50,
+              50
+            ],
+            "biases": [
+              0,
+              20,
+              40,
+              60,
+              80,
+              100,
+              120,
+              140,
+              160,
+              180
+            ],
+            "inverse_distance_weight": true,
+            "multiply_lambda": true,
+            "skip_normalize": true,
+            "transpose_rotation": true
+          },
+          "functions": [
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "rosenbrock"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "hgbat"
+              }
+            },
+            {
+              "type": "rastrigin"
+            },
+            {
+              "type": "ackley"
+            },
+            {
+              "type": "weierstrass"
+            },
+            {
+              "type": "katsuura"
+            },
+            {
+              "type": "schaffer_f6_expanded"
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 1.0
+              },
+              "function": {
+                "type": "griewank_of_rosenbrock"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": -1.0
+              },
+              "function": {
+                "type": "happy_cat"
+              }
+            },
+            {
+              "type": "offset",
+              "parameters": {
+                "value": 420.9687462275036
+              },
+              "function": {
+                "type": "schwefel_sin",
+                "parameters": {
+                  "boundary_handling": true
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
