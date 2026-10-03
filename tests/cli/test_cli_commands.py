@@ -1,5 +1,3 @@
-"""Comprehensive unit tests for the pyMOFL CLI ergonomics commands."""
-
 import json
 from pathlib import Path
 
@@ -7,7 +5,7 @@ from typer.testing import CliRunner
 
 from pyMOFL.cli.main import app
 
-runner = CliRunner()
+runner = CliRunner(env={"NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dumb"})
 
 
 class TestCliErgonomics:

@@ -1,12 +1,15 @@
-"""Tests for generic suite utility CLI commands."""
-
+import re
 from pathlib import Path
 
 from typer.testing import CliRunner
 
 from pyMOFL.cli.main import app
 
-runner = CliRunner()
+runner = CliRunner(env={"NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dumb"})
+
+
+def _clean(text: str) -> str:
+    return re.sub(r"\x1b\[[0-9;]*[a-zA-Z]", "", text)
 
 
 class TestSuiteCLI:
@@ -15,29 +18,33 @@ class TestSuiteCLI:
     def test_suite_help(self):
         result = runner.invoke(app, ["suite", "--help"])
         assert result.exit_code == 0
-        assert "list" in result.output
-        assert "validate" in result.output
+        output = _clean(result.output)
+        assert "list" in output
+        assert "validate" in output
 
     def test_suite_list_help(self):
         result = runner.invoke(app, ["suite", "list", "--help"])
         assert result.exit_code == 0
-        assert "Path to a suite JSON configuration" in result.output
-        assert "--suite-id" in result.output
-        assert "--search" in result.output
+        output = _clean(result.output)
+        assert "Path to a suite JSON configuration" in output
+        assert "--suite-id" in output
+        assert "--search" in output
 
     def test_suite_list_gnbg(self):
         result = runner.invoke(app, ["suite", "list", "--suite-id", "gnbg_suite"])
         assert result.exit_code == 0
-        assert "gnbg_f01" in result.output
-        assert "gnbg_f24" in result.output
-        assert "2, 10, 30, 50, 100" in result.output
+        output = _clean(result.output)
+        assert "gnbg_f01" in output
+        assert "gnbg_f24" in output
+        assert "2, 10, 30, 50, 100" in output
 
     def test_suite_validate_help(self):
         result = runner.invoke(app, ["suite", "validate", "--help"])
         assert result.exit_code == 0
-        assert "Path to a suite JSON configuration" in result.output
-        assert "--suite-id" in result.output
-        assert "--strict" in result.output
+        output = _clean(result.output)
+        assert "Path to a suite JSON configuration" in output
+        assert "--suite-id" in output
+        assert "--strict" in output
 
     def test_validate_default_suite(self):
         result = runner.invoke(app, ["suite", "validate", "--suite-id", "cec2005_suite"])
