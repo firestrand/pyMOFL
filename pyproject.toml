@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyMOFL"
-version = "0.4.0"
+version = "0.4.1"
 description = "Python Modular Optimization Function Library"
 readme = "README.md"
 authors = [

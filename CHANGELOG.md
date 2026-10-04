@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1 — 2026-10-04
+
+- Fix the explicit reference-validation workflow: initialize runner temporary paths in a shell step through `GITHUB_ENV`, where runner variables are available.
+- Preserve the published v0.4.0 tag; this patch includes the corrected workflow.
+
 ## 0.4.0 — 2026-10-04
 
 ### Added

@@ -696,3 +696,18 @@ CLI execution. Locked metadata checks, lint/format, the exact CI type gate,
 strict documentation and wheel/sdist build pass. All 60 dependency versions
 are unchanged. Versioned logs/artifacts are retained externally under
 `/tmp/pymofl-implementation/release-040-*`.
+
+## Version 0.4.1 reference workflow repair
+
+RELEASE.1 (Test): GitHub rejected the initially pushed reference workflow and
+manual dispatch with HTTP 422, identifying `runner.temp` in job-level `env`
+as an unavailable context. The local equivalent tests verified execution logic
+but did not validate GitHub's expression-context rules. This is retained failure
+evidence, not a passed remote run.
+
+RELEASE.2 (Implement): Move both reference path bindings into an initial runner
+shell step that writes `RUNNER_TEMP` paths through `GITHUB_ENV`. Preserve all
+source pins, actual capture/manifest/report execution, required counts and
+zero-skip gates. Bump metadata/runtime/lock to 0.4.1 so the final tag includes
+the fix without rewriting published v0.4.0. Remote syntax/dispatch and both
+matrices must pass before final delivery; dependency versions remain unchanged.

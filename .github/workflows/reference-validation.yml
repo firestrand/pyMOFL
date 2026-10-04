@@ -15,10 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.12", "3.13"]
-    env:
-      CEC_BENCHMARKS_PATH: ${{ runner.temp }}/pymofl-reference-captures
-      PYMOFL_REFERENCE_CAPTURE_ROOT: ${{ runner.temp }}/pymofl-reference-captures
     steps:
+      - name: Set reference capture paths
+        shell: bash
+        run: |
+          echo "CEC_BENCHMARKS_PATH=$RUNNER_TEMP/pymofl-reference-captures" >> "$GITHUB_ENV"
+          echo "PYMOFL_REFERENCE_CAPTURE_ROOT=$RUNNER_TEMP/pymofl-reference-captures" >> "$GITHUB_ENV"
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Set up Python
