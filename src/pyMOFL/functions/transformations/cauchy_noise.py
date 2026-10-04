@@ -6,6 +6,7 @@ where U ~ Uniform(0,1), N1, N2 ~ Normal(0,1).
 
 import numpy as np
 
+from ._rng import resolve_generator
 from .base import ScalarTransform
 
 
@@ -23,12 +24,21 @@ class CauchyNoiseTransform(ScalarTransform):
         Probability of Cauchy-like perturbation (0 to 1).
     seed : int, optional
         Seed for np.random.Generator reproducibility.
+    rng : numpy.random.Generator, optional
+        Explicit caller-owned stream, mutually exclusive with seed.
     """
 
-    def __init__(self, alpha: float, p: float, seed: int | None = None):
+    def __init__(
+        self,
+        alpha: float,
+        p: float,
+        seed: int | None = None,
+        *,
+        rng: np.random.Generator | None = None,
+    ):
         self.alpha = alpha
         self.p = p
-        self._rng = np.random.default_rng(seed)
+        self._rng = resolve_generator(seed, rng)
 
     def __call__(self, y: float) -> float:
         u = self._rng.uniform()

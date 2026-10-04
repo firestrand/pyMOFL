@@ -218,13 +218,41 @@ class FunctionFactory:
             parser=self._parser,
         )
 
-    def create_function(self, config: dict[str, Any]) -> ComposedFunction:
+    def create_function(
+        self, config: dict[str, Any], *, fixed_dimension: int | None = None
+    ) -> ComposedFunction:
+        """Build a config; opt into a fixed constructor with fixed_dimension.
+
+        The optional fixed dimension rejects conflicting explicit config values
+        and composition delegation, removes only parser-injected constructor
+        dimension fields, and verifies the resulting base before transforms.
+        Existing calls retain their dimension-injection behavior.
+        """
+        if fixed_dimension is not None:
+            if (
+                isinstance(fixed_dimension, bool)
+                or not isinstance(fixed_dimension, int)
+                or fixed_dimension <= 0
+            ):
+                raise ValueError("fixed_dimension must be a positive integer")
+            nodes = [config]
+            while nodes:
+                node = nodes.pop()
+                parameters = node.get("parameters", {})
+                for key in ("dimension", "dim"):
+                    if key in parameters and parameters[key] != fixed_dimension:
+                        raise ValueError("Explicit config dimension conflicts with fixed_dimension")
+                if isinstance(node.get("function"), dict):
+                    nodes.append(node["function"])
+                nodes.extend(item for item in node.get("functions", []) if isinstance(item, dict))
         parsed = self._parser.parse(config)
         if parsed.base_type is None:
             raise ValueError("No base function found in configuration")
 
         # Composition/hybrid/decomposed delegation
         if parsed.is_composition:
+            if fixed_dimension is not None:
+                raise ValueError("fixed_dimension does not support composition delegation")
             comp_config = parsed.raw_composition_config
             assert comp_config is not None
 
@@ -278,7 +306,14 @@ class FunctionFactory:
 
         # Instantiate base function (load any file-backed base params first)
         processed_base_params = dict(parsed.base_params)
-        dim = processed_base_params.get("dimension")
+        dim = (
+            fixed_dimension
+            if fixed_dimension is not None
+            else processed_base_params.get("dimension")
+        )
+        if fixed_dimension is not None:
+            processed_base_params.pop("dimension", None)
+            processed_base_params.pop("dim", None)
 
         for key in ("shift", "vector", "B", "alpha", "optimum_point"):
             val = processed_base_params.get(key)
@@ -311,6 +346,8 @@ class FunctionFactory:
                 cond = np.power(100.0, np.arange(dim) / (2.0 * (dim - 1)))
                 processed_base_params["cosine_rotation"] = r2 @ np.diag(cond) @ r1
         base_func = self.registry.create_base_function(parsed.base_type, **processed_base_params)
+        if fixed_dimension is not None and base_func.dimension != fixed_dimension:
+            raise ValueError("Constructed base dimension disagrees with fixed_dimension")
 
         # Build transform objects — already in application order from ConfigParser
         input_transforms: list[VectorTransform] = []

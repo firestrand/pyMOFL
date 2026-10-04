@@ -19,32 +19,46 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
+          version: "0.12.22"
           enable-cache: true
 
       - name: Sync
-        run: uv sync --all-extras
+        run: uv sync --locked --extra dev --extra cli
 
       - name: Format check (ruff)
-        run: uv run ruff format --check .
+        run: uv run --locked ruff format --check .
 
       - name: Lint (ruff)
-        run: uv run ruff check .
+        run: uv run --locked ruff check .
 
       - name: Type check (ty)
-        run: uv run ty check src/pyMOFL/
+        run: uv run --locked ty check src/pyMOFL/
 
       - name: Tests (pytest)
-        run: uv run pytest
+        run: uv run --locked pytest
+
+      - name: Build distributions
+        run: uv build --no-sources --build-constraints scripts/build-constraints.txt --out-dir /tmp/pymofl-artifacts
+
+      - name: Export artifact dependency constraints
+        run: uv export --locked --no-dev --extra cli --no-emit-project --output-file /tmp/pymofl-artifact-constraints.txt
+
+      - name: Verify installed core and CLI artifacts
+        run: uv run --locked python scripts/verify_installed_package.py --wheel /tmp/pymofl-artifacts --constraints /tmp/pymofl-artifact-constraints.txt
+
+      - name: Verify minimum runtime dependencies
+        if: matrix.python-version == '3.12'
+        run: uv run --locked python scripts/verify_installed_package.py --wheel /tmp/pymofl-artifacts --constraints scripts/minimum-runtime-constraints.txt
 
       - name: Prune uv cache
         run: uv cache prune --ci

@@ -5,6 +5,7 @@ Transformations are pure functions that transform inputs/outputs.
 They are composed with optimization functions to create complex benchmarks.
 """
 
+from .absolute import AbsoluteTransform
 from .asymmetric import AsymmetricTransform
 from .base import PenaltyTransform, ScalarTransform, VectorTransform
 from .bias import BiasTransform
@@ -23,6 +24,7 @@ from .decomposition import (
 from .discretize import DiscretizeTransform
 from .fused_asy import FusedBufferAliasAsymmetricTransform
 from .gaussian_noise import GaussianNoiseTransform
+from .half_up_quantization import HalfUpQuantizationTransform
 from .indexed_rotation import IndexedRotateTransform
 from .indexed_scale import IndexedScaleTransform
 from .indexed_shift import IndexedShiftTransform
@@ -42,6 +44,7 @@ from .step_half import StepHalfTransform
 from .uniform_noise import UniformNoiseTransform
 
 __all__ = [
+    "AbsoluteTransform",
     "AsymmetricTransform",
     "BiasTransform",
     "BlockDiagonalRotateTransform",
@@ -57,6 +60,7 @@ __all__ = [
     "FusedBufferAliasAsymmetricTransform",
     "GaussianNoiseTransform",
     "GroupingTransform",
+    "HalfUpQuantizationTransform",
     "IndexedRotateTransform",
     "IndexedScaleTransform",
     "IndexedShiftTransform",

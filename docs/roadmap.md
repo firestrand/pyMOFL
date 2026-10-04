@@ -1,14 +1,27 @@
 # pyMOFL Roadmap
 
-Last updated: 2026-04-06
+Last updated: 2026-10-04
 
 This document outlines planned future work for pyMOFL. Items are grouped by priority and theme. Completed phases are listed for context; active and planned work is marked accordingly.
+
+## Version 0.4.0 improvements
+
+The [implementation evidence](implementation-progress.md) records verified
+changes delivered in v0.4.0: discovery reuse, single-call batch failures, live
+suite lookup, explicit RNG injection, supported bounded evaluation, four selected
+SPSO definitions, deterministic definition records, and actual reference/report
+execution. The [proposal](improvement-proposal.md) preserves full scope and
+accepted scope, source limitations and verified local gates. Numerical optimization
+defaults were retained after the measured review; broader acceleration remains
+research work.
 
 ---
 
 ## Completed
 
-These milestones are done and shipped in v0.3.0.
+This section preserves the inherited v0.3.0 milestone record. Current verification
+does not establish every historical release/reference claim; the implementation
+evidence states which source datasets and checks were actually provisioned.
 
 | Milestone | Description |
 |-----------|-------------|
@@ -26,9 +39,9 @@ These milestones are done and shipped in v0.3.0.
 | BBOB mixed-integer | 24 functions with DiscretizeTransform |
 | BBOB large-scale | 24 functions with block-diagonal rotations |
 | BBOB constrained | 54 functions (9 objectives x 6 constraint configs) |
-| Classical benchmarks | 175 registered classes (336 aliases) |
+| Classical benchmarks | Registered benchmark classes and aliases; see the generated catalog for the current inventory |
 | GNBG suite factory | GNBGSuiteFactory for 24 problem instances with MinComposition |
-| Documentation & Catalog | Function catalog (docs/function_catalog.md), updated coding guidelines, CONTRIBUTING.md, and quickstart notebook |
+| Documentation & Catalog | Function catalog (function_catalog.md), updated coding guidelines, CONTRIBUTING.md, and quickstart notebook |
 | CEC 2015 Niching suite | F1-F15 with 8 multimodal niching base functions, compositions, and golden C validation |
 | CEC 2019 suite | F1-F10 (100-Digit Challenge) with Chebyshev, Hilbert, Lennard-Jones |
 | CEC 2024 suite | 29 active functions evaluated at 30D with U-score protocol |
@@ -121,12 +134,19 @@ Requires multi-objective optimization framework (`evaluate` returning vector of 
 
 ### SPSO Benchmark Functions
 
-Standard Particle Swarm Optimisation suites (SPSO 2007 and SPSO 2011). Most functions are already implemented as CEC 2005 shifted variants or standalone classical functions. Remaining unique functions:
+The local implementation provides four selected native-coordinate definitions
+from pinned SPSO 2007/2011 sources:
 
-- Tripod (2D, piecewise quadratic)
-- Network (42D mixed-integer)
+- Tripod (2D, piecewise linear, explicit zero-axis source semantics)
+- Network (42D: 38 binary links and four continuous coordinates)
 - Gear Train (4D integer)
 - Compression Spring (3D mixed-integer, constrained)
+
+Original controls and all 546 source-backed half-step/axis cases pass.
+Fixed-factory rejection checks and current coverage are verified; the implementation
+is included in v0.4.0. Other source functions and optimizer algorithms remain outside this
+selected implementation. [Source review](spso-reference-review.md) records
+the exact versions, historical Spring penalty difference and rights limits.
 
 ### Additional Benchmark Libraries
 
@@ -154,7 +174,7 @@ Potential future integration with function sets from:
 ### Packaging and Distribution
 
 - [ ] Publish to PyPI
-- [ ] Add CI/CD pipeline (GitHub Actions)
+- [x] CI configuration (GitHub Actions) with locked checks and installed-artifact gates; remote execution remains unobserved in this work
 - [x] Generate API documentation setup (MkDocs configuration in mkdocs.yml)
 - [ ] Add type stubs or improve ty/mypy compliance
 

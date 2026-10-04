@@ -1,0 +1,352 @@
+{
+  "suite_id": "spso2007",
+  "name": "Pinned SPSO2007 selected native-coordinate functions",
+  "dimension_policy": "fixed_heterogeneous",
+  "scope": "Selected IDs4/11/18/21, equivalence within declared search bounds only; bounds metadata does not enforce domains",
+  "reference": {
+    "source": "https://www.particleswarm.info/standard_pso_2007.zip",
+    "archive_sha256": "f9524f7f9568009b4ab5c76cd32d91c255fef978b4ff64891b460cb520f34bd1",
+    "known_discrepancy": "2007 spring g2-positive branch uses stress g1 in multiplier; unmodified"
+  },
+  "functions": [
+    {
+      "id": "spso2007_f04",
+      "name": "Source Tripod",
+      "dimension": 2,
+      "bounds": {
+        "low": [
+          -100,
+          -100
+        ],
+        "high": [
+          100,
+          100
+        ],
+        "steps": [
+          0,
+          0
+        ]
+      },
+      "source_target": 0,
+      "function": {
+        "type": "absolute",
+        "function": {
+          "type": "bias",
+          "parameters": {
+            "value": 0
+          },
+          "function": {
+            "type": "spso_tripod",
+            "parameters": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "spso2007_f11",
+      "name": "Source Network",
+      "dimension": 42,
+      "bounds": {
+        "low": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "high": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          20,
+          20,
+          20,
+          20
+        ],
+        "steps": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "source_target": 0,
+      "function": {
+        "type": "absolute",
+        "function": {
+          "type": "bias",
+          "parameters": {
+            "value": 0
+          },
+          "function": {
+            "type": "half_up_quantization",
+            "parameters": {
+              "steps": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "function": {
+              "type": "network",
+              "parameters": {}
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "spso2007_f18",
+      "name": "Source Gear Train",
+      "dimension": 4,
+      "bounds": {
+        "low": [
+          12,
+          12,
+          12,
+          12
+        ],
+        "high": [
+          60,
+          60,
+          60,
+          60
+        ],
+        "steps": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "source_target": 2.7e-12,
+      "function": {
+        "type": "absolute",
+        "function": {
+          "type": "bias",
+          "parameters": {
+            "value": -2.7e-12
+          },
+          "function": {
+            "type": "half_up_quantization",
+            "parameters": {
+              "steps": [
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            "function": {
+              "type": "power",
+              "parameters": {
+                "exponent": 2
+              },
+              "function": {
+                "type": "gear_train",
+                "parameters": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "spso2007_f21",
+      "name": "Historical Spring (g2 stress multiplier)",
+      "dimension": 3,
+      "bounds": {
+        "low": [
+          1,
+          0.6,
+          0.207
+        ],
+        "high": [
+          70,
+          3,
+          0.5
+        ],
+        "steps": [
+          1,
+          0,
+          0.001
+        ]
+      },
+      "source_target": 2.6254214578,
+      "function": {
+        "type": "absolute",
+        "function": {
+          "type": "bias",
+          "parameters": {
+            "value": -2.6254214578
+          },
+          "function": {
+            "type": "half_up_quantization",
+            "parameters": {
+              "steps": [
+                1,
+                0,
+                0.001
+              ]
+            },
+            "function": {
+              "type": "spso_compression_spring",
+              "parameters": {
+                "penalty_version": "2007"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

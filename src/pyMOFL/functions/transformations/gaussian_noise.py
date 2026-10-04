@@ -5,6 +5,7 @@ COCO formula: f_noisy = f * exp(beta * N(0,1))
 
 import numpy as np
 
+from ._rng import resolve_generator
 from .base import ScalarTransform
 
 
@@ -19,11 +20,15 @@ class GaussianNoiseTransform(ScalarTransform):
         Noise intensity. beta=0 gives identity.
     seed : int, optional
         Seed for np.random.Generator reproducibility.
+    rng : numpy.random.Generator, optional
+        Explicit caller-owned stream, mutually exclusive with seed.
     """
 
-    def __init__(self, beta: float, seed: int | None = None):
+    def __init__(
+        self, beta: float, seed: int | None = None, *, rng: np.random.Generator | None = None
+    ):
         self.beta = beta
-        self._rng = np.random.default_rng(seed)
+        self._rng = resolve_generator(seed, rng)
 
     def __call__(self, y: float) -> float:
         n = self._rng.standard_normal()

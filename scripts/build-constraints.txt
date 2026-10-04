@@ -1,0 +1,8 @@
+# Build environment is separate from uv.lock's runtime/development environment.
+# Reviewed versions used for the installed-artifact gate; update deliberately.
+hatchling==1.32.4
+packaging==26.0
+pathspec==1.1.1
+pluggy==1.6.0
+tomlkit==0.15.1
+trove-classifiers==2026.9.21.13

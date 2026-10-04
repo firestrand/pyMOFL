@@ -11,6 +11,7 @@ import typer
 from . import catalog, suite
 from . import eval as cli_eval
 from . import info as cli_info
+from . import reference as cli_reference
 
 app = typer.Typer(
     name="pymofl",
@@ -71,6 +72,9 @@ app.command(
     "list", help="List and search benchmark functions available across suites and registry."
 )(catalog.list_functions)
 app.command("suites", help="List all benchmark suites supported by pyMOFL.")(catalog.list_suites)
+app.command("validate", help="Execute required local reference cases and write a JSON report.")(
+    cli_reference.validate
+)
 
 # Legacy suite utilities
 app.add_typer(suite.app, name="suite", help="Suite utilities for benchmark configurations.")

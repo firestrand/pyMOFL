@@ -3,9 +3,17 @@ Tests for ComposedFunction - a wrapper-free function composition system.
 Following TDD principles - tests written before implementation.
 """
 
+import gc
+import json
+import weakref
+from pathlib import Path
+from types import MethodType
+
 import numpy as np
 import pytest
 
+import pyMOFL
+from pyMOFL.core.function import OptimizationFunction
 from pyMOFL.functions.benchmark.ackley import AckleyFunction
 from pyMOFL.functions.benchmark.sphere import SphereFunction
 from pyMOFL.functions.transformations import (
@@ -15,7 +23,126 @@ from pyMOFL.functions.transformations import (
     ScaleTransform,
     ShiftTransform,
 )
+from pyMOFL.functions.transformations.base import ScalarTransform
 from pyMOFL.functions.transformations.composed import ComposedFunction
+
+
+@pytest.fixture
+def captured_cec_f1_batch():
+    """DATA-01: reuse existing F1/D10 inputs and independent captured outputs."""
+    path = Path(__file__).parents[1] / "validation_data/cec/2005/f01.json"
+    case = next(c for c in json.loads(path.read_text())["cases"] if c["dimension"] == 10)
+    X = np.asarray(
+        [
+            case["optimum"],
+            case["random_input"],
+            case["operational_bounds"]["low"],
+            case["operational_bounds"]["high"],
+        ],
+        dtype=np.float64,
+    )
+    expected = np.asarray([case["outputs"][k] for k in ("optimum", "random", "lower", "upper")])
+    return X, expected
+
+
+@pytest.mark.parametrize("stage", ["base", "output"])
+@pytest.mark.parametrize("supports_out", [False, True])
+@pytest.mark.parametrize("use_out", [False, True])
+def test_internal_type_error_propagates_once(
+    monkeypatch, captured_cec_f1_batch, stage, supports_out, use_out
+):
+    """DEC-01/V2.1: approved call-counter failure; pytest restores replacements."""
+    X, _ = captured_cec_f1_batch
+    function = pyMOFL.load("cec2005_f01", dimension=10)
+    calls = 0
+    failure = TypeError("controlled failure")
+    cause = ValueError("controlled cause")
+
+    def fail(values, out=None):
+        nonlocal calls
+        calls += 1
+        raise failure from cause
+
+    def fail_without_buffer(values):
+        return fail(values)
+
+    target, method = (
+        (function.base_function, "evaluate_batch")
+        if stage == "base"
+        else (function.output_transforms[0], "transform_batch")
+    )
+    monkeypatch.setattr(target, method, fail if supports_out else fail_without_buffer)
+    out = np.empty(len(X)) if use_out else None
+    with pytest.raises(TypeError) as caught:
+        function.evaluate_batch(X, out=out)
+    assert caught.value is failure
+    assert caught.value.__cause__ is cause
+    assert calls == 1
+
+
+@pytest.mark.parametrize("fallback_base", [False, True])
+@pytest.mark.parametrize("fallback_output", [False, True])
+@pytest.mark.parametrize("use_out", [False, True])
+def test_captured_batch_preserves_buffers_and_live_methods(
+    monkeypatch, captured_cec_f1_batch, fallback_base, fallback_output, use_out
+):
+    """Existing fallback methods remain usable when replaced after construction."""
+    X, expected = captured_cec_f1_batch
+    original = X.copy()
+    function = pyMOFL.load("cec2005_f01", dimension=10)
+    if fallback_base:
+        base = function.base_function
+        monkeypatch.setattr(
+            base, "evaluate_batch", MethodType(OptimizationFunction.evaluate_batch, base)
+        )
+    if fallback_output:
+        transform = function.output_transforms[0]
+        monkeypatch.setattr(
+            transform, "transform_batch", MethodType(ScalarTransform.transform_batch, transform)
+        )
+    out = np.empty(len(X)) if use_out else None
+    result = function.evaluate_batch(X, out=out)
+    np.testing.assert_allclose(result, expected, rtol=0, atol=1e-8)
+    np.testing.assert_array_equal(X, original)
+    if use_out:
+        assert result is out
+
+
+def test_opaque_batch_callable_retains_buffer_identity(monkeypatch, captured_cec_f1_batch):
+    """A real NumPy ufunc needs no signature introspection to execute once."""
+    X, expected = captured_cec_f1_batch
+    function = pyMOFL.load("cec2005_f01", dimension=10)
+    identity = BiasTransform(0.0)
+    monkeypatch.setattr(identity, "transform_batch", np.positive)
+    function.output_transforms.append(identity)
+    out = np.empty(len(X))
+    assert function.evaluate_batch(X, out=out) is out
+    np.testing.assert_allclose(out, expected, rtol=0, atol=1e-8)
+
+
+@pytest.mark.parametrize("instance_bound", [False, True])
+def test_batch_dispatch_cache_does_not_retain_function_instances(
+    captured_cec_f1_batch, instance_bound
+):
+    """Signature reuse must not retain a function and its potentially large data."""
+    X, _ = captured_cec_f1_batch
+    function = pyMOFL.load("cec2005_f01", dimension=10)
+    if instance_bound:
+        # Delegate to the real existing method; its bound closure owns the base.
+        def wrap(original_method):
+            def replacement(self, values, out=None):
+                return original_method(values, out=out)
+
+            return replacement
+
+        function.base_function.evaluate_batch = MethodType(
+            wrap(function.base_function.evaluate_batch), function.base_function
+        )
+    reference = weakref.ref(function.base_function)
+    function.evaluate_batch(X)
+    del function
+    gc.collect()
+    assert reference() is None
 
 
 class TestComposedFunction:

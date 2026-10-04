@@ -12,6 +12,7 @@ from pyMOFL.core.bounds_optimum_transform import (
 )
 from pyMOFL.factories.data_loader import DataLoader
 from pyMOFL.functions.transformations import (
+    AbsoluteTransform,
     AsymmetricTransform,
     BiasTransform,
     BlockDiagonalRotateTransform,
@@ -22,6 +23,7 @@ from pyMOFL.functions.transformations import (
     FusedBufferAliasAsymmetricTransform,
     GaussianNoiseTransform,
     GroupingTransform,
+    HalfUpQuantizationTransform,
     IndexedRotateTransform,
     IndexedScaleTransform,
     IndexedShiftTransform,
@@ -74,6 +76,8 @@ class TransformBuilder:
         params = dict(params or {})
 
         # Vector transforms
+        if transform_type == "half_up_quantization":
+            return HalfUpQuantizationTransform(params["steps"])
         if transform_type in {"shift", "translate"}:
             return self._build_shift(params, dimension)
         if transform_type in {"rotate", "rotation"}:
@@ -134,6 +138,8 @@ class TransformBuilder:
             return BoundaryPenaltyTransform(bound=bound)
 
         # Scalar transforms
+        if transform_type == "absolute":
+            return AbsoluteTransform()
         if transform_type in {"obj_oscillate", "t_osz_obj"}:
             return ObjectiveOscillationTransform()
         if transform_type == "bias":
@@ -144,7 +150,9 @@ class TransformBuilder:
             noise_level = float(
                 params.get("noise_level", params.get("level", params.get("factor", 0.4)))
             )
-            return NoiseTransform(noise_level=noise_level, seed=params.get("seed"))
+            return NoiseTransform(
+                noise_level=noise_level, seed=params.get("seed"), rng=params.get("rng")
+            )
         if transform_type == "normalize":
             return NormalizeTransform(
                 C=float(params.get("C", 2000.0)),
@@ -155,18 +163,21 @@ class TransformBuilder:
             return GaussianNoiseTransform(
                 beta=float(params.get("beta", 1.0)),
                 seed=params.get("seed"),
+                rng=params.get("rng"),
             )
         if transform_type == "uniform_noise":
             return UniformNoiseTransform(
                 alpha=float(params.get("alpha", 0.01)),
                 beta=float(params.get("beta", 0.01)),
                 seed=params.get("seed"),
+                rng=params.get("rng"),
             )
         if transform_type == "cauchy_noise":
             return CauchyNoiseTransform(
                 alpha=float(params.get("alpha", 0.01)),
                 p=float(params.get("p", 0.05)),
                 seed=params.get("seed"),
+                rng=params.get("rng"),
             )
 
         raise ValueError(f"Unknown transform type: {transform_type}")

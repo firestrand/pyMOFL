@@ -4,6 +4,7 @@ import inspect
 import re
 import unicodedata
 from collections import defaultdict
+from datetime import date
 from pathlib import Path
 
 from pyMOFL.core.function import OptimizationFunction
@@ -35,6 +36,8 @@ def categorize(cls_name: str, mod: str, default_dim: int | None) -> str:
         "CompressionSpringFunction",
         "NetworkFunction",
         "TripodFunction",
+        "SPSOTripodFunction",
+        "SPSOCompressionSpringFunction",
         "LennardJonesFunction",
         "ColaFunction",
     }:
@@ -50,11 +53,11 @@ def categorize(cls_name: str, mod: str, default_dim: int | None) -> str:
     }:
         return "BBOB Primitives"
     if default_dim == 2:
-        return "Fixed 2D Functions"
+        return "Constructor Default D=2"
     elif default_dim in {3, 4, 5, 6}:
-        return "Fixed Dimension (3D-6D) Functions"
+        return "Constructor Defaults D=3-6"
     else:
-        return "Scalable Functions"
+        return "Other Constructor Signatures"
 
 
 categories = defaultdict(list)
@@ -63,10 +66,16 @@ for cls, aliases in class_to_aliases.items():
     doc = (cls.__doc__ or "").strip().split("\n")[0]
     doc = doc.replace("|", "\\|")
     sig = inspect.signature(cls.__init__)
-    dim_param = sig.parameters.get("dimension")
+    dim_param = sig.parameters.get("dimension", sig.parameters.get("dim"))
     default_dim = (
         dim_param.default if dim_param and dim_param.default != inspect.Parameter.empty else None
     )
+    if dim_param is None:
+        dimension_label = "No explicit dimension parameter"
+    elif dim_param.default == inspect.Parameter.empty:
+        dimension_label = "Required dimension parameter"
+    else:
+        dimension_label = f"Default D={dim_param.default}"
 
     file_path = inspect.getfile(cls)
     abs_path = str(Path(file_path).resolve())
@@ -77,7 +86,7 @@ for cls, aliases in class_to_aliases.items():
         {
             "name": cls.__name__,
             "aliases": sorted(aliases),
-            "dim": f"D={default_dim}" if default_dim else "Scalable (D ≥ 1)",
+            "dim": dimension_label,
             "abs_path": abs_path,
             "rel_path": rel_path,
             "doc": doc,
@@ -85,17 +94,28 @@ for cls, aliases in class_to_aliases.items():
     )
 
 order = [
-    "Scalable Functions",
+    "Other Constructor Signatures",
     "BBOB Primitives",
-    "Fixed 2D Functions",
-    "Fixed Dimension (3D-6D) Functions",
+    "Constructor Default D=2",
+    "Constructor Defaults D=3-6",
     "Mishra Family",
     "Schwefel Family",
     "Engineering & Special Benchmarks",
 ]
 
 lines = [
+    "---",
+    "title: pyMOFL benchmark function catalog",
+    "version: 1.0.0",
+    f"last_updated: {date.today().isoformat()}",
+    "status: generated",
+    "owner: product-owner",
+    "tags: [benchmarks, registry, constructor-metadata]",
+    "---",
+    "",
     "# pyMOFL Benchmark Function Catalog",
+    "",
+    "The dimension column records constructor signatures/defaults, not proof of fixed or scalable dimension support. See each class and suite contract for supported dimensions.",
     "",
     (
         f"This catalog provides a comprehensive index of all **{len(class_to_aliases)} concrete"

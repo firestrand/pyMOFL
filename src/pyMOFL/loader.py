@@ -10,18 +10,26 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
+from pyMOFL.core.bound_mode_enum import BoundModeEnum
+from pyMOFL.core.bounds import Bounds
 from pyMOFL.core.function import OptimizationFunction
+from pyMOFL.core.quantization_type_enum import QuantizationTypeEnum
 from pyMOFL.factories.data_loader import DataLoader
 from pyMOFL.factories.function_factory import FunctionFactory
-from pyMOFL.registry import _COMPONENTS, scan_package
+from pyMOFL.registry import _COMPONENTS, _discover_builtins
+from pyMOFL.registry import scan_package as scan_package
 from pyMOFL.utils.suite_config import (
     _extract_function_code,
+    find_suite_function_config,
     inject_dimension,
     load_suite_config,
-    load_suite_function_config,
 )
 
 _PREFIX_TO_SUITE: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"^spso2007(?:_|$)", re.IGNORECASE), "spso2007"),
+    (re.compile(r"^spso2011(?:_|$)", re.IGNORECASE), "spso2011"),
     (re.compile(r"^bbob(?:_|$)", re.IGNORECASE), "bbob"),
     (re.compile(r"^gnbg(?:_|$)", re.IGNORECASE), "gnbg"),
     (re.compile(r"^cec(?:05|2005)(?:_|$)", re.IGNORECASE), "cec2005"),
@@ -99,6 +107,50 @@ def _resolve_suite_path(suite_id: str) -> Path:
     raise ValueError(f"No suite configuration found for '{suite_id}'. Available: {available}")
 
 
+def _fixed_entry(payload: dict[str, Any], identifier: str) -> dict[str, Any]:
+    """Resolve an entry in a declared fixed heterogeneous suite."""
+    query = identifier.strip().lower()
+    number = re.fullmatch(r"f?(\d+)", query)
+    code = f"f{int(number.group(1)):02d}" if number else None
+    for entry in payload["functions"]:
+        identity = str(entry["id"]).lower()
+        if identity == query or (code is not None and _extract_function_code(identity) == code):
+            return entry
+    raise ValueError(f"Function '{identifier}' not found in fixed suite")
+
+
+def _apply_fixed_bounds(function: OptimizationFunction, entry: dict[str, Any]) -> None:
+    """Apply only explicit fixed-suite metadata, without enforcing bounds."""
+    if function.dimension != entry["dimension"]:
+        raise ValueError("Fixed suite entry dimension disagrees with its function")
+    metadata = entry["bounds"]
+    low = np.asarray(metadata["low"], dtype=np.float64)
+    high = np.asarray(metadata["high"], dtype=np.float64)
+    steps = np.asarray(metadata["steps"], dtype=np.float64)
+    if any(values.shape != (function.dimension,) for values in (low, high, steps)):
+        raise ValueError("Fixed suite bounds and steps must match entry dimension")
+    qtype = np.array(
+        [
+            QuantizationTypeEnum.CONTINUOUS
+            if step == 0
+            else QuantizationTypeEnum.INTEGER
+            if step == 1
+            else QuantizationTypeEnum.STEP
+            for step in steps
+        ]
+    )
+    fractional = np.unique(steps[(steps != 0) & (steps != 1)])
+    if len(fractional) > 1:
+        raise ValueError("Bounds metadata supports one fractional step per fixed entry")
+    step = float(fractional[0]) if len(fractional) else 1.0
+    function.initialization_bounds = Bounds(
+        low.copy(), high.copy(), BoundModeEnum.INITIALIZATION, qtype.copy(), step
+    )
+    function.operational_bounds = Bounds(
+        low.copy(), high.copy(), BoundModeEnum.OPERATIONAL, qtype.copy(), step
+    )
+
+
 class BenchmarkSuite(list[OptimizationFunction]):
     """Container representing a benchmark suite of OptimizationFunction instances.
 
@@ -117,35 +169,44 @@ class BenchmarkSuite(list[OptimizationFunction]):
         self.suite_id = suite_id
         self.dimension = dimension
         self.name = name or suite_id
-        self._by_key: dict[str, OptimizationFunction] = {}
-
-        for idx, func in enumerate(self):
-            # Indexing (0-based and 1-based string numbers)
-            self._by_key[str(idx)] = func
-            self._by_key[str(idx + 1)] = func
-
-            # Canonical function ID or name
-            func_id = getattr(func, "function_id", getattr(func, "name", None))
-            if func_id:
-                s_id = str(func_id).strip().lower()
-                self._by_key[s_id] = func
-                code = _extract_function_code(s_id)
-                if code:
-                    self._by_key[code] = func
-                    self._by_key[code.lstrip("f")] = func
 
     def __getitem__(self, key: Any) -> Any:
+        """Resolve current names/IDs or canonical numbers; preserve list indexing.
+
+        Ambiguous named matches raise ValueError, including repeated entries.
+        Numeric strings identify function numbers, never positions in this list.
+        """
         if isinstance(key, (int, slice)):
             return super().__getitem__(key)
-        if isinstance(key, str):
-            k = key.strip().lower()
-            if k in self._by_key:
-                return self._by_key[k]
-            code = _extract_function_code(k)
-            if code and code in self._by_key:
-                return self._by_key[code]
+        if not isinstance(key, str):
+            raise TypeError(f"Invalid key type: {type(key)}")
+        normalized = key.strip().lower()
+        short_match = re.fullmatch(r"f?(\d+)", normalized)
+        short_code = f"f{int(short_match.group(1)):02d}" if short_match else None
+        qualified_code = re.fullmatch(r".+_f\d+", normalized)
+        found = None
+        for function in self:
+            identifiers = (
+                str(value).strip().lower()
+                for value in (
+                    getattr(function, "function_id", None),
+                    getattr(function, "name", None),
+                )
+                if value
+            )
+            matches = any(
+                identifier == normalized
+                or (short_code is not None and _extract_function_code(identifier) == short_code)
+                or (qualified_code is not None and identifier.startswith(normalized + "_"))
+                for identifier in identifiers
+            )
+            if matches:
+                if found is not None:
+                    raise ValueError(f"Ambiguous function '{key}' in suite '{self.suite_id}'")
+                found = function
+        if found is None:
             raise KeyError(f"Function '{key}' not found in suite '{self.suite_id}'")
-        raise TypeError(f"Invalid key type: {type(key)}")
+        return found
 
     def get(self, key: int | str, default: Any = None) -> Any:
         """Get function by index or ID, returning default if not found."""
@@ -188,7 +249,7 @@ def load(
     OptimizationFunction
         Instantiated, callable optimization function.
     """
-    scan_package()
+    _discover_builtins()
 
     # 1. Suite specified explicitly
     if suite is not None:
@@ -221,10 +282,24 @@ def load(
 
         # Config-driven suite
         suite_path = _resolve_suite_path(suite)
-        config = load_suite_function_config(suite_path, str(name_or_id), dimension=dimension)
+        payload = load_suite_config(suite_path)
+        fixed_entry = None
+        if payload.get("dimension_policy") == "fixed_heterogeneous":
+            fixed_entry = _fixed_entry(payload, str(name_or_id))
+            if dimension is not None and dimension != fixed_entry["dimension"]:
+                raise ValueError("dimension must match the fixed suite entry")
+            config = fixed_entry["function"]
+        else:
+            config = find_suite_function_config(payload, str(name_or_id))
+            if dimension is not None:
+                config = inject_dimension(config, dimension)
         data_loader = DataLoader(base_path=suite_path.parent)
         func_factory = FunctionFactory(data_loader=data_loader)
-        func = func_factory.create_function(config)
+        func = func_factory.create_function(
+            config, fixed_dimension=fixed_entry["dimension"] if fixed_entry is not None else None
+        )
+        if fixed_entry is not None:
+            _apply_fixed_bounds(func, fixed_entry)
         func.function_id = str(name_or_id)
         return func
 
@@ -351,6 +426,9 @@ def get_suite(
     suite_path = _resolve_suite_path(suite_id)
     suite_payload = load_suite_config(suite_path)
     functions_list = suite_payload.get("functions", [])
+    fixed = suite_payload.get("dimension_policy") == "fixed_heterogeneous"
+    if fixed and dimension is not None:
+        raise ValueError("A fixed heterogeneous suite has no single dimension; omit dimension")
     if not isinstance(functions_list, list):
         raise TypeError(f"Suite config '{suite_path}' does not contain a 'functions' list")
 
@@ -366,7 +444,11 @@ def get_suite(
             continue
         if dimension is not None:
             func_cfg = inject_dimension(func_cfg, dimension)
-        func = factory.create_function(func_cfg)
+        func = factory.create_function(
+            func_cfg, fixed_dimension=entry["dimension"] if fixed else None
+        )
+        if fixed:
+            _apply_fixed_bounds(func, entry)
         func.function_id = str(entry["id"]) if "id" in entry else None
         func.name = str(entry["name"]) if "name" in entry else None
         funcs.append(func)

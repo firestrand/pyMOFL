@@ -10,6 +10,113 @@ from pyMOFL.functions.transformations.composed import ComposedFunction
 from pyMOFL.loader import BenchmarkSuite, get_suite, load
 
 
+@pytest.fixture
+def canonical_suite_entries():
+    """DATA-03: actual BBOB F1/F2/F3 instances and their existing identifiers."""
+    return get_suite("bbob", dimension=2, instance=1)[:3]
+
+
+def test_suite_numeric_strings_are_canonical_not_positions(canonical_suite_entries):
+    first, second, third = canonical_suite_entries
+    suite = BenchmarkSuite([third, first, second], "bbob")
+    assert suite["1"] is first
+    assert suite["01"] is first
+    assert suite["f01"] is first
+    assert suite[1] is first
+    assert suite[-1] is second
+    assert suite[:2] == [third, first]
+    with pytest.raises(KeyError):
+        suite["0"]
+    with pytest.raises(KeyError):
+        suite["cec17_f01"]  # A different full ID must not fall back to BBOB F1.
+
+
+@pytest.mark.parametrize(
+    "operation",
+    [
+        "append",
+        "extend",
+        "insert",
+        "remove",
+        "pop",
+        "clear",
+        "setitem",
+        "setslice",
+        "delitem",
+        "delslice",
+        "reverse",
+        "sort",
+        "iadd",
+        "imul0",
+        "imul2",
+    ],
+)
+def test_suite_lookup_tracks_every_list_mutator(canonical_suite_entries, operation):
+    first, second, third = canonical_suite_entries
+    suite = BenchmarkSuite([first, second], "bbob")
+    if operation == "append":
+        suite.append(third)
+    elif operation == "extend":
+        suite.extend([third])
+    elif operation == "insert":
+        suite.insert(0, third)
+    elif operation == "remove":
+        suite.remove(first)
+    elif operation == "pop":
+        assert suite.pop() is second
+    elif operation == "clear":
+        suite.clear()
+    elif operation == "setitem":
+        suite[0] = third
+    elif operation == "setslice":
+        suite[:] = [third]
+    elif operation == "delitem":
+        del suite[0]
+    elif operation == "delslice":
+        del suite[:]
+    elif operation == "reverse":
+        suite.reverse()
+    elif operation == "sort":
+        suite.sort(key=lambda entry: entry.function_id, reverse=True)
+    elif operation == "iadd":
+        suite += [third]
+    elif operation == "imul0":
+        suite *= 0
+    elif operation == "imul2":
+        suite *= 2
+    for number, entry in enumerate(canonical_suite_entries, start=1):
+        count = sum(item is entry for item in suite)
+        if count == 0:
+            assert suite.get(str(number)) is None
+            with pytest.raises(KeyError):
+                suite[entry.function_id]
+        elif count == 1:
+            assert suite[str(number)] is entry
+            assert suite[entry.function_id] is entry
+        else:
+            with pytest.raises(ValueError, match=r"[Aa]mbiguous"):
+                suite.get(str(number))
+
+
+def test_suite_lookup_tracks_metadata_and_rejects_ambiguity(canonical_suite_entries):
+    first, second, third = canonical_suite_entries
+    original_id = first.function_id
+    suite = BenchmarkSuite([first, second], "bbob")
+    first.function_id = third.function_id
+    first.name = SphereFunction.__name__
+    assert suite["3"] is first
+    assert suite[" SPHEREFUNCTION "] is first
+    assert suite.get(original_id) is None
+    first.function_id = second.function_id
+    with pytest.raises(ValueError, match=r"[Aa]mbiguous"):
+        suite[second.function_id]
+    second.name = first.name
+    with pytest.raises(ValueError, match=r"[Aa]mbiguous"):
+        suite[first.name]
+    with pytest.raises(TypeError):
+        suite[None]
+
+
 class TestLoadClassicalFunctions:
     """Test pyMOFL.load with classical benchmark functions from registry."""
 

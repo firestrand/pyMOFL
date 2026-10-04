@@ -6,6 +6,7 @@ where U, U' ~ Uniform(0,1).
 
 import numpy as np
 
+from ._rng import resolve_generator
 from .base import ScalarTransform
 
 
@@ -23,12 +24,21 @@ class UniformNoiseTransform(ScalarTransform):
         Controls base multiplicative noise.
     seed : int, optional
         Seed for np.random.Generator reproducibility.
+    rng : numpy.random.Generator, optional
+        Explicit caller-owned stream, mutually exclusive with seed.
     """
 
-    def __init__(self, alpha: float, beta: float, seed: int | None = None):
+    def __init__(
+        self,
+        alpha: float,
+        beta: float,
+        seed: int | None = None,
+        *,
+        rng: np.random.Generator | None = None,
+    ):
         self.alpha = alpha
         self.beta = beta
-        self._rng = np.random.default_rng(seed)
+        self._rng = resolve_generator(seed, rng)
 
     def __call__(self, y: float) -> float:
         if y == 0.0:

@@ -4,11 +4,60 @@ Composed function that chains transformations with optimization functions.
 Allows building compositions like: bias(sphere(shift(x)))
 """
 
+from collections.abc import Callable
+from inspect import signature
+from types import FunctionType, MethodType
+from weakref import WeakKeyDictionary
+
 import numpy as np
 
 from pyMOFL.core.function import OptimizationFunction
 
 from .base import PenaltyTransform, ScalarTransform, VectorTransform
+
+_BUFFER_METHODS: WeakKeyDictionary[FunctionType, bool] = WeakKeyDictionary()
+
+
+def _method_accepts_out(function: FunctionType) -> bool:
+    """Reuse live class-method capabilities without retaining their functions."""
+    if function in _BUFFER_METHODS:
+        return _BUFFER_METHODS[function]
+    try:
+        signature(function).bind(None, None, out=None)
+    except (TypeError, ValueError):
+        accepts_out = False
+    else:
+        accepts_out = True
+    _BUFFER_METHODS[function] = accepts_out
+    return accepts_out
+
+
+def _call_batch(
+    method: Callable[..., np.ndarray], values: np.ndarray, out: np.ndarray | None
+) -> np.ndarray:
+    """Select optional-buffer invocation before calling the current component.
+
+    Opaque callables use the established bufferless contract. The caller copies
+    their result into out when needed. Only signature/binding errors are caught;
+    failures from component execution propagate unchanged, without a retry.
+    """
+    if (
+        isinstance(method, MethodType)
+        and isinstance(method.__func__, FunctionType)
+        and getattr(type(method.__self__), method.__func__.__name__, None) is method.__func__
+    ):
+        accepts_out = _method_accepts_out(method.__func__)
+    else:
+        # Instance replacements and opaque callables use their current signature.
+        try:
+            signature(method).bind(values, out=out)
+        except (TypeError, ValueError):
+            accepts_out = False
+        else:
+            accepts_out = True
+    if not accepts_out:
+        return method(values)
+    return method(values, out=out)
 
 
 class ComposedFunction(OptimizationFunction):
@@ -128,10 +177,7 @@ class ComposedFunction(OptimizationFunction):
             X = transform.transform_batch(X)
 
         # Evaluate base function
-        try:
-            results = self.base_function.evaluate_batch(X, out=out)  # type: ignore[unknown-argument]
-        except TypeError:
-            results = self.base_function.evaluate_batch(X)
+        results = _call_batch(self.base_function.evaluate_batch, X, out)
 
         if out is not None and results is not out:
             out[:] = results
@@ -139,10 +185,7 @@ class ComposedFunction(OptimizationFunction):
 
         # Apply output transformations in order
         for transform in self.output_transforms:
-            try:
-                results = transform.transform_batch(results, out=out)  # type: ignore[unknown-argument]
-            except TypeError:
-                results = transform.transform_batch(results)
+            results = _call_batch(transform.transform_batch, results, out)
             if out is not None and results is not out:
                 out[:] = results
                 results = out

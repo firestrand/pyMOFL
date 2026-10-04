@@ -1,11 +1,10 @@
 # SPSO 2007 & SPSO 2011 - **Benchmark-Function Handbook**
 
-> Standard Particle Swarm Optimisation (SPSO) is released with two reference
-> benchmark suites—**SPSO 2007** and **SPSO 2011**—so that new PSO variants
-> can be compared on a *fixed*, *traceable* set of problems.
-> The tables below collect every function in those suites, give its basic
-> properties, and point you to the *primary* literature where the analytic
-> form, bounds and optima are defined.
+The supported pyMOFL suites select F04 Tripod, F11 Network, F18 Gear and F21
+Spring from pinned 2007/2011 distributions. [Source review](spso-reference-review.md)
+records the verified definitions, source captures, bounds and version differences.
+The broader tables below are historical research notes; entries outside that
+selected scope have not been independently source-validated by this work.
 
 ---
 
@@ -13,8 +12,8 @@
 
 | SPSO ID | Function                   | Dimension   | Category                  | Short description                                                            | Canonical source                                                                                                            |
 | ------- | -------------------------- | ----------- | ------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| 4       | **Tripod**                 | 2           | multimodal, non-separable | Piece-wise quadratic surface with three “legs”.                              | Molga & Smutnicki, *Test Functions for Optimization Needs* (2005) ([robertmarks.org][1])                                    |
-| 11      | **Network**                | 42 (mixed)  | hybrid, partly binary     | Cost minimisation of a simplified tele-com network; 35 real + 7 binary vars. | Clerc, *SPSO Benchmark Doc* (2012 tech. note) and Zambrano-Bigiarini et al., *CEC-2013 baseline* (2013) ([ResearchGate][2]) |
+| 4       | **Tripod**                 | 2           | multimodal, non-separable | Piecewise linear source definition; sign(0)=0. | [Pinned source review](spso-reference-review.md) |
+| 11      | **Network**                | 42 (mixed)  | hybrid, partly binary     | 38 binary links followed by four continuous BSC coordinates. | [Pinned source review](spso-reference-review.md) |
 | 15      | **Step** (biased)          | 10          | discontinuous             | De Jong’s discontinuous step surface, additional bias term per SPSO spec.    | De Jong, PhD thesis (1975) ([CiteSeerX][3])                                                                                 |
 | 17      | **Lennard-Jones (6-atom)** | 18          | physics, non-convex       | 12-6 potential energy of a six-atom cluster; many local minima.              | Lennard-Jones (1924) ([Royal Society Publishing][4])                                                                        |
 | 18      | **Gear Train**             | 4 (integer) | engineering, discrete     | Select numbers of teeth to approximate a target ratio 1 ∶ 6.931.             | Sandgren, *J. Mech. Des.* 112 (2):223–229 (1990) ([ASME Digital Collection][5])                                             |
@@ -45,36 +44,30 @@ All six are defined in the CEC technical report by Liang et al. (2005)
 
 ## 3 Relationship between the 2007 & 2011 suites
 
-* **SPSO 2007** uses *all* functions in Tables 1 and 2.
-* **SPSO 2011** **drops** the low-dimensional Tripod (ID 4) and adds adaptive,
-  rotational-invariant sampling, but the *function* list is otherwise
-  unchanged. Benchmarks for SPSO 2011 are documented in the Zambrano-Bigiarini
-  **CEC-2013 baseline** paper ([ResearchGate][2]).
+Both pinned distributions define Tripod (ID4). The selected Spring objectives
+differ: 2007 retains the historical g2 penalty multiplier bug; 2011 corrects it.
+The library exposes these source variants explicitly. Neither the selected
+catalog nor this review claims implementation of the entire source suite or
+its optimizer algorithms.
 
 ---
 
 ## 4 Implementing in **pyMOFL**
 
 ```python
-from pymofl.functions.unimodal   import SphereFunction
-from pymofl.decorators           import ShiftedFunction
-from pymofl.functions.engineering import GearTrainFunction
+import pyMOFL
 
-# SPSO-100 : shifted 30-D Sphere
-shift_vec  = load_cec_shift('F1_30D.dat')
-sphere100  = ShiftedFunction(SphereFunction(dimension=30), shift_vec)
-
-# SPSO-18 : integer Gear-train design
-gear18 = GearTrainFunction()
-
-# evaluate
-print(sphere100.evaluate(np.zeros(30)))
-print(gear18.evaluate([12, 28, 16, 18]))
+suite = pyMOFL.get_suite("spso2011")
+print([function.dimension for function in suite])  # [2, 42, 4, 3]
+spring = pyMOFL.load("spso2011_f21")
+print(spring.dimension)  # 3; source coordinates are [N, D, d]
 ```
 
-*Every SPSO member can be reproduced via either*
-(1) a dedicated `*Function` class (engineering cases) *or*
-(2) **base + decorator** (`ShiftedFunction`, `RotatedFunction`, …) for the CEC derivatives.
+Selected source suites use the existing config-driven function/transform
+pipeline. Omit a suite-wide dimension for these heterogeneous fixed entries.
+Existing generic engineering aliases retain their definitions. Spring has no
+certified optimum point in the acquired source; metadata does not clip or enforce
+bounds. [API notes](api-compatibility.md) explain loading and quantization limits.
 
 ---
 
@@ -93,10 +86,8 @@ See also Zambrano-Bigiarini M. et al. (2013). *Standard PSO-2011 at CEC-2013*. (
 
 ---
 
-**File placement:** save this file as `docs/suites/sPSO_benchmarks.md` so that
-developers can open it alongside the codebase and immediately see (i) which
-functions to call, (ii) how to reproduce SPSO figures, and (iii) where every
-formula came from.
+This handbook lives at `docs/SPSO_Functions.md`; the pinned source review is the
+authority for the currently selected library scope.
 
 [1]: https://robertmarks.org/Classes/ENGR5358/Papers/functions.pdf?utm_source=chatgpt.com "[PDF] Test functions for optimization needs - Robert Marks.org"
 [2]: https://www.researchgate.net/publication/255756848_Standard_Particle_Swarm_Optimisation_2011_at_CEC-2013_A_baseline_for_future_PSO_improvements "(PDF) Standard Particle Swarm Optimisation 2011 at CEC-2013: A baseline for future PSO improvements"

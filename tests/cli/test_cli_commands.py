@@ -3,6 +3,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
+from pyMOFL import __version__
 from pyMOFL.cli.main import app
 
 runner = CliRunner(env={"NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dumb"})
@@ -23,7 +24,7 @@ class TestCliErgonomics:
     def test_version_flag(self):
         result = runner.invoke(app, ["--version"])
         assert result.exit_code == 0
-        assert "0.3.0" in result.output
+        assert result.output.strip() == __version__
 
     # -------------------------------------------------------------
     # Info Command Tests

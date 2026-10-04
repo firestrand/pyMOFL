@@ -9,8 +9,8 @@ It uses a **function-composition architecture** driven by declarative configs.
 
 **Key features:**
 
-- 175 registered benchmark classes and 336 aliases (unimodal, multimodal, classical, Mishra family, and more)
-- 10 bundled benchmark suites: CEC 2005/2013/2014/2015/2017/2020/2021/2022, BBOB, and GNBG
+- Registered benchmark classes for unimodal, multimodal, classical and Mishra functions; see the generated function catalog for current counts
+- Bundled CEC, BBOB and GNBG definitions, plus four selected native SPSO 2007/2011 problems in v0.4.0
 - Extended BBOB variants: noisy, mixed-integer, large-scale, and constrained
 - Functional transformation pipeline (shift, rotate, scale, bias, noise, oscillation, asymmetric, penalty, and more)
 - Composition and hybrid function creation (weighted, min, hybrid)
@@ -119,7 +119,7 @@ This pattern is how the bundled suite JSONs describe complex variants.
 
 ## Benchmark Suites
 
-pyMOFL ships with 10 benchmark suite configurations, each defined as a JSON file under `src/pyMOFL/constants/`:
+The following table is a selected overview of bundled definitions under `src/pyMOFL/constants/`, including the v0.4.0 additions. Presence of a definition does not establish complete independent reference validation.
 
 | Suite | Functions | Description |
 |-------|-----------|-------------|
@@ -130,9 +130,10 @@ pyMOFL ships with 10 benchmark suite configurations, each defined as a JSON file
 | **CEC 2017** | F1-F30 | Extended CEC 2014 with additional compositions |
 | **CEC 2020** | F1-F10 | Remapped functions with non-standard hybrid partitions |
 | **CEC 2021** | F1-F10 | Streamlined CEC 2020 subset |
-| **CEC 2022** | F1-F12 | Latest CEC single-objective suite |
+| **CEC 2022** | F1-F12 | CEC single-objective suite |
 | **BBOB** | F1-F24 | COCO-compatible noiseless functions (+ noisy, mixed-integer, large-scale, and constrained variants via dedicated factories) |
 | **GNBG** | - | Generalized Numerical Benchmark Generator |
+| **SPSO 2007 / 2011** | IDs 4, 11, 18, 21 | Selected native Tripod, Network, Gear and Spring definitions; fixed dimensions 2, 42, 4 and 3 respectively; v0.4.0 additions |
 
 Suite configs are loaded by `FunctionFactory` or suite-specific factories (e.g., `BBOBSuiteFactory`, `BBOBNoisySuiteFactory`).
 
@@ -158,9 +159,22 @@ uv run pymofl suite validate --suite /path/to/suite.json --suite-dir /path/to/re
 uv run pymofl suite list --suite-id cec2005_suite --json
 ```
 
+With an approved local reference capture root and its producer-created manifest:
+
+```bash
+uv run --locked pymofl validate --capture-root /tmp/pymofl-reference-captures --manifest /tmp/pymofl-reference-manifest.json --report /tmp/pymofl-reference-report.json
+```
+
+This command executes the required scalar and batch cases and writes an observed
+JSON report to a fresh path. [Reference setup and reporting](docs/reference-validation.md)
+explains manifest creation, pinned coverage and verification limits. Validation
+does not download or run a reference engine. Existing global `--json` and
+`--quiet` options also apply.
+
 ## Documentation & Function Catalog
 
-- **[Function Catalog](docs/function_catalog.md)**: Complete index of all 175 benchmark function classes and 336 registered aliases across classical, modern, CEC, and BBOB benchmarks.
+- **[API compatibility notes](docs/api-compatibility.md)**: Suite lookup, batch errors, RNG ownership, bounded evaluation, selected SPSO suites and deterministic definition records.
+- **[Function Catalog](docs/function_catalog.md)**: Generated index of benchmark classes, registered component aliases and constructor metadata.
 - **[Coding Guidelines](CODING_GUIDELINES.md)**: Architecture guide, functional transform pipeline, and coding conventions.
 - **[Contributing Guide](CONTRIBUTING.md)**: Setup instructions, workflow, and testing contracts for new contributors.
 - **[Roadmap](ROADMAP.md)**: Current development status and planned competition suites.
@@ -168,11 +182,11 @@ uv run pymofl suite list --suite-id cec2005_suite --json
 ## Project Orientation
 
 - Core benchmark functions are first-class classes (e.g., `SphereFunction`) with `@register` aliases for factory lookup.
-- Transformations are pure functions (`VectorTransform`, `ScalarTransform`, `PenaltyTransform`) composed around base functions via `ComposedFunction`.
+- Vector, scalar and penalty transformations compose around base functions via `ComposedFunction`. Noise transformations own advancing RNG state; their replay and batching limits are documented in the API notes.
 - Compositions combine multiple functions: `WeightedComposition` (Gaussian weighting), `HybridFunction` (input-vector partitioning), and `MinComposition`.
 - Suite descriptors live as JSON config under `src/pyMOFL/constants/.../*_suite.json`.
 - CEC/BBOB compatibility is handled via shared config conventions, not separate benchmark APIs.
-- Bounds are metadata unless you explicitly wrap with `Quantized` from `pyMOFL.functions.transformations`.
+- Bounds describe domain metadata. Quantization transforms handle discrete coordinates; they do not clip or enforce bounds.
 
 ## Citation
 

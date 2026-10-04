@@ -44,11 +44,11 @@ All benchmark functions must inherit from [`OptimizationFunction`](../src/pyMOFL
 * **Input Validation**: Subclasses must invoke `self._validate_input(x)` and `self._validate_batch_input(X)` to check input shape, dimension, and data type without modifying input values.
 * **Bounds as Metadata**:
   * `initialization_bounds` and `operational_bounds` are data containers defining recommended search domains.
-  * Base functions do **not** enforce or clip bounds internally. Domain enforcement or boundary penalties are handled externally via transforms (e.g., `BoundaryPenaltyTransform`) or opt-in quantization.
+  * Base functions do **not** enforce or clip bounds internally. Boundary penalties can be handled externally via `BoundaryPenaltyTransform`. Quantization handles discrete coordinates without enforcing or clipping domain bounds.
 
 ### 2.2 Functional Transformations Pipeline
 
-Transformations are pure, stateless operators in [`pyMOFL.functions.transformations`](../src/pyMOFL/functions/transformations/):
+Transformations compose operators in [`pyMOFL.functions.transformations`](../src/pyMOFL/functions/transformations/). Noise transforms advance RNG state; their ownership, replay and scalar/batch limits are documented in [API compatibility notes](api-compatibility.md).
 
 1. **`VectorTransform` (Input Transformations)**:
    * Subclasses must implement `__call__(x: NDArray) -> NDArray` and `transform_batch(X: NDArray) -> NDArray`.
